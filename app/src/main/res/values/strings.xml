@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ProjectGroup5</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Events</string>
+    <string name="userAccount">Account</string>
+    <string name="Login">Login</string>
+    <string name="CreateAccount">Create an Account</string>
+</resources>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "498800404663",
+    "project_id": "eams-4ceab",
+    "storage_bucket": "eams-4ceab.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:498800404663:android:3506a5db8322ca41a10532",
+        "android_client_info": {
+          "package_name": "com.example.projectgroup5"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTnhlHCejDj5AHsZWwNuyFtMJLJU9pxos"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
