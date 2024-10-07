@@ -35,4 +35,10 @@
         android:label="@string/userAccount"
         tools:layout="@layout/login_or_create_account_fragment" />
 
+    <fragment
+        android:id="@+id/create_account"
+        android:name="com.example.projectgroup5.ui.account.CreateAccountFragment"
+        android:label="@string/userAccount"
+        tools:layout="@layout/fragment_create_account" />
+
 </navigation>

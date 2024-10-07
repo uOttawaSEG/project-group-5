@@ -36,15 +36,14 @@ public class LoginOrCreate extends Fragment {
 
         });
 
-
         // same for the create account button
-        binding.getRoot().findViewById(R.id.createAccountButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // pop from the stack to go back
-//                Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main).popBackStack();
-
-            }});
+        binding.getRoot().findViewById(R.id.createAccountButton).setOnClickListener(v -> {
+            Fragment createAccountFragment = new CreateAccountFragment();
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.nav_host_fragment_activity_main, createAccountFragment)
+                    .addToBackStack(createAccountFragment.getClass().getName())
+                    .commit();
+        });
 
         return binding.getRoot();
     }

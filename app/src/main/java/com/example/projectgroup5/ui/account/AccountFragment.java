@@ -39,6 +39,13 @@ public class AccountFragment extends Fragment {
                     .replace(R.id.nav_host_fragment_activity_main, loginOrCreateFragment)
                     .addToBackStack(loginOrCreateFragment.getClass().getName())
                     .commit();
+        } else {
+            Fragment accountManagementFragment = new AccountManagementFragment();
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.nav_host_fragment_activity_main, accountManagementFragment)
+                    .addToBackStack(accountManagementFragment.getClass().getName())
+                    .commit();
+
         }
 
 

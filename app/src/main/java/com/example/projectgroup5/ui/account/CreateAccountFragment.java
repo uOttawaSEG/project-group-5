@@ -2,6 +2,7 @@ package com.example.projectgroup5.ui.account;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +16,9 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.databinding.FragmentAccountBinding;
+import com.example.projectgroup5.databinding.FragmentCreateAccountBinding;
 import com.example.projectgroup5.databinding.FragmentDashboardBinding;
-import com.example.projectgroup5.databinding.FragmentLoginBinding;
+import com.example.projectgroup5.databinding.LoginOrCreateAccountFragmentBinding;
 import com.example.projectgroup5.ui.search.DashboardFragment;
 import com.example.projectgroup5.users.UserSession;
 
@@ -26,14 +28,23 @@ public class CreateAccountFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentLoginBinding.inflate(inflater, container, false);
+        binding = FragmentCreateAccountBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        root.findViewById(R.id.confirmCredentialAndLoginButton).setOnClickListener(v -> {
+        root.findViewById(R.id.confirmCredentialAndCreateButton).setOnClickListener(v -> {
             // login the user using the email and password
             // if the login is successful, navigate to the dashboard fragment
             // if the login is not successful, show an error message
             // if the user is not logged in, show an error message
-            UserSession.getInstance().login(binding.emailInput.getText().toString(), binding.passwordInput.getText().toString(), (task) -> {
+            // first check if the data in the fields are valid
+            if (binding.editTextTextEmailAddressUserCreate.getText().toString().isEmpty()) {
+                binding.editTextTextEmailAddressUserCreate.setError("Please enter an email");
+                return;
+            }
+            if (binding.editTextTextPasswordUserCreate.getText().toString().isEmpty()) {
+                binding.editTextTextPasswordUserCreate.setError("Please enter a password");
+                return;
+            }
+            UserSession.getInstance().createUser(binding.editTextTextEmailAddressUserCreate.getText().toString(), binding.editTextTextPasswordUserCreate.getText().toString(), (task) -> {
                 if (task.isSuccessful()) {
                     UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
                     Fragment dashboardFragment = new DashboardFragment();
@@ -43,15 +54,23 @@ public class CreateAccountFragment extends Fragment {
                             .addToBackStack(dashboardFragment.getClass().getName())
                             .commit();
                 } else {
+                    Log.d("CreateAccountFragment", "onCreateView: " + task.getException());
+                    // provide more information about the error
+                    if (task.getException() != null) {
+                        Log.d("CreateAccountFragment", "onCreateView: " + task.getException().getMessage());
+                    }
+
                     // show an error message
-                    binding.emailInput.setError("Invalid email or password");
+                    binding.editTextTextEmailAddressUserCreate.setError("Invalid email or password");
+                    String message = task.getException().getMessage();
+                    binding.editTextTextPasswordUserCreate.setError(message.substring(message.lastIndexOf("[") + 2).replaceAll("]", "").stripTrailing());
                 }
             });
 
 
 //
         });
-        root.findViewById(R.id.cancelButton).setOnClickListener(v -> {
+        root.findViewById(R.id.cancelButtonCreate).setOnClickListener(v -> {
             // go back
             Fragment accountFragment = new AccountFragment();
 
