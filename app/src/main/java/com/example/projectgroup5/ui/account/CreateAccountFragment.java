@@ -1,6 +1,6 @@
 package com.example.projectgroup5.ui.account;
 
-import android.app.Activity;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,15 +10,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.projectgroup5.R;
-import com.example.projectgroup5.databinding.FragmentAccountBinding;
 import com.example.projectgroup5.databinding.FragmentCreateAccountBinding;
-import com.example.projectgroup5.databinding.FragmentDashboardBinding;
-import com.example.projectgroup5.databinding.LoginOrCreateAccountFragmentBinding;
 import com.example.projectgroup5.ui.search.DashboardFragment;
 import com.example.projectgroup5.users.UserSession;
 
@@ -30,6 +24,17 @@ public class CreateAccountFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentCreateAccountBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        // Switch between user and organizer
+        root.findViewById(R.id.OrganizerVSUserSwitch).setOnClickListener(v -> {
+                    if (binding.OrganizerVSUserSwitch.isChecked()) {
+                        binding.editTextTextOrganisation.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.editTextTextOrganisation.setVisibility(View.GONE);
+                    }
+                }
+        );
+
         root.findViewById(R.id.confirmCredentialAndCreateButton).setOnClickListener(v -> {
             // login the user using the email and password
             // if the login is successful, navigate to the dashboard fragment

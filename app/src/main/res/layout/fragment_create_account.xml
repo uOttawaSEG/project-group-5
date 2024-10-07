@@ -68,6 +68,16 @@
             android:ems="10"
             android:hint="Last Name"
             android:inputType="text" />
+
+        <EditText
+            android:id="@+id/editTextTextOrganisation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            android:visibility="gone"
+            android:hint="Organisation" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
