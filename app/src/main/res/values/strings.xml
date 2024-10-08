@@ -5,4 +5,14 @@
     <string name="userAccount">Account</string>
     <string name="Login">Login</string>
     <string name="CreateAccount">Create an Account</string>
+    <string name="organizer">Organizer</string>
+    <string name="email">Email</string>
+    <string name="phone">Phone</string>
+    <string name="address">Address</string>
+    <string name="password">Password</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="organisation">Organisation</string>
+    <string name="cancel">Cancel</string>
+    <string name="create">Create</string>
 </resources>

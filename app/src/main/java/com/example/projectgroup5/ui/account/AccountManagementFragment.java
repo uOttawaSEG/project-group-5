@@ -21,6 +21,21 @@ public class AccountManagementFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentAccountManagementBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        // get the user name (email) and the user type (organizer or user or admin)
+        // change the text of userWelcomeMessage based on the previous
+
+        if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_ORGANIZER) {
+//            binding.userWelcomeMessage.setText("Welcome Organizer " + UserSession.getInstance().getUserName()); // TODO make this faction
+        } else if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_USER) {
+//            binding.userWelcomeMessage.setText("Welcome User " + UserSession.getInstance().getUserName());  // TODO make this faction
+        } else if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_ADMIN) {
+//            binding.userWelcomeMessage.setText("Welcome Admin " + UserSession.getInstance().getUserName()); //TODO fix this
+        } else {
+            // unknwon user type
+//            binding.userWelcomeMessage.setText("Welcome " + UserSession.getInstance().getUserName());  // TODO make this function work
+        }
+
         root.findViewById(R.id.logoutButton).setOnClickListener(v -> {
             // login the user using the email and password
             // if the login is successful, navigate to the dashboard fragment

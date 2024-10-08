@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,71 +9,78 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="20sp"
+        android:layout_margin="@dimen/create_form_text_size"
         android:gravity="center"
         android:orientation="vertical">
 
         <Switch
             android:id="@+id/OrganizerVSUserSwitch"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Organizer"
-            android:textSize="20sp"
-            tools:ignore="HardcodedText,UseSwitchCompatOrMaterialXml" />
+            android:layout_height="48sp"
+            android:textSize="@dimen/create_form_text_size"
+            android:text="@string/organizer"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
         <EditText
             android:id="@+id/editTextTextEmailAddressUserCreate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Email"
+            android:hint="@string/email"
+            android:textSize="@dimen/create_form_text_size"
             android:ems="10"
             android:inputType="textEmailAddress"
-            tools:ignore="Autofill,HardcodedText" />
+            android:autofillHints="emailAddress" />
 
         <EditText
             android:id="@+id/editTextPhoneUserCreate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Phone"
+            android:hint="@string/phone"
+            android:textSize="@dimen/create_form_text_size"
             android:ems="10"
             android:inputType="phone"
-            tools:ignore="Autofill,HardcodedText" />
+            android:autofillHints="phone" />
 
         <EditText
             android:id="@+id/editTextTextPostalAddressUserCreate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Address"
+            android:hint="@string/address"
+            android:textSize="@dimen/create_form_text_size"
             android:ems="10"
             android:inputType="textPostalAddress"
-            tools:ignore="Autofill,HardcodedText" />
+            android:autofillHints="postalAddress" />
 
         <EditText
             android:id="@+id/editTextTextPasswordUserCreate"
             android:layout_width="wrap_content"
-            android:hint="Password"
+            android:hint="@string/password"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/create_form_text_size"
             android:ems="10"
             android:inputType="textPassword"
-            tools:ignore="Autofill,HardcodedText" />
+            android:autofillHints="password" />
 
         <EditText
             android:id="@+id/editTextTextUserCreate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="First Name"
+            android:hint="@string/first_name"
+            android:textSize="@dimen/create_form_text_size"
             android:ems="10"
             android:inputType="text"
-            tools:ignore="Autofill,HardcodedText" />
+            android:autofillHints="personGivenName"
+            />
 
         <EditText
             android:id="@+id/editTextText2UserCreate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/create_form_text_size"
             android:ems="10"
-            android:hint="Last Name"
+            android:hint="@string/last_name"
             android:inputType="text"
-            tools:ignore="Autofill,HardcodedText" />
+            android:autofillHints="personFamilyName" />
 
         <EditText
             android:id="@+id/editTextTextOrganisation"
@@ -82,8 +89,9 @@
             android:ems="10"
             android:inputType="text"
             android:visibility="gone"
-            android:hint="Organisation"
-            tools:ignore="Autofill,HardcodedText" />
+            android:hint="@string/organisation"
+            android:autofillHints="organization"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -97,16 +105,16 @@
                 android:backgroundTint="@color/backbutton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cancel"
-                tools:ignore="ButtonStyle,HardcodedText" />
+                android:text="@string/cancel"
+                tools:ignore="ButtonStyle" />
 
             <Button
                 android:id="@+id/confirmCredentialAndCreateButton"
                 android:backgroundTint="@color/loginButton2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Create"
-                tools:ignore="ButtonStyle,HardcodedText" /> />
+                android:text="@string/create"
+                tools:ignore="ButtonStyle" /> />
         </LinearLayout>
     </LinearLayout>
 

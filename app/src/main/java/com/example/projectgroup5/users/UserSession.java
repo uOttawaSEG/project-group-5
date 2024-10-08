@@ -13,6 +13,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.AuthResult;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.concurrent.Executor;
 
@@ -20,9 +22,14 @@ public class UserSession {
     private static UserSession instance;
     private String userId;
     private FirebaseAuth firebaseAuth;
+    public final static int USER_TYPE_ORGANIZER = 1;
+    public final static int USER_TYPE_USER = 2;
+    public final static int USER_TYPE_ADMIN = 0;
+    private static FirebaseDatabase database;
 
     private UserSession() {
         // Initialize Firebase Auth
+        database = FirebaseDatabase.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         // must setup the configuration of the firebase
         // check if the user is already logged in
@@ -93,5 +100,9 @@ public class UserSession {
     public boolean isLoggedIn() {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         return user != null;
+    }
+
+    public int getUserType() {
+        return USER_TYPE_USER; // TODO do the firebase call here to get the user type
     }
 }
