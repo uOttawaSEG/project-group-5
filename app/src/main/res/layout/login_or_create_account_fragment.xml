@@ -7,14 +7,20 @@
     tools:context=".ui.account.LoginOrCreate">
 
     <LinearLayout
+<<<<<<< HEAD
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
+        android:orientation="vertical"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="1dp" >
 
         <Button
+            android:id="@+id/loginButton"
+            android:layout_width="312dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="50sp"
             android:backgroundTint="@color/white"
             android:elevation="10dp"
             android:textColor="@color/black"
@@ -34,9 +40,6 @@
             android:layout_height="40sp" />
 
         <Button
-            android:backgroundTint="@color/white"
-            android:elevation="30dp"
-            android:textColor="@color/black"
             android:id="@+id/createAccountButton"
             android:layout_width="wrap_content"
             android:shadowRadius="1"
@@ -46,6 +49,10 @@
             android:shadowColor="@color/text_shadow_button_form"
             android:layout_marginHorizontal="50sp"
             android:layout_height="wrap_content"
-            android:text="@string/CreateAccount" />
+            android:layout_marginHorizontal="50sp"
+            android:backgroundTint="@color/white"
+            android:elevation="30dp"
+            android:text="@string/CreateAccount"
+            android:textColor="@color/black" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
