@@ -28,6 +28,7 @@ public class LoginFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentLoginBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
         root.findViewById(R.id.confirmCredentialAndLoginButton).setOnClickListener(v -> {
             // login the user using the email and password
             // if the login is successful, navigate to the dashboard fragment
@@ -36,12 +37,13 @@ public class LoginFragment extends Fragment {
             UserSession.getInstance().login(binding.emailInput.getText().toString(), binding.passwordInput.getText().toString(), (task) -> {
                 if (task.isSuccessful()) {
                     UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
-                    Fragment dashboardFragment = new DashboardFragment();
+                    //Fragment dashboardFragment = new DashboardFragment();
 
-                    getActivity().getSupportFragmentManager().beginTransaction()
+                    /*getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.nav_host_fragment_activity_main, dashboardFragment)
                             .addToBackStack(dashboardFragment.getClass().getName())
-                            .commit();
+                            .commit();*/
+                    navController.navigate(R.id.action_login_to_dashboard);
                 } else {
                     // show an error message
                     binding.emailInput.setError("Invalid email or password");
@@ -53,12 +55,13 @@ public class LoginFragment extends Fragment {
         });
         root.findViewById(R.id.cancelButton).setOnClickListener(v -> {
             // go back
-            Fragment accountFragment = new AccountFragment();
+            //Fragment accountFragment = new AccountFragment();
 
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.nav_host_fragment_activity_main, accountFragment)
+            /*getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.nav_host_fragment_activity_main, accountFragments)
                     .addToBackStack(accountFragment.getClass().getName())
-                    .commit();
+                    .commit();*/
+            navController.navigate(R.id.action_go_back_to_login);
         });
         return root;
     }
