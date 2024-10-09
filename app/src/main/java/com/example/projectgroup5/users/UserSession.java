@@ -22,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.concurrent.Executor;
 
 public class UserSession {
+    private static final String USER_TYPE = "UserType";
     private static UserSession instance;
     private String userId;
     private FirebaseAuth firebaseAuth;
@@ -110,30 +111,47 @@ public class UserSession {
     }
 
     public void storeData(String type, String data, OnCompleteListener<Void> listener) {
-        DatabaseReference ref = database.getReference(type);
+        DatabaseReference ref = database.getReference().child("users").child(userId).child(type);
         ref.setValue(data).addOnCompleteListener(listener);
     }
 
     // Use a callback to get the value corresponding to the key asynchronously
-    public void getUserType(String key, final FirebaseCallback callback) {
-        DatabaseReference ref = database.getReference(key);
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+//    public void getUserType(final FirebaseCallback callback) {
+//        DatabaseReference ref = database.getReference(userId);
+//        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.exists()) {
+//                    // Get the value as a string
+//                    String data = snapshot.getValue(String.class);
+//                    callback.onCallback(data);  // Return the data via callback
+//                } else {
+//                    callback.onCallback("Unknown");  // Handle case where the key doesn't exist
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                callback.onCallback("Error");  // Handle the error case
+//            }
+//        });
+//    }
+
+    public int getUserType() {
+        final int[] userType = {USER_TYPE_USER};
+        database.getReference().child("users").child(userId).child(USER_TYPE).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    // Get the value as a string
-                    String data = snapshot.getValue(String.class);
-                    callback.onCallback(data);  // Return the data via callback
-                } else {
-                    callback.onCallback("Unknown");  // Handle case where the key doesn't exist
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                }
+                else {
+                    Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                    userType[0] =Integer.parseInt((String) task.getResult().getValue());
                 }
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                callback.onCallback("Error");  // Handle the error case
-            }
         });
+        return userType[0];
     }
 
 }

@@ -27,9 +27,12 @@ public class AccountManagementFragment extends Fragment {
 
         if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_ORGANIZER) {
 //            binding.userWelcomeMessage.setText("Welcome Organizer " + UserSession.getInstance().getUserName()); // TODO make this faction
+            binding.userWelcomeMessage.setText("Welcome Organizer");
         } else if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_USER) {
 //            binding.userWelcomeMessage.setText("Welcome User " + UserSession.getInstance().getUserName());  // TODO make this faction
+            binding.userWelcomeMessage.setText("Welcome User");
         } else if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_ADMIN) {
+            binding.userWelcomeMessage.setText("Welcome Admin");
 //            binding.userWelcomeMessage.setText("Welcome Admin " + UserSession.getInstance().getUserName()); //TODO fix this
         } else {
             // unknwon user type
