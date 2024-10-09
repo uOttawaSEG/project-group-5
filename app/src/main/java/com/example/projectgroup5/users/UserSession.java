@@ -13,8 +13,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.AuthResult;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.concurrent.Executor;
 
@@ -102,7 +105,37 @@ public class UserSession {
         return user != null;
     }
 
-    public int getUserType() {
-        return USER_TYPE_USER; // TODO do the firebase call here to get the user type
+    public interface FirebaseCallback {
+        void onCallback(String value);
     }
+
+    public void storeData(String type, String data, OnCompleteListener<Void> listener) {
+        DatabaseReference ref = database.getReference(type);
+        ref.setValue(data).addOnCompleteListener(listener);
+    }
+
+    // Use a callback to get the value corresponding to the key asynchronously
+    public void getUserType(String key, final FirebaseCallback callback) {
+        DatabaseReference ref = database.getReference(key);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    // Get the value as a string
+                    String data = snapshot.getValue(String.class);
+                    callback.onCallback(data);  // Return the data via callback
+                } else {
+                    callback.onCallback("Unknown");  // Handle case where the key doesn't exist
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onCallback("Error");  // Handle the error case
+            }
+        });
+    }
+
 }
+
+
