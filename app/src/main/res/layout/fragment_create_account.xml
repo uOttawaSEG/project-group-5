@@ -59,7 +59,7 @@
             android:textSize="@dimen/form_text_size"
             android:ems="10"
             android:inputType="textPassword"
-            android:autofillHints="password" />
+            android:autofillHints="newPassword" />
 
         <EditText
             android:id="@+id/editTextTextUserCreate"
