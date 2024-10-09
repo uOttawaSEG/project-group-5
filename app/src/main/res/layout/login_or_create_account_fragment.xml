@@ -4,15 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context=".ui.account.LoginOrCreate">
+    tools:context=".ui.account.LoginOrCreateFragment">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="409dp"
+        android:layout_height="729dp"
         android:orientation="vertical"
         android:gravity="center"
         tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="1dp" >
+        tools:layout_editor_absoluteY="1dp">
 
         <Button
             android:id="@+id/loginButton"
@@ -35,12 +35,7 @@
 
         <Button
             android:id="@+id/createAccountButton"
-            android:layout_width="wrap_content"
-            android:shadowRadius="1"
-            android:textSize="@dimen/form_text_size"
-            android:shadowDx="-1"
-            android:shadowDy="3"
-            android:shadowColor="@color/text_shadow_button_form"
+            android:layout_width="match_parent"
             android:layout_marginHorizontal="50sp"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/white"
