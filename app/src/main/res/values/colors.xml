@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="backbutton">#80AA0E0E</color>
     <color name="loginButton2">#7AA941</color>
+    <color name="text_shadow_button_form">#59454B5F</color>
 </resources>

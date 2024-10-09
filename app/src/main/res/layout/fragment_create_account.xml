@@ -9,7 +9,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/create_form_text_size"
+        android:layout_margin="@dimen/form_text_size"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -17,7 +17,7 @@
             android:id="@+id/OrganizerVSUserSwitch"
             android:layout_width="wrap_content"
             android:layout_height="48sp"
-            android:textSize="@dimen/create_form_text_size"
+            android:textSize="@dimen/form_text_size"
             android:text="@string/organizer"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
 
@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="@string/email"
-            android:textSize="@dimen/create_form_text_size"
+            android:textSize="@dimen/form_text_size"
             android:ems="10"
             android:inputType="textEmailAddress"
             android:autofillHints="emailAddress" />
@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="@string/phone"
-            android:textSize="@dimen/create_form_text_size"
+            android:textSize="@dimen/form_text_size"
             android:ems="10"
             android:inputType="phone"
             android:autofillHints="phone" />
@@ -46,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="@string/address"
-            android:textSize="@dimen/create_form_text_size"
+            android:textSize="@dimen/form_text_size"
             android:ems="10"
             android:inputType="textPostalAddress"
             android:autofillHints="postalAddress" />
@@ -56,7 +56,7 @@
             android:layout_width="wrap_content"
             android:hint="@string/password"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/create_form_text_size"
+            android:textSize="@dimen/form_text_size"
             android:ems="10"
             android:inputType="textPassword"
             android:autofillHints="password" />
@@ -66,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="@string/first_name"
-            android:textSize="@dimen/create_form_text_size"
+            android:textSize="@dimen/form_text_size"
             android:ems="10"
             android:inputType="text"
             android:autofillHints="personGivenName"
@@ -76,7 +76,7 @@
             android:id="@+id/editTextText2UserCreate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/create_form_text_size"
+            android:textSize="@dimen/form_text_size"
             android:ems="10"
             android:hint="@string/last_name"
             android:inputType="text"
@@ -94,6 +94,7 @@
             />
 
         <LinearLayout
+            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
@@ -102,19 +103,33 @@
 
             <Button
                 android:id="@+id/cancelButtonCreate"
+                style="?android:attr/buttonBarButtonStyle"
                 android:backgroundTint="@color/backbutton"
+                android:textColor="@color/white"
+                android:textSize="@dimen/form_text_size"
+                android:layout_margin="1sp"
+                android:shadowRadius="2"
+                android:shadowDx="-2"
+                android:shadowDy="5"
+                android:shadowColor="@color/text_shadow_button_form"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/cancel"
-                tools:ignore="ButtonStyle" />
+                android:text="@string/cancel" />
 
             <Button
                 android:id="@+id/confirmCredentialAndCreateButton"
+                style="?android:attr/buttonBarButtonStyle"
                 android:backgroundTint="@color/loginButton2"
+                android:textColor="@color/white"
+                android:textSize="@dimen/form_text_size"
+                android:layout_margin="1sp"
+                android:shadowRadius="2"
+                android:shadowDx="-2"
+                android:shadowDy="5"
+                android:shadowColor="@color/text_shadow_button_form"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/create"
-                tools:ignore="ButtonStyle" /> />
+                android:text="@string/create" /> />
         </LinearLayout>
     </LinearLayout>
 

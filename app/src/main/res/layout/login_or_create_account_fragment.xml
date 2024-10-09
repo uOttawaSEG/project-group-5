@@ -4,23 +4,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context=".ui.account.LoginOrCreateFragment">
+    tools:context=".ui.account.LoginOrCreate">
 
     <LinearLayout
-        android:layout_width="409dp"
-        android:layout_height="729dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
         tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="1dp">
+        tools:layout_editor_absoluteY="1dp" >
 
         <Button
             android:backgroundTint="@color/white"
             android:elevation="10dp"
             android:textColor="@color/black"
             android:id="@+id/loginButton"
-            android:layout_width="match_parent"
+            android:layout_width="200sp"
+            android:textSize="@dimen/form_text_size"
             android:layout_marginHorizontal="50sp"
+            android:shadowRadius="1"
+            android:shadowDx="-1"
+            android:shadowDy="3"
+            android:shadowColor="@color/text_shadow_button_form"
             android:layout_height="wrap_content"
             android:text="@string/Login" />
 
@@ -33,7 +38,12 @@
             android:elevation="30dp"
             android:textColor="@color/black"
             android:id="@+id/createAccountButton"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
+            android:shadowRadius="1"
+            android:textSize="@dimen/form_text_size"
+            android:shadowDx="-1"
+            android:shadowDy="3"
+            android:shadowColor="@color/text_shadow_button_form"
             android:layout_marginHorizontal="50sp"
             android:layout_height="wrap_content"
             android:text="@string/CreateAccount" />
