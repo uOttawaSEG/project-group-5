@@ -28,19 +28,6 @@ public class AccountManagementFragment extends Fragment {
 
         // get the user name (email) and the user type (organizer or user or admin)
         // change the text of userWelcomeMessage based on the previous
-
-//        if (UserSession.getInstance().getUserRepresentation() == null) {
-//            Log.d("AccountManagementFragment", "UserSession is null");
-//            // go back to the login fragment
-//            Fragment loginFragment = new LoginFragment();  //TODO YONGEN pls change this to the login fragment
-//            getActivity().getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.nav_host_fragment_activity_main, loginFragment)
-//                    .addToBackStack(loginFragment.getClass().getName())
-//                    .commit();
-//        }
-//        Log.d("firebase", "Updating user type");
-//        UserSession.getInstance().updateUserType();
-//        Log.d("firebase", "Retrieved user type: " + UserSession.getInstance().getUserRepresentation().getUserType());
         UserSession.getInstance().getUserData(USER_TYPE, new UserSession.FirebaseCallback<Object>() {
             @Override
             public void onCallback(Object userType) {

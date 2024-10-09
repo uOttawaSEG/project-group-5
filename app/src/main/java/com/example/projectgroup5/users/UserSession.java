@@ -44,6 +44,11 @@ public class UserSession {
         instantiateUserRepresentation();
     }
 
+    /**
+     * This creates a new User and assigns it to userRepresentation
+     * It also takes care of the updating the data from firebase
+     * For now it only updates the user type and email
+     */
     public void instantiateUserRepresentation() {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
@@ -174,25 +179,6 @@ public class UserSession {
         ref.setValue(value).addOnCompleteListener(listener);
     }
 
-    public void updateUserType() {
-        Log.d("UserSession", "UPDATING USER TYPE: " + userId);
-        getUserData(USER_TYPE, new FirebaseCallback<Object>() {
-            @Override
-            public void onCallback(Object userType) {
-                Log.d("UserSession", "In the onCallback: " + userType);
-                if (userType != null) {
-                    // Create a User representation based on the user type
-
-                    Log.d("UserSession", "User type UPDATED: " + userType);
-                    userRepresentation.setUserType((int)(long)((Long) userType));
-
-                } else {
-                    Log.e("UserSession", "User type not found");
-                }
-            }
-        });
-    }
-
 
     /**
      * @param key
@@ -232,28 +218,6 @@ public class UserSession {
             }
         });
     }
-
-
-
-//    public int getUserType() {
-//        final Integer[] userType = {USER_TYPE_USER};
-//        database.getReference().child("users").child(userId).child(USER_TYPE).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DataSnapshot> task) {
-//                if (!task.isSuccessful()) {
-//                    Log.e("firebase", "Error getting data", task.getException());
-//                }
-//                else {
-//                    Log.d("firebase", "Before transfer: "+String.valueOf(task.getResult().getValue()));
-//                    userType[0] = Integer.parseInt(String.valueOf(task.getResult().getValue()));
-//                }
-//            }
-//        });
-//        Log.d("firebase", "After transfer: "+userType[0]);
-//        return userType[0];
-//    }
-
-
 
 }
 
