@@ -24,13 +24,16 @@ import java.util.concurrent.Executor;
 
 public class UserSession {
     public static final String USER_TYPE = "UserType";
+    public static final String USER_UID = "UserUID";
+    public static final String USER_EMAIL = "UserEmail";
     private static UserSession instance;
     private String userId;
-    private FirebaseAuth firebaseAuth;
+    private final FirebaseAuth firebaseAuth;
     public final static int USER_TYPE_ORGANIZER = 1;
     public final static int USER_TYPE_USER = 2;
     public final static int USER_TYPE_ADMIN = 0;
     private static FirebaseDatabase database;
+    private static User userRepresentation;
 
     private UserSession() {
         // Initialize Firebase Auth
@@ -43,7 +46,38 @@ public class UserSession {
             userId = user.getUid();
             Log.d("UserSession", "UserSession: " + userId);
             Log.d("UserSession", "UserSession: " + firebaseAuth.getCurrentUser());
+            // update all the data from the database
+            getUserData(USER_TYPE, new FirebaseCallback<Object>() {
+                @Override
+                public void onCallback(Object userType) {
+                    if (userType != null) {
+                        // Create a User representation based on the user type
+                        userRepresentation = User.newUser(userId, (int)(long)((Long) userType));
+                        Log.d("UserSession", "User type: " + userType);
+                    } else {
+                        Log.e("UserSession", "User type not found");
+                    }
+                }
+            });
+
+            // set the user email
+//            storeValue(USER_EMAIL, user.getEmail(), (task) -> {
+//                if (task.isSuccessful()) {
+//                    Log.d("UserSession", "Success: " + task.getResult());
+//                } else {
+//                    Log.d("UserSession", "storeUserEmailError: " + task.getException());
+//                }
+//            });
+//
+//            // save it in the user representation
+//            userRepresentation.setUserEmail(user.getEmail());
+
+            // can add more call to load data here
         }
+    }
+
+    public User getUserRepresentation() {
+        return userRepresentation;
     }
 
     public static void initialize(MainActivity activity) {
@@ -82,6 +116,19 @@ public class UserSession {
     // Create a new user with email and password
     public void createUser(String email, String password, OnCompleteListener<AuthResult> listener) {
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(listener);
+        getUserData(USER_TYPE, new FirebaseCallback<Object>() {
+            @Override
+            public void onCallback(Object userType) {
+                if (userType != null) {
+                    // Create a User representation based on the user type
+                    userRepresentation = User.newUser(userId, (int)(long)((Long) userType));
+                    Log.d("UserSession", "User type: " + userType);
+                } else {
+                    Log.e("UserSession", "User type not found");
+                }
+            }
+        });
+
     }
 
     // Delete the current user
@@ -107,69 +154,97 @@ public class UserSession {
         return user != null;
     }
 
-    public interface FirebaseCallback {
-        void onCallback(String value);
+    public void setUserType(int userType) {
+        this.userRepresentation.setUserType(userType);
+    }
+
+    public interface FirebaseCallback<T> {
+        void onCallback(T value);
     }
 
     public void storeValue(String type, @Nullable Object value, OnCompleteListener<Void> listener) {
         DatabaseReference ref = database.getReference().child("users").child(userId).child(type);
         ref.setValue(value).addOnCompleteListener(listener);
     }
-    public Object readData(String type, OnCompleteListener<Void> listener) {
-        final Object[] value = {null};
-        database.getReference().child("users").child(userId).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+
+    public void updateUserType() {
+        Log.d("UserSession", "UPDATING USER TYPE: " + userId);
+        getUserData(USER_TYPE, new FirebaseCallback<Object>() {
             @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if (!task.isSuccessful()) {
-                    Log.e("firebase", "Error getting data", task.getException());
-                }
-                else {
-                    value[0] = task.getResult().getValue();
-                    Log.d("firebase", String.valueOf(task.getResult().getValue()));
+            public void onCallback(Object userType) {
+                Log.d("UserSession", "In the onCallback: " + userType);
+                if (userType != null) {
+                    // Create a User representation based on the user type
+
+                    Log.d("UserSession", "User type UPDATED: " + userType);
+                    userRepresentation.setUserType((int)(long)((Long) userType));
+
+                } else {
+                    Log.e("UserSession", "User type not found");
                 }
             }
         });
-        return value[0];
     }
 
-    // Use a callback to get the value corresponding to the key asynchronously
-//    public void getUserType(final FirebaseCallback callback) {
-//        DatabaseReference ref = database.getReference(userId);
-//        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
+    /**
+     * @param key
+     * @param callback
+     * The allowed return types for the data are as follows:
+     * <ul>
+     *   <li><code>Boolean</code></li>
+     *   <li><code>String</code></li>
+     *   <li><code>Long</code></li>
+     *   <li><code>Double</code></li>
+     *   <li><code>Map&lt;String, Object&gt;</code></li>
+     *   <li><code>List&lt;Object&gt;</code></li>
+     * </ul>
+     */
+    public void getUserData(String key, final FirebaseCallback<Object> callback) {
+        DatabaseReference ref = database.getReference("users").child(userId).child(key);
+
+        Log.d("UserSession", "Fetching user data for key: " + key); // Add this line
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Object data = snapshot.getValue();
+                    Log.d("UserSession", "Data retrieved: " + data); // Add this line
+                    callback.onCallback(data);
+                } else {
+                    Log.e("UserSession", "Snapshot does not exist for key: " + key); // Add this line
+                    callback.onCallback(null);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("FirebaseError", error.getMessage());
+                callback.onCallback(null);
+            }
+        });
+    }
+
+
+
+//    public int getUserType() {
+//        final Integer[] userType = {USER_TYPE_USER};
+//        database.getReference().child("users").child(userId).child(USER_TYPE).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
 //            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if (snapshot.exists()) {
-//                    // Get the value as a string
-//                    String data = snapshot.getValue(String.class);
-//                    callback.onCallback(data);  // Return the data via callback
-//                } else {
-//                    callback.onCallback("Unknown");  // Handle case where the key doesn't exist
+//            public void onComplete(@NonNull Task<DataSnapshot> task) {
+//                if (!task.isSuccessful()) {
+//                    Log.e("firebase", "Error getting data", task.getException());
+//                }
+//                else {
+//                    Log.d("firebase", "Before transfer: "+String.valueOf(task.getResult().getValue()));
+//                    userType[0] = Integer.parseInt(String.valueOf(task.getResult().getValue()));
 //                }
 //            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//                callback.onCallback("Error");  // Handle the error case
-//            }
 //        });
+//        Log.d("firebase", "After transfer: "+userType[0]);
+//        return userType[0];
 //    }
-
-    public int getUserType() {
-        final Integer[] userType = {USER_TYPE_USER};
-        database.getReference().child("users").child(userId).child(USER_TYPE).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if (!task.isSuccessful()) {
-                    Log.e("firebase", "Error getting data", task.getException());
-                }
-                else {
-                    Log.d("firebase", String.valueOf(task.getResult().getValue()));
-                    userType[0] = Integer.parseInt(String.valueOf(task.getResult().getValue()));
-                }
-            }
-        });
-        return userType[0];
-    }
 
 
 

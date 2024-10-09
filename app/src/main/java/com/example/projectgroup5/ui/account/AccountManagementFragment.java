@@ -1,5 +1,8 @@
 package com.example.projectgroup5.ui.account;
 
+import static com.example.projectgroup5.users.UserSession.USER_EMAIL;
+import static com.example.projectgroup5.users.UserSession.USER_TYPE;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,25 +29,73 @@ public class AccountManagementFragment extends Fragment {
         // get the user name (email) and the user type (organizer or user or admin)
         // change the text of userWelcomeMessage based on the previous
 
-        if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_ORGANIZER) {
-            binding.userWelcomeMessage.setVisibility(View.VISIBLE);
-//            binding.userWelcomeMessage.setText("Welcome Organizer " + UserSession.getInstance().getUserName()); // TODO make this faction
-            Log.d("AccountManagementFragment", "usertype: organizer");
-            binding.userWelcomeMessage.setText("Welcome Organizer");
-        } else if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_USER) {
-//            binding.userWelcomeMessage.setText("Welcome User " + UserSession.getInstance().getUserName());  // TODO make this faction
-            binding.userWelcomeMessage.setVisibility(View.VISIBLE);
-            Log.d("AccountManagementFragment", "usertype: user");
-            binding.userWelcomeMessage.setText("Welcome User");
-        } else if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_ADMIN) {
-            binding.userWelcomeMessage.setVisibility(View.VISIBLE);
-            binding.userWelcomeMessage.setText("Welcome Admin");
-//            binding.userWelcomeMessage.setText("Welcome Admin " + UserSession.getInstance().getUserName()); //TODO fix this
-        } else {
-            binding.userWelcomeMessage.setVisibility(View.GONE);
-            // unknwon user type
-//            binding.userWelcomeMessage.setText("Welcome " + UserSession.getInstance().getUserName());  // TODO make this function work
-        }
+//        if (UserSession.getInstance().getUserRepresentation() == null) {
+//            Log.d("AccountManagementFragment", "UserSession is null");
+//            // go back to the login fragment
+//            Fragment loginFragment = new LoginFragment();  //TODO YONGEN pls change this to the login fragment
+//            getActivity().getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.nav_host_fragment_activity_main, loginFragment)
+//                    .addToBackStack(loginFragment.getClass().getName())
+//                    .commit();
+//        }
+//        Log.d("firebase", "Updating user type");
+//        UserSession.getInstance().updateUserType();
+//        Log.d("firebase", "Retrieved user type: " + UserSession.getInstance().getUserRepresentation().getUserType());
+        UserSession.getInstance().getUserData(USER_TYPE, new UserSession.FirebaseCallback<Object>() {
+            @Override
+            public void onCallback(Object userType) {
+                Log.d("UserSession", "In the onCallback: " + userType);
+                if (userType != null) {
+                    // Create a User representation based on the user type
+
+                    Log.d("UserSession", "User type UPDATED: " + userType);
+                    UserSession.getInstance().getUserRepresentation().setUserType((int)(long)((Long) userType));
+                    int intUserType = (int)(long)((Long) userType);
+                    Log.d("firebase", "Retrieved user type: " + userType);
+//                    String currentText = binding.userWelcomeMessage.getText().toString();
+                    if (intUserType == UserSession.USER_TYPE_ORGANIZER) {
+                        binding.userWelcomeMessage.setVisibility(View.VISIBLE);
+                        Log.d("AccountManagementFragment", "usertype: organizer");
+                        binding.userWelcomeMessage.setText("Welcome Organizer");
+                    } else if (intUserType == UserSession.USER_TYPE_USER) {
+                        binding.userWelcomeMessage.setVisibility(View.VISIBLE);
+                        Log.d("AccountManagementFragment", "usertype: user");
+                        binding.userWelcomeMessage.setText("Welcome User");
+                    } else if (intUserType == UserSession.USER_TYPE_ADMIN) {
+                        binding.userWelcomeMessage.setVisibility(View.VISIBLE);
+                        binding.userWelcomeMessage.setText("Welcome Admin");
+                    } else {
+                        // unknown user type
+                        binding.userWelcomeMessage.setVisibility(View.GONE);
+                    }
+
+                } else {
+                    Log.e("UserSession", "User type not found");
+                }
+            }
+        });
+
+        UserSession.getInstance().getUserData(USER_EMAIL, new UserSession.FirebaseCallback<Object>() {
+            @Override
+            public void onCallback(Object userEmail) {
+                Log.d("UserSession", "In the onCallback: " + userEmail);
+                if (userEmail != null) {
+                    // Create a User representation based on the user type
+
+                    Log.d("UserSession", "User type UPDATED: " + userEmail);
+                    UserSession.getInstance().getUserRepresentation().setUserEmail(String.valueOf(userEmail));
+                        // Append the user email to the current text
+
+                        Log.d("AccountManagementFragment", "usertype: organizer");
+                        String newText = binding.userWelcomeMessage.getText().toString() + " " + String.valueOf(userEmail);
+                        binding.userWelcomeMessage.setText(newText);
+                } else {
+                    Log.e("UserSession", "User type not found");
+                }
+            }
+        });
+
+
 
         root.findViewById(R.id.logoutButton).setOnClickListener(v -> {
             // login the user using the email and password
