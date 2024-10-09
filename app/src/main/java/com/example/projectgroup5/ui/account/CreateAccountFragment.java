@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.databinding.FragmentCreateAccountBinding;
@@ -24,7 +26,7 @@ public class CreateAccountFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentCreateAccountBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
+        NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
         // Switch between user and organizer
         root.findViewById(R.id.OrganizerVSUserSwitch).setOnClickListener(v -> {
                     if (binding.OrganizerVSUserSwitch.isChecked()) {
@@ -52,12 +54,13 @@ public class CreateAccountFragment extends Fragment {
             UserSession.getInstance().createUser(binding.editTextTextEmailAddressUserCreate.getText().toString(), binding.editTextTextPasswordUserCreate.getText().toString(), (task) -> {
                 if (task.isSuccessful()) {
                     UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
-                    Fragment dashboardFragment = new DashboardFragment();
+                    //Fragment dashboardFragment = new DashboardFragment();
 
-                    getActivity().getSupportFragmentManager().beginTransaction()
+                    /*getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.nav_host_fragment_activity_main, dashboardFragment)
                             .addToBackStack(dashboardFragment.getClass().getName())
-                            .commit();
+                            .commit();*/
+                    navController.navigate(R.id.action_create_account_to_dashboard);
                 } else {
                     Log.d("CreateAccountFragment", "onCreateView: " + task.getException());
                     // provide more information about the error
@@ -77,12 +80,13 @@ public class CreateAccountFragment extends Fragment {
         });
         root.findViewById(R.id.cancelButtonCreate).setOnClickListener(v -> {
             // go back
-            Fragment accountFragment = new AccountFragment();
+            //Fragment accountFragment = new AccountFragment();
 
-            getActivity().getSupportFragmentManager().beginTransaction()
+            /*getActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.nav_host_fragment_activity_main, accountFragment)
                     .addToBackStack(accountFragment.getClass().getName())
-                    .commit();
+                    .commit();*/
+            navController.navigate(R.id.action_create_account_to_account);
         });
         return root;
     }

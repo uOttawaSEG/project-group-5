@@ -25,11 +25,11 @@ public class AccountManagementFragment extends Fragment {
         // get the user name (email) and the user type (organizer or user or admin)
         // change the text of userWelcomeMessage based on the previous
 
-        if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_ORGANIZER) {
+        if(UserSession.getInstance().getUserType() == UserSession.USER_TYPE_ORGANIZER) {
 //            binding.userWelcomeMessage.setText("Welcome Organizer " + UserSession.getInstance().getUserName()); // TODO make this faction
-        } else if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_USER) {
+        } else if(UserSession.getInstance().getUserType() == UserSession.USER_TYPE_USER) {
 //            binding.userWelcomeMessage.setText("Welcome User " + UserSession.getInstance().getUserName());  // TODO make this faction
-        } else if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_ADMIN) {
+        } else if(UserSession.getInstance().getUserType() == UserSession.USER_TYPE_ADMIN) {
 //            binding.userWelcomeMessage.setText("Welcome Admin " + UserSession.getInstance().getUserName()); //TODO fix this
         } else {
             // unknwon user type
