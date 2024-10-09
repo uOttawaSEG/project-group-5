@@ -9,33 +9,33 @@
     <LinearLayout
         android:layout_width="409dp"
         android:layout_height="729dp"
-        android:gravity="center"
         android:orientation="vertical"
+        android:gravity="center"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="1dp">
 
         <Button
-            android:id="@+id/loginButton"
-            android:layout_width="312dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="50sp"
             android:backgroundTint="@color/white"
             android:elevation="10dp"
-            android:text="@string/Login"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:id="@+id/loginButton"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="50sp"
+            android:layout_height="wrap_content"
+            android:text="@string/Login" />
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="40sp" />
 
         <Button
-            android:id="@+id/createAccountButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="50sp"
             android:backgroundTint="@color/white"
             android:elevation="30dp"
-            android:text="@string/CreateAccount"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:id="@+id/createAccountButton"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="50sp"
+            android:layout_height="wrap_content"
+            android:text="@string/CreateAccount" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
