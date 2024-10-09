@@ -41,6 +41,10 @@ public class UserSession {
         firebaseAuth = FirebaseAuth.getInstance();
         // must setup the configuration of the firebase
         // check if the user is already logged in
+        instantiateUserRepresentation();
+    }
+
+    public void instantiateUserRepresentation() {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
             userId = user.getUid();
@@ -53,26 +57,29 @@ public class UserSession {
                     if (userType != null) {
                         // Create a User representation based on the user type
                         userRepresentation = User.newUser(userId, (int)(long)((Long) userType));
+                        instantiateEmailForUser(user);
                         Log.d("UserSession", "User type: " + userType);
                     } else {
                         Log.e("UserSession", "User type not found");
                     }
                 }
             });
+        }
+    }
 
-            // set the user email
-//            storeValue(USER_EMAIL, user.getEmail(), (task) -> {
-//                if (task.isSuccessful()) {
-//                    Log.d("UserSession", "Success: " + task.getResult());
-//                } else {
-//                    Log.d("UserSession", "storeUserEmailError: " + task.getException());
-//                }
-//            });
-//
-//            // save it in the user representation
-//            userRepresentation.setUserEmail(user.getEmail());
-
-            // can add more call to load data here
+    private void instantiateEmailForUser(FirebaseUser user) {
+        //  set the user email
+        storeValue(USER_EMAIL, user.getEmail(), (task) -> {
+            if (task.isSuccessful()) {
+                Log.d("UserSession", "Success: " + task.getResult());
+            } else {
+                Log.d("UserSession", "storeUserEmailError: " + task.getException());
+            }
+        });
+        if (userRepresentation != null) {
+            userRepresentation.setUserEmail(user.getEmail());
+        } else {
+            Log.e("UserSession", "User representation is null");
         }
     }
 
@@ -110,7 +117,7 @@ public class UserSession {
     // Login the user using email and password with Firebase
     public void login(String email, String password, OnCompleteListener<AuthResult> listener) {
         firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(listener);
+                .addOnCompleteListener(listener).addOnSuccessListener(task -> instantiateUserRepresentation());
     }
 
     // Create a new user with email and password
