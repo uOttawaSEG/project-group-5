@@ -20,6 +20,7 @@
             android:gravity="center"
             android:textSize="@dimen/form_text_size"
             android:hint="@string/email"
+            android:autofillHints="emailAddress"
             android:inputType="textWebEmailAddress" />
 
         <EditText
@@ -29,6 +30,7 @@
             android:textSize="@dimen/form_text_size"
             android:layout_height="wrap_content"
             android:hint="@string/password"
+            android:autofillHints="password"
             android:inputType="textPassword" />
 
         <LinearLayout
