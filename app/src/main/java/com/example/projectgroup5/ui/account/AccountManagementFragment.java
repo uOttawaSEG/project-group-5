@@ -1,6 +1,7 @@
 package com.example.projectgroup5.ui.account;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,15 +27,21 @@ public class AccountManagementFragment extends Fragment {
         // change the text of userWelcomeMessage based on the previous
 
         if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_ORGANIZER) {
+            binding.userWelcomeMessage.setVisibility(View.VISIBLE);
 //            binding.userWelcomeMessage.setText("Welcome Organizer " + UserSession.getInstance().getUserName()); // TODO make this faction
+            Log.d("AccountManagementFragment", "usertype: organizer");
             binding.userWelcomeMessage.setText("Welcome Organizer");
         } else if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_USER) {
 //            binding.userWelcomeMessage.setText("Welcome User " + UserSession.getInstance().getUserName());  // TODO make this faction
+            binding.userWelcomeMessage.setVisibility(View.VISIBLE);
+            Log.d("AccountManagementFragment", "usertype: user");
             binding.userWelcomeMessage.setText("Welcome User");
         } else if (UserSession.getInstance().getUserType() == UserSession.USER_TYPE_ADMIN) {
+            binding.userWelcomeMessage.setVisibility(View.VISIBLE);
             binding.userWelcomeMessage.setText("Welcome Admin");
 //            binding.userWelcomeMessage.setText("Welcome Admin " + UserSession.getInstance().getUserName()); //TODO fix this
         } else {
+            binding.userWelcomeMessage.setVisibility(View.GONE);
             // unknwon user type
 //            binding.userWelcomeMessage.setText("Welcome " + UserSession.getInstance().getUserName());  // TODO make this function work
         }

@@ -18,11 +18,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.annotations.Nullable;
 
 import java.util.concurrent.Executor;
 
 public class UserSession {
-    private static final String USER_TYPE = "UserType";
+    public static final String USER_TYPE = "UserType";
     private static UserSession instance;
     private String userId;
     private FirebaseAuth firebaseAuth;
@@ -110,9 +111,25 @@ public class UserSession {
         void onCallback(String value);
     }
 
-    public void storeData(String type, String data, OnCompleteListener<Void> listener) {
+    public void storeValue(String type, @Nullable Object value, OnCompleteListener<Void> listener) {
         DatabaseReference ref = database.getReference().child("users").child(userId).child(type);
-        ref.setValue(data).addOnCompleteListener(listener);
+        ref.setValue(value).addOnCompleteListener(listener);
+    }
+    public Object readData(String type, OnCompleteListener<Void> listener) {
+        final Object[] value = {null};
+        database.getReference().child("users").child(userId).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                }
+                else {
+                    value[0] = task.getResult().getValue();
+                    Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                }
+            }
+        });
+        return value[0];
     }
 
     // Use a callback to get the value corresponding to the key asynchronously
@@ -138,7 +155,7 @@ public class UserSession {
 //    }
 
     public int getUserType() {
-        final int[] userType = {USER_TYPE_USER};
+        final Integer[] userType = {USER_TYPE_USER};
         database.getReference().child("users").child(userId).child(USER_TYPE).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -147,12 +164,14 @@ public class UserSession {
                 }
                 else {
                     Log.d("firebase", String.valueOf(task.getResult().getValue()));
-                    userType[0] =Integer.parseInt((String) task.getResult().getValue());
+                    userType[0] = Integer.parseInt(String.valueOf(task.getResult().getValue()));
                 }
             }
         });
         return userType[0];
     }
+
+
 
 }
 
