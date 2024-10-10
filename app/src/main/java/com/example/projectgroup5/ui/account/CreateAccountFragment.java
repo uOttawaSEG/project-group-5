@@ -54,7 +54,17 @@ public class CreateAccountFragment extends Fragment {
             UserSession.getInstance().createUser(binding.editTextTextEmailAddressUserCreate.getText().toString(), binding.editTextTextPasswordUserCreate.getText().toString(), (task) -> {
                 if (task.isSuccessful()) {
                     UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
+
                     //Fragment dashboardFragment = new DashboardFragment();
+                    // add the user type to the database
+                    UserSession.getInstance().storeValue(UserSession.USER_TYPE, binding.OrganizerVSUserSwitch.isChecked() ? UserSession.USER_TYPE_ORGANIZER : UserSession.USER_TYPE_USER, (task1) -> {
+                        if (task1.isSuccessful()) {
+                            Log.d("CreateAccountFragment", "Success: " + task1.getResult());
+                        } else {
+                            Log.d("CreateAccountFragment", "storeUserTypeError: " + task1.getException());
+                        }
+
+                            });
 
                     /*getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.nav_host_fragment_activity_main, dashboardFragment)

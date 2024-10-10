@@ -5,6 +5,10 @@ import android.provider.ContactsContract;
 
 public class Administrator extends User{
 
+    public Administrator(String userId) {
+        super(userId);
+    }
+
     @Override
     void SaveLoginInfo() {
 // TODO complete this
