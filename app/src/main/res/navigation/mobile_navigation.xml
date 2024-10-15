@@ -22,17 +22,25 @@
         android:name="com.example.projectgroup5.ui.account.AccountFragment"
         android:label="@string/userAccount"
         tools:layout="@layout/fragment_account">
-
+        <action
+            android:id="@+id/action_to_account_managment"
+            app:destination="@id/account_managment"
+            app:popUpTo="@id/account_managment"/>
         <action
             android:id="@+id/action_login"
-            app:destination="@+id/login" />
-
+            app:destination="@+id/login"
+            app:popUpTo="@id/account_managment"
+            app:popUpToInclusive="true"/>
         <action
             android:id="@+id/action_login_or_create_account"
-            app:destination="@+id/login_or_create_account"/>
+            app:destination="@+id/login_or_create_account"
+            app:popUpTo="@id/account_managment"
+            app:popUpToInclusive="true"/>
         <action
             android:id="@+id/action_create_account"
-            app:destination="@+id/create_account"/>
+            app:destination="@+id/create_account"
+            app:popUpTo="@id/account_managment"
+            app:popUpToInclusive="true"/>
     </fragment>
 
     <fragment

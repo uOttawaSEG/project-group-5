@@ -33,19 +33,23 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.search_event_dashboard, R.id.account_managment)
-                .build();
+                R.id.navigation_home,
+                R.id.search_event_dashboard,
+                R.id.account_managment).build();
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
+
+
         // set the navigation bar to the dashboard fragment
-//        navController.navigate(R.id.account_settings);
+        //navController.navigate(R.id.account_settings);
     }
 
-    @Override
+   /* @Override
     public boolean onSupportNavigateUp(){
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         return navController.navigateUp() || super.onSupportNavigateUp();
 
-    }
+    }*/
 }

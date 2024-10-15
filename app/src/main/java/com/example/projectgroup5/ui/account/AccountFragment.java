@@ -47,7 +47,7 @@ public class AccountFragment extends Fragment {
                     .commit();
 
         }*/
-        NavController navController = Navigation.findNavController(getActivity(),R.id.nav_host_fragment_activity_main);
+        NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
         if(UserSession.getInstance().getUserId() == null){
             navController.navigate(R.id.action_login_or_create_account);
         }else{
