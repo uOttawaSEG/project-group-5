@@ -1,77 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
     tools:context=".ui.account.LoginFragment">
+
+    <!-- Container for the Email and Password fields -->
+
+    <!-- Buttons for Cancel and Login -->
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="16dp">
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <EditText
-            android:id="@+id/emailInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="@dimen/form_text_size"
-            android:hint="@string/email"
-            android:autofillHints="emailAddress"
-            android:inputType="textWebEmailAddress" />
+        <!-- Cancel Button -->
 
-        <EditText
-            android:id="@+id/passwordInput"
-            android:layout_width="match_parent"
-            android:gravity="center"
-            android:textSize="@dimen/form_text_size"
-            android:layout_height="wrap_content"
-            android:hint="@string/password"
-            android:autofillHints="password"
-            android:inputType="textPassword" />
-
+        <!-- Login Button -->
         <LinearLayout
-            style="?android:attr/buttonBarStyle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/cancelButton"
-                style="?android:attr/buttonBarButtonStyle"
-                android:backgroundTint="@color/backbutton"
-                android:textColor="@color/white"
-                android:layout_width="wrap_content"
-                android:textSize="@dimen/form_text_size"
-                android:layout_margin="1sp"
-                android:shadowRadius="2"
-                android:shadowDx="-2"
-                android:shadowDy="5"
-                android:shadowColor="@color/text_shadow_button_form"
-                android:layout_height="wrap_content"
-                android:text="@string/cancel" />
+            <EditText
+                android:id="@+id/emailInput"
+                android:layout_width="316dp"
+                android:layout_height="43dp"
+                android:autofillHints="emailAddress"
+                android:background="@drawable/rectangular_input"
+                android:gravity="center"
+                android:hint="@string/email"
+                android:inputType="textWebEmailAddress"
+                android:textSize="@dimen/form_text_size" />
 
-            <Button
-                android:id="@+id/confirmCredentialAndLoginButton"
-                style="?android:attr/buttonBarButtonStyle"
-                android:backgroundTint="@color/loginButton2"
-                android:textColor="@color/white"
-                android:textSize="@dimen/form_text_size"
-                android:layout_margin="1sp"
-                android:shadowRadius="2"
-                android:shadowDx="-2"
-                android:shadowDy="5"
-                android:shadowColor="@color/text_shadow_button_form"
+            <EditText
+                android:id="@+id/passwordInput"
+                android:layout_width="314dp"
+                android:layout_height="42dp"
+                android:background="@drawable/rectangular_input"
+                android:gravity="center"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:textSize="@dimen/form_text_size" />
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/login" />
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/cancelButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_button"
+                    android:text="@string/cancel"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/form_text_size" />
+
+                <Button
+                    android:id="@+id/confirmCredentialAndLoginButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_button"
+                    android:text="@string/login"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/form_text_size" />
+            </LinearLayout>
+
         </LinearLayout>
-
-
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
