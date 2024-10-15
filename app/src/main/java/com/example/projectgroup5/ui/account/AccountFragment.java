@@ -32,7 +32,7 @@ public class AccountFragment extends Fragment {
 
         // place the login in the center of the remaining space
 
-        if (UserSession.getInstance().getUserId() == null) {
+        /*if (UserSession.getInstance().getUserId() == null) {
             Fragment loginOrCreateFragment = new LoginOrCreate();
             // add the loginOrCreateFragment to the container
             getActivity().getSupportFragmentManager().beginTransaction()
@@ -46,6 +46,12 @@ public class AccountFragment extends Fragment {
                     .addToBackStack(accountManagementFragment.getClass().getName())
                     .commit();
 
+        }*/
+        NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
+        if(UserSession.getInstance().getUserId() == null){
+            navController.navigate(R.id.action_login_or_create_account);
+        }else{
+            navController.navigate(R.id.action_create_account);
         }
 
 

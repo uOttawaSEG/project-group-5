@@ -21,24 +21,69 @@
         android:id="@+id/account_managment"
         android:name="com.example.projectgroup5.ui.account.AccountFragment"
         android:label="@string/userAccount"
-        tools:layout="@layout/fragment_account" />
+        tools:layout="@layout/fragment_account">
+        <action
+            android:id="@+id/action_to_account_managment"
+            app:destination="@id/account_managment"
+            app:popUpTo="@id/account_managment"/>
+        <action
+            android:id="@+id/action_login"
+            app:destination="@+id/login"
+            app:popUpTo="@id/account_managment"
+            app:popUpToInclusive="true"/>
+        <action
+            android:id="@+id/action_login_or_create_account"
+            app:destination="@+id/login_or_create_account"
+            app:popUpTo="@id/account_managment"
+            app:popUpToInclusive="true"/>
+        <action
+            android:id="@+id/action_create_account"
+            app:destination="@+id/create_account"
+            app:popUpTo="@id/account_managment"
+            app:popUpToInclusive="true"/>
+    </fragment>
 
     <fragment
         android:id="@+id/login"
         android:name="com.example.projectgroup5.ui.account.LoginFragment"
         android:label="@string/userAccount"
-        tools:layout="@layout/fragment_login" />
+        tools:layout="@layout/fragment_login">
+
+        <action
+            android:id="@+id/action_login_to_dashboard"
+            app:destination="@+id/search_event_dashboard"/>
+
+        <action
+            android:id="@+id/action_go_back_to_login"
+            app:destination="@+id/account_managment"/>
+    </fragment>
 
     <fragment
         android:id="@+id/login_or_create_account"
         android:name="com.example.projectgroup5.ui.account.LoginOrCreate"
         android:label="@string/userAccount"
-        tools:layout="@layout/login_or_create_account_fragment" />
+        tools:layout="@layout/login_or_create_account_fragment" >
+        <action
+            android:id="@+id/action_login_or_create_account_to_login"
+            app:destination="@+id/login"/>
+        <action
+            android:id="@+id/action_login_or_create_account_to_create_account"
+            app:destination="@+id/create_account"/>
+    </fragment>
 
     <fragment
         android:id="@+id/create_account"
         android:name="com.example.projectgroup5.ui.account.CreateAccountFragment"
         android:label="@string/userAccount"
-        tools:layout="@layout/fragment_create_account" />
+        tools:layout="@layout/fragment_create_account">
+
+        <action
+            android:id="@+id/action_create_account_to_dashboard"
+            app:destination="@+id/search_event_dashboard"/>
+
+        <action
+            android:id="@+id/action_create_account_to_account"
+            app:destination="@+id/account_managment"/>
+    </fragment>
 
 </navigation>
