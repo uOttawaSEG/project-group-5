@@ -51,6 +51,27 @@ public class CreateAccountFragment extends Fragment {
                 binding.editTextTextPasswordUserCreate.setError("Please enter a password");
                 return;
             }
+            if (binding.editTextTextPostalAddressUserCreate.getText().toString().isEmpty()) {
+                binding.editTextTextPostalAddressUserCreate.setError("Please enter an address");
+                return;
+            }
+            if (binding.editTextPhoneUserCreate.getText().toString().isEmpty()) {
+                binding.editTextPhoneUserCreate.setError("Please enter a phone number");
+                return;
+            }
+            if (binding.editTextTextUserCreate.getText().toString().isEmpty()) {
+                binding.editTextTextUserCreate.setError("Please enter a first name");
+                return;
+            }
+            if (binding.editTextText2UserCreate.getText().toString().isEmpty()) {
+                binding.editTextText2UserCreate.setError("Please enter a last name");
+                return;
+            }
+            if (binding.editTextTextConfirmPasswordUserCreate.getText().toString().isEmpty()) {
+                binding.editTextTextConfirmPasswordUserCreate.setError("Please enter a password");
+                return;
+            }
+
             UserSession.getInstance().createUser(binding.editTextTextEmailAddressUserCreate.getText().toString(), binding.editTextTextPasswordUserCreate.getText().toString(), (task) -> {
                 if (task.isSuccessful()) {
                     UserSession.getInstance().setUserId(task.getResult().getUser().getUid());

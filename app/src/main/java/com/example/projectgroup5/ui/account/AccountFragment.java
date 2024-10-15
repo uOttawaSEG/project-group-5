@@ -51,7 +51,7 @@ public class AccountFragment extends Fragment {
         if(UserSession.getInstance().getUserId() == null){
             navController.navigate(R.id.action_login_or_create_account);
         }else{
-            navController.navigate(R.id.action_create_account);
+            navController.navigate(R.id.account_management);
         }
 
 

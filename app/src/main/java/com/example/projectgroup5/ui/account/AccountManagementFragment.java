@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.databinding.FragmentAccountManagementBinding;
@@ -36,7 +38,7 @@ public class AccountManagementFragment extends Fragment {
                     // Create a User representation based on the user type
 
                     Log.d("UserSession", "User type UPDATED: " + userType);
-                    UserSession.getInstance().getUserRepresentation().setUserType((int)(long)((Long) userType));
+                    //UserSession.getInstance().getUserRepresentation().setUserType((int)(long)((Long) userType));
                     int intUserType = (int)(long)((Long) userType);
                     Log.d("firebase", "Retrieved user type: " + userType);
 //                    String currentText = binding.userWelcomeMessage.getText().toString();
@@ -70,7 +72,7 @@ public class AccountManagementFragment extends Fragment {
                     // Create a User representation based on the user type
 
                     Log.d("UserSession", "User type UPDATED: " + userEmail);
-                    UserSession.getInstance().getUserRepresentation().setUserEmail(String.valueOf(userEmail));
+                    //UserSession.getInstance().getUserRepresentation().setUserEmail(String.valueOf(userEmail));
                         // Append the user email to the current text
 
                         Log.d("AccountManagementFragment", "usertype: organizer");
@@ -83,6 +85,7 @@ public class AccountManagementFragment extends Fragment {
         });
 
 
+        NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
 
         root.findViewById(R.id.logoutButton).setOnClickListener(v -> {
             // login the user using the email and password
@@ -91,11 +94,13 @@ public class AccountManagementFragment extends Fragment {
             // if the user is not logged in, show an error message
             UserSession.getInstance().logout();
             // go back to the login fragment
-            Fragment loginFragment = new LoginFragment();
+            /*Fragment loginFragment = new LoginFragment();
             getActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.nav_host_fragment_activity_main, loginFragment)
                     .addToBackStack(loginFragment.getClass().getName())
-                    .commit();
+                    .commit();*/
+            navController.navigate(R.id.login);
+
 //
         });
 
