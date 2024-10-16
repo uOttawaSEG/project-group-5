@@ -141,6 +141,12 @@ public class UserSession {
                 if (userType != null) {
                     // Create a User representation based on the user type
                     userRepresentation = User.newUser(userId, (int)(long)((Long) userType));
+                    if (userRepresentation == null) {
+                        Log.e("UserSession", "User representation is null 1");
+//                            return;
+                    }
+                    instantiateEmailForUser(firebaseAuth.getCurrentUser());
+                    navController.navigate(R.id.account);
                     Log.d("UserSession", "User type: " + userType);
                 } else {
                     Log.e("UserSession", "User type not found");
