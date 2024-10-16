@@ -190,7 +190,7 @@ public class CreateAccountFragment extends Fragment {
                     .replace(R.id.nav_host_fragment_activity_main, accountFragment)
                     .addToBackStack(accountFragment.getClass().getName())
                     .commit();*/
-            navController.navigate(R.id.account);
+            navController.navigate(R.id.action_create_account_to_account);
         });
         return root;
     }
