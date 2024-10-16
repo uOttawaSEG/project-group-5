@@ -5,13 +5,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_gradient_2"
     tools:context=".ui.account.CreateAccountFragment">
 
     <LinearLayout
         android:layout_width="320sp"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:layout_marginBottom="100sp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -49,6 +49,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="48sp"
                     android:gravity="center"
+                    android:textColor="@color/black"
                     android:text="@string/organizer"
                     android:textSize="@dimen/form_text_size"
                     tools:ignore="UseSwitchCompatOrMaterialXml" />
@@ -69,6 +70,8 @@
                 android:inputType="text"
                 android:minHeight="48dp"
                 android:textSize="@dimen/form_text_size"
+                android:textColorHint="@color/material_dynamic_neutral30"
+                android:textColor="@color/black"
                 android:visibility="gone" />
 
             <EditText
@@ -83,6 +86,8 @@
                 android:hint="@string/email"
                 android:inputType="textWebEmailAddress"
                 android:minHeight="48dp"
+                android:textColorHint="@color/material_dynamic_neutral30"
+                android:textColor="@color/black"
                 android:textSize="@dimen/form_text_size" />
 
             <EditText
@@ -98,6 +103,8 @@
                 android:hint="@string/phone"
                 android:inputType="phone"
                 android:minHeight="48dp"
+                android:textColorHint="@color/material_dynamic_neutral30"
+                android:textColor="@color/black"
                 android:textSize="@dimen/form_text_size" />
 
             <EditText
@@ -112,6 +119,8 @@
                 android:hint="@string/address"
                 android:inputType="textPostalAddress"
                 android:minHeight="48dp"
+                android:textColorHint="@color/material_dynamic_neutral30"
+                android:textColor="@color/black"
                 android:textSize="@dimen/form_text_size" />
 
             <EditText
@@ -126,6 +135,8 @@
                 android:hint="@string/password"
                 android:inputType="textPassword"
                 android:minHeight="48dp"
+                android:textColorHint="@color/material_dynamic_neutral30"
+                android:textColor="@color/black"
                 android:textSize="@dimen/form_text_size" />
           
           <EditText
@@ -140,6 +151,8 @@
             android:hint="@string/confirm_password"
             android:inputType="textPassword"
             android:minHeight="48dp"
+              android:textColorHint="@color/material_dynamic_neutral30"
+              android:textColor="@color/black"
             android:textSize="@dimen/form_text_size" />
 
             <EditText
@@ -154,6 +167,8 @@
                 android:hint="@string/first_name"
                 android:inputType="text"
                 android:minHeight="48dp"
+                android:textColorHint="@color/material_dynamic_neutral30"
+                android:textColor="@color/black"
                 android:textSize="@dimen/form_text_size" />
 
             <EditText
@@ -168,6 +183,8 @@
                 android:hint="@string/last_name"
                 android:inputType="text"
                 android:minHeight="48dp"
+                android:textColorHint="@color/material_dynamic_neutral30"
+                android:textColor="@color/black"
                 android:textSize="@dimen/form_text_size" />
 
             <LinearLayout
