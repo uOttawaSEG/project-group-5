@@ -83,12 +83,13 @@ public class UserSession {
         //  set the user email
         storeValue(USER_EMAIL, user.getEmail(), (task) -> {
             if (task.isSuccessful()) {
-                Log.d("UserSession", "Success: " + task.getResult());
+                Log.d("UserSession", "Success instantiateEmailForUser: success");
             } else {
                 Log.d("UserSession", "storeUserEmailError: " + task.getException());
             }
         });
         if (userRepresentation != null) {
+            Log.d("UserSession", "Set the user email in the user representation to: " + user.getEmail());
             userRepresentation.setUserEmail(user.getEmail());
         } else {
             Log.e("UserSession", "User representation is null");
@@ -134,8 +135,7 @@ public class UserSession {
 
     // Create a new user with email and password
     public void createUser(String email, String password, OnCompleteListener<AuthResult> listener) {
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(listener);
-        getUserData(USER_TYPE, new FirebaseCallback<Object>() {
+        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(listener).addOnSuccessListener(task -> {getUserData(USER_TYPE, new FirebaseCallback<Object>() {
             @Override
             public void onCallback(Object userType) {
                 if (userType != null) {
@@ -152,7 +152,8 @@ public class UserSession {
                     Log.e("UserSession", "User type not found");
                 }
             }
-        });
+        });});
+
 
     }
 
