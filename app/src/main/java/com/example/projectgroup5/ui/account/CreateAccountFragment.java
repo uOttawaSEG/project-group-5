@@ -43,28 +43,46 @@ public class CreateAccountFragment extends Fragment {
             // if the login is not successful, show an error message
             // if the user is not logged in, show an error message
             // first check if the data in the fields are valid
+
             if (binding.editTextTextEmailAddressUserCreate.getText().toString().isEmpty()) {
                 binding.editTextTextEmailAddressUserCreate.setError("Please enter an email");
                 return;
             }
-            if (binding.editTextTextPasswordUserCreate.getText().toString().isEmpty()) {
+
+            String password = binding.editTextTextPasswordUserCreate.getText().toString().trim();
+            if (password.isEmpty()){
                 binding.editTextTextPasswordUserCreate.setError("Please enter a password");
                 return;
             }
-            if (binding.editTextTextPostalAddressUserCreate.getText().toString().isEmpty()) {
+
+            String address = binding.editTextTextPostalAddressUserCreate.getText().toString().trim();
+            if (address.isEmpty()){
                 binding.editTextTextPostalAddressUserCreate.setError("Please enter an address");
                 return;
             }
-            if (binding.editTextPhoneUserCreate.getText().toString().isEmpty()) {
+
+            String phoneNumber = binding.editTextPhoneUserCreate.getText().toString().trim();
+            if (phoneNumber.isEmpty()) {
                 binding.editTextPhoneUserCreate.setError("Please enter a phone number");
                 return;
             }
-            if (binding.editTextTextUserCreate.getText().toString().isEmpty()) {
+            String firstName = binding.editTextTextUserCreate.getText().toString().trim();
+
+            if (firstName.isEmpty()){
                 binding.editTextTextUserCreate.setError("Please enter a first name");
                 return;
             }
-            if (binding.editTextText2UserCreate.getText().toString().isEmpty()) {
+            if(!firstName.matches("[a-zA-Z]+")){
+                binding.editTextTextUserCreate.setError("Invalid first name");
+                return;
+            }
+            String lastName = binding.editTextTextUserCreate.getText().toString().trim();
+            if (lastName.isEmpty()) {
                 binding.editTextText2UserCreate.setError("Please enter a last name");
+                return;
+            }
+            if(!lastName.matches("[a-zA-Z]+")){
+                binding.editTextTextUserCreate.setError("Invalid last name");
                 return;
             }
             if (binding.editTextTextConfirmPasswordUserCreate.getText().toString().isEmpty()) {
