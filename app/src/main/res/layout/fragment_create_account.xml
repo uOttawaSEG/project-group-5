@@ -1,149 +1,225 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background_gradient_2"
     tools:context=".ui.account.CreateAccountFragment">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="@dimen/form_text_size"
+        android:layout_width="320sp"
+        android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4"
+        android:background="@drawable/rounded_rectangle_border"
+        >
 
-        <Switch
-            android:id="@+id/OrganizerVSUserSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="48sp"
-            android:textSize="@dimen/form_text_size"
-            android:text="@string/organizer"
-            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
-        <EditText
-            android:id="@+id/editTextTextEmailAddressUserCreate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="@string/email"
-            android:textSize="@dimen/form_text_size"
-            android:ems="10"
-            android:inputType="textEmailAddress"
-            android:autofillHints="emailAddress" />
-
-        <EditText
-            android:id="@+id/editTextPhoneUserCreate"
-            android:maxLength="10"
+        <Space
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/phone"
-            android:textSize="@dimen/form_text_size"
-            android:ems="10"
-            android:inputType="phone"
-            android:autofillHints="phone" />
+            android:layout_weight="1" />
 
-        <EditText
-            android:id="@+id/editTextTextPostalAddressUserCreate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="@string/address"
-            android:textSize="@dimen/form_text_size"
-            android:ems="10"
-            android:inputType="textPostalAddress"
-            android:autofillHints="postalAddress" />
-
-        <EditText
-            android:id="@+id/editTextTextPasswordUserCreate"
-            android:layout_width="wrap_content"
-            android:hint="@string/password"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/form_text_size"
-            android:ems="10"
-            android:inputType="textPassword"
-            android:autofillHints="newPassword" />
-
-        <EditText
-            android:id="@+id/editTextTextConfirmPasswordUserCreate"
-            android:layout_width="wrap_content"
-            android:hint="@string/confirm_password"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/form_text_size"
-            android:ems="10"
-            android:inputType="textPassword"
-            android:autofillHints="confirmPassword" />
-
-        <EditText
-            android:id="@+id/editTextTextUserCreate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="@string/first_name"
-            android:textSize="@dimen/form_text_size"
-            android:ems="10"
-            android:inputType="text"
-            android:autofillHints="personGivenName"
-            />
-
-        <EditText
-            android:id="@+id/editTextText2UserCreate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/form_text_size"
-            android:ems="10"
-            android:hint="@string/last_name"
-            android:inputType="text"
-            android:autofillHints="personFamilyName" />
-
-        <EditText
-            android:id="@+id/editTextTextOrganisation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:textSize="@dimen/form_text_size"
-            android:inputType="text"
-            android:visibility="gone"
-            android:hint="@string/organisation"
-            android:autofillHints="organization"
-            />
 
         <LinearLayout
-            style="?android:attr/buttonBarStyle"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginBottom="5sp"
+                android:orientation="horizontal">
+
+
+                <Switch
+                    android:id="@+id/OrganizerVSUserSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48sp"
+                    android:gravity="center"
+                    android:text="@string/organizer"
+                    android:textSize="@dimen/form_text_size"
+                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/editTextTextOrganisation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5sp"
+                android:layout_marginBottom="5sp"
+                android:autofillHints="organization"
+                android:background="@drawable/rectangular_input"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="@string/organisation"
+                android:inputType="text"
+                android:minHeight="48dp"
+                android:textSize="@dimen/form_text_size"
+                android:visibility="gone" />
+
+            <EditText
+                android:id="@+id/editTextTextEmailAddressUserCreate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5sp"
+                android:autofillHints="emailAddress"
+                android:background="@drawable/rectangular_input"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="@string/email"
+                android:inputType="textWebEmailAddress"
+                android:minHeight="48dp"
+                android:textSize="@dimen/form_text_size" />
+
+            <EditText
+                android:id="@+id/editTextPhoneUserCreate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5sp"
+                android:autofillHints="phoneNumber"
+                android:background="@drawable/rectangular_input"
+                android:ems="10"
+                android:gravity="center"
+                android:maxLength="10"
+                android:hint="@string/phone"
+                android:inputType="phone"
+                android:minHeight="48dp"
+                android:textSize="@dimen/form_text_size" />
+
+            <EditText
+                android:id="@+id/editTextTextPostalAddressUserCreate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5sp"
+                android:autofillHints="Address"
+                android:background="@drawable/rectangular_input"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="@string/address"
+                android:inputType="textPostalAddress"
+                android:minHeight="48dp"
+                android:textSize="@dimen/form_text_size" />
+
+            <EditText
+                android:id="@+id/editTextTextPasswordUserCreate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5sp"
+                android:autofillHints="newPassword"
+                android:background="@drawable/rectangular_input"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:minHeight="48dp"
+                android:textSize="@dimen/form_text_size" />
+          
+          <EditText
+            android:id="@+id/editTextTextConfirmPasswordUserCreate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"
-            tools:ignore="ExtraText">
+            android:layout_marginBottom="5sp"
+            android:autofillHints="confirmPassword"
+            android:background="@drawable/rectangular_input"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="@string/confirm_password"
+            android:inputType="textPassword"
+            android:minHeight="48dp"
+            android:textSize="@dimen/form_text_size" />
 
-            <Button
-                android:id="@+id/cancelButtonCreate"
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/editTextTextUserCreate"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="1sp"
-                android:backgroundTint="@color/backbutton"
-                android:shadowColor="@color/text_shadow_button_form"
-                android:shadowDx="-2"
-                android:shadowDy="5"
-                android:shadowRadius="2"
-                android:text="@string/cancel"
-                android:textColor="@color/white"
+                android:layout_marginBottom="5sp"
+                android:autofillHints="personGivenName"
+                android:background="@drawable/rectangular_input"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="@string/first_name"
+                android:inputType="text"
+                android:minHeight="48dp"
                 android:textSize="@dimen/form_text_size" />
 
-            <Button
-                android:id="@+id/confirmCredentialAndCreateButton"
-                style="?android:attr/buttonBarButtonStyle"
+            <EditText
+                android:id="@+id/editTextText2UserCreate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="1sp"
-                android:backgroundTint="@color/loginButton2"
-                android:shadowColor="@color/text_shadow_button_form"
-                android:shadowDx="-2"
-                android:shadowDy="5"
-                android:shadowRadius="2"
-                android:text="@string/create"
-                android:textColor="@color/white"
+                android:layout_marginBottom="5sp"
+                android:autofillHints="personFamilyName"
+                android:background="@drawable/rectangular_input"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="@string/last_name"
+                android:inputType="text"
+                android:minHeight="48dp"
                 android:textSize="@dimen/form_text_size" />
-            />
+
+            <LinearLayout
+                style="?android:attr/buttonBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5sp"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                tools:ignore="ExtraText">
+
+                <Button
+                    android:id="@+id/cancelButtonCreate"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="1sp"
+                    android:background="@drawable/rounded_button"
+                    android:shadowColor="@color/text_shadow_button_form"
+                    android:shadowDx="-2"
+                    android:shadowDy="5"
+                    android:shadowRadius="2"
+                    android:text="@string/cancel"
+                    android:textColor="@color/white"
+                    android:textSize="19sp" />
+
+                <Button
+                    android:id="@+id/confirmCredentialAndCreateButton"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="1sp"
+                    android:background="@drawable/rounded_button"
+                    android:shadowColor="@color/text_shadow_button_form"
+                    android:shadowDx="-2"
+                    android:shadowDy="5"
+                    android:shadowRadius="2"
+                    android:text="@string/create"
+                    android:textColor="@color/white"
+                    android:textSize="19sp" /><![CDATA[
+
+                />
+            ]]>
+            </LinearLayout>
+
         </LinearLayout>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

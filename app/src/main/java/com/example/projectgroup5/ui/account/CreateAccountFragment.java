@@ -74,7 +74,7 @@ public class CreateAccountFragment extends Fragment {
 
             String phoneNumber = binding.editTextPhoneUserCreate.getText().toString().trim();
             //The regex code was taken on stack overflow
-            if(!PhoneNumberUtils.isGlobalPhoneNumber(phoneNumber)){
+            if(!PhoneNumberUtils.isGlobalPhoneNumber(phoneNumber) || phoneNumber.length() != 10){
                 binding.editTextPhoneUserCreate.setError("Invalid phone number");
                 errorFlag =true;
             }
@@ -98,6 +98,18 @@ public class CreateAccountFragment extends Fragment {
                 binding.editTextText2UserCreate.setError("Invalid last name");
                 errorFlag =true;
             }
+            if (binding.OrganizerVSUserSwitch.isChecked()){
+                String organisation = binding.editTextTextOrganisation.getText().toString().trim().toLowerCase();
+                if (organisation.isEmpty()){
+                    binding.editTextTextOrganisation.setError("Please enter an organisation");
+                    errorFlag =true;
+                }
+                if(!organisation.matches("[a-zA-Z]+")){
+                    binding.editTextTextOrganisation.setError("Invalid organisation");
+                    errorFlag =true;
+                }
+            }
+
             if(errorFlag){
                 return;
             }
@@ -132,7 +144,7 @@ public class CreateAccountFragment extends Fragment {
                     // show an error message
                     binding.editTextTextEmailAddressUserCreate.setError("Invalid email or password");
                     String message = task.getException().getMessage();
-                    binding.editTextTextPasswordUserCreate.setError(message.substring(message.lastIndexOf("[") + 2).replaceAll("]", "").stripTrailing());
+                    binding.editTextTextPasswordUserCreate.setError(message.substring(message.lastIndexOf("[") + 1).replaceAll("]", "").stripTrailing());
                 }
             });
 

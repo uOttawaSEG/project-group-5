@@ -15,9 +15,10 @@
         tools:layout_editor_absoluteY="1dp" >
 
         <Button
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@color/black"
+            android:background="@drawable/rounded_rectangle_border"
             android:elevation="10dp"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:id="@+id/loginButton"
             android:layout_width="200sp"
             android:textSize="@dimen/form_text_size"
@@ -35,8 +36,9 @@
 
         <Button
             android:backgroundTint="@color/white"
+            android:background="@drawable/rounded_rectangle_border"
             android:elevation="30dp"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:id="@+id/createAccountButton"
             android:layout_width="wrap_content"
             android:shadowRadius="1"
