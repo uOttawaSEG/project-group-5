@@ -94,6 +94,7 @@
                 android:background="@drawable/rectangular_input"
                 android:ems="10"
                 android:gravity="center"
+                android:maxLength="10"
                 android:hint="@string/phone"
                 android:inputType="phone"
                 android:minHeight="48dp"
