@@ -27,12 +27,9 @@
             android:layout_weight="1" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-
-
-            android:background="@color/white"
             android:orientation="vertical">
 
             <LinearLayout
@@ -54,149 +51,149 @@
 
             </LinearLayout>
 
-            <LinearLayout
+            <EditText
+                android:id="@+id/editTextTextOrganisation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5sp"
+                android:layout_marginBottom="5sp"
+                android:autofillHints="organization"
+                android:background="@drawable/rectangular_input"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="@string/organisation"
+                android:inputType="text"
+                android:minHeight="48dp"
+                android:textSize="@dimen/form_text_size"
+                android:visibility="gone" />
+
+            <EditText
+                android:id="@+id/editTextTextEmailAddressUserCreate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5sp"
+                android:autofillHints="emailAddress"
+                android:background="@drawable/rectangular_input"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="@string/email"
+                android:inputType="textWebEmailAddress"
+                android:minHeight="48dp"
+                android:textSize="@dimen/form_text_size" />
+
+            <EditText
+                android:id="@+id/editTextPhoneUserCreate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5sp"
+                android:autofillHints="phoneNumber"
+                android:background="@drawable/rectangular_input"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="@string/phone"
+                android:inputType="phone"
+                android:minHeight="48dp"
+                android:textSize="@dimen/form_text_size" />
+
+            <EditText
+                android:id="@+id/editTextTextPostalAddressUserCreate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5sp"
+                android:autofillHints="Address"
+                android:background="@drawable/rectangular_input"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="@string/address"
+                android:inputType="textPostalAddress"
+                android:minHeight="48dp"
+                android:textSize="@dimen/form_text_size" />
+
+            <EditText
+                android:id="@+id/editTextTextPasswordUserCreate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5sp"
+                android:autofillHints="newPassword"
+                android:background="@drawable/rectangular_input"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:minHeight="48dp"
+                android:textSize="@dimen/form_text_size" />
+
+            <EditText
+                android:id="@+id/editTextTextUserCreate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5sp"
+                android:autofillHints="personGivenName"
+                android:background="@drawable/rectangular_input"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="@string/first_name"
+                android:inputType="text"
+                android:minHeight="48dp"
+                android:textSize="@dimen/form_text_size" />
+
+            <EditText
+                android:id="@+id/editTextText2UserCreate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center">
+                android:layout_marginBottom="5sp"
+                android:autofillHints="personFamilyName"
+                android:background="@drawable/rectangular_input"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="@string/last_name"
+                android:inputType="text"
+                android:minHeight="48dp"
+                android:textSize="@dimen/form_text_size" />
 
-                <EditText
-                    android:id="@+id/editTextTextEmailAddressUserCreate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5sp"
-                    android:layout_marginBottom="5sp"
-                    android:autofillHints="emailAddress"
-                    android:background="@drawable/rectangular_input"
-                    android:ems="10"
-                    android:gravity="center"
-                    android:hint="@string/email"
-                    android:inputType="textWebEmailAddress"
-                    android:minHeight="48dp"
-                    android:textSize="@dimen/form_text_size" />
+            <LinearLayout
+                style="?android:attr/buttonBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5sp"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                tools:ignore="ExtraText">
 
-                <EditText
-                    android:id="@+id/editTextPhoneUserCreate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5sp"
-                    android:autofillHints="phoneNumber"
-                    android:background="@drawable/rectangular_input"
-                    android:ems="10"
-                    android:gravity="center"
-                    android:hint="@string/phone"
-                    android:inputType="phone"
-                    android:minHeight="48dp"
-                    android:textSize="@dimen/form_text_size" />
-
-                <EditText
-                    android:id="@+id/editTextTextPostalAddressUserCreate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5sp"
-                    android:autofillHints="Address"
-                    android:background="@drawable/rectangular_input"
-                    android:ems="10"
-                    android:gravity="center"
-                    android:hint="@string/address"
-                    android:inputType="textPostalAddress"
-                    android:minHeight="48dp"
-                    android:textSize="@dimen/form_text_size" />
-
-                <EditText
-                    android:id="@+id/editTextTextPasswordUserCreate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5sp"
-                    android:autofillHints="newPassword"
-                    android:background="@drawable/rectangular_input"
-                    android:ems="10"
-                    android:gravity="center"
-                    android:hint="@string/password"
-                    android:inputType="textPassword"
-                    android:minHeight="48dp"
-                    android:textSize="@dimen/form_text_size" />
-
-                <EditText
-                    android:id="@+id/editTextTextUserCreate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5sp"
-                    android:autofillHints="personGivenName"
-                    android:background="@drawable/rectangular_input"
-                    android:ems="10"
-                    android:gravity="center"
-                    android:hint="@string/first_name"
-                    android:inputType="text"
-                    android:minHeight="48dp"
-                    android:textSize="@dimen/form_text_size" />
-
-                <EditText
-                    android:id="@+id/editTextText2UserCreate"
+                <Button
+                    android:id="@+id/cancelButtonCreate"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="5sp"
-                    android:autofillHints="personFamilyName"
-                    android:background="@drawable/rectangular_input"
-                    android:ems="10"
-                    android:gravity="center"
-                    android:hint="@string/last_name"
-                    android:inputType="text"
-                    android:minHeight="48dp"
-                    android:textSize="@dimen/form_text_size" />
+                    android:layout_margin="1sp"
+                    android:background="@drawable/rounded_button"
+                    android:shadowColor="@color/text_shadow_button_form"
+                    android:shadowDx="-2"
+                    android:shadowDy="5"
+                    android:shadowRadius="2"
+                    android:text="@string/cancel"
+                    android:textColor="@color/white"
+                    android:textSize="19sp" />
 
-                <LinearLayout
-                    style="?android:attr/buttonBarStyle"
-                    android:layout_width="match_parent"
+                <Button
+                    android:id="@+id/confirmCredentialAndCreateButton"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="5sp"
-                    tools:ignore="ExtraText">
+                    android:layout_margin="1sp"
+                    android:background="@drawable/rounded_button"
+                    android:shadowColor="@color/text_shadow_button_form"
+                    android:shadowDx="-2"
+                    android:shadowDy="5"
+                    android:shadowRadius="2"
+                    android:text="@string/create"
+                    android:textColor="@color/white"
+                    android:textSize="19sp" /><![CDATA[
 
-                    <Button
-                        android:id="@+id/cancelButtonCreate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="1sp"
-                        android:background="@drawable/rounded_button"
-                        android:shadowColor="@color/text_shadow_button_form"
-                        android:shadowDx="-2"
-                        android:shadowDy="5"
-                        android:shadowRadius="2"
-                        android:text="@string/cancel"
-                        android:textColor="@color/white"
-                        android:textSize="19sp" />
-
-                    <Button
-                        android:id="@+id/confirmCredentialAndCreateButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="1sp"
-                        android:background="@drawable/rounded_button"
-                        android:shadowColor="@color/text_shadow_button_form"
-                        android:shadowDx="-2"
-                        android:shadowDy="5"
-                        android:shadowRadius="2"
-                        android:text="@string/create"
-                        android:textColor="@color/white"
-                        android:textSize="19sp" />
-                    />
-                </LinearLayout>
+                />
+            ]]>
             </LinearLayout>
-
         </LinearLayout>
-
-        <EditText
-            android:id="@+id/editTextTextOrganisation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:autofillHints="organization"
-            android:ems="10"
-            android:hint="@string/organisation"
-            android:inputType="text"
-            android:textSize="@dimen/form_text_size"
-            android:visibility="gone" />
 
         <Space
             android:layout_width="wrap_content"
