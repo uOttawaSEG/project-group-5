@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.account.LoginFragment"
-    android:background="@drawable/background_gradient_2"
     >
 
     <!-- Container for the Email and Password fields -->
@@ -15,7 +14,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/background_gradient_2"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -48,6 +46,8 @@
                 android:background="@drawable/rectangular_input"
                 android:gravity="center"
                 android:hint="@string/email"
+                android:textColorHint="@color/material_dynamic_neutral30"
+                android:textColor="@color/black"
                 android:inputType="textWebEmailAddress"
                 android:minHeight="48dp"
                 android:importantForAutofill=""
@@ -61,6 +61,8 @@
                 android:background="@drawable/rectangular_input"
                 android:gravity="center"
                 android:hint="@string/password"
+                android:textColorHint="@color/material_dynamic_neutral30"
+                android:textColor="@color/black"
                 android:inputType="textPassword"
                 android:autofillHints="password"
                 android:minHeight="48dp"
