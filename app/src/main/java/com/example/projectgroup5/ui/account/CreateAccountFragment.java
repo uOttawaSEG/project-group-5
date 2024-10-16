@@ -2,6 +2,7 @@ package com.example.projectgroup5.ui.account;
 
 
 import android.os.Bundle;
+import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,50 +44,61 @@ public class CreateAccountFragment extends Fragment {
             // if the login is not successful, show an error message
             // if the user is not logged in, show an error message
             // first check if the data in the fields are valid
-
+            boolean errorFlag = false;
             if (binding.editTextTextEmailAddressUserCreate.getText().toString().isEmpty()) {
                 binding.editTextTextEmailAddressUserCreate.setError("Please enter an email");
-                return;
+                errorFlag =true;
             }
 
             String password = binding.editTextTextPasswordUserCreate.getText().toString().trim();
             if (password.isEmpty()){
                 binding.editTextTextPasswordUserCreate.setError("Please enter a password");
-                return;
+                errorFlag =true;
+            }
+            String confirmPassword = binding.editTextTextConfirmPasswordUserCreate.getText().toString().trim();
+
+            if (confirmPassword.isEmpty()) {
+                binding.editTextTextConfirmPasswordUserCreate.setError("Please comfirm your password");
+                errorFlag =true;
             }
 
+            if(!password.equals(confirmPassword)){
+                binding.editTextTextConfirmPasswordUserCreate.setError("Incorrect password");
+                errorFlag =true;
+            }
             String address = binding.editTextTextPostalAddressUserCreate.getText().toString().trim();
             if (address.isEmpty()){
                 binding.editTextTextPostalAddressUserCreate.setError("Please enter an address");
-                return;
+                errorFlag =true;
             }
 
             String phoneNumber = binding.editTextPhoneUserCreate.getText().toString().trim();
-            if (phoneNumber.isEmpty()) {
-                binding.editTextPhoneUserCreate.setError("Please enter a phone number");
-                return;
+            //The regex code was taken on stack overflow
+            if(!PhoneNumberUtils.isGlobalPhoneNumber(phoneNumber)){
+                binding.editTextPhoneUserCreate.setError("Invalid phone number");
+                errorFlag =true;
             }
-            String firstName = binding.editTextTextUserCreate.getText().toString().trim();
 
+            String firstName = binding.editTextTextUserCreate.getText().toString().trim().toLowerCase();
             if (firstName.isEmpty()){
                 binding.editTextTextUserCreate.setError("Please enter a first name");
-                return;
+                errorFlag =true;
             }
             if(!firstName.matches("[a-zA-Z]+")){
                 binding.editTextTextUserCreate.setError("Invalid first name");
-                return;
+                errorFlag =true;
             }
-            String lastName = binding.editTextTextUserCreate.getText().toString().trim();
+
+            String lastName = binding.editTextText2UserCreate.getText().toString().trim().toLowerCase();
             if (lastName.isEmpty()) {
                 binding.editTextText2UserCreate.setError("Please enter a last name");
-                return;
+                errorFlag =true;
             }
             if(!lastName.matches("[a-zA-Z]+")){
-                binding.editTextTextUserCreate.setError("Invalid last name");
-                return;
+                binding.editTextText2UserCreate.setError("Invalid last name");
+                errorFlag =true;
             }
-            if (binding.editTextTextConfirmPasswordUserCreate.getText().toString().isEmpty()) {
-                binding.editTextTextConfirmPasswordUserCreate.setError("Please enter a password");
+            if(errorFlag){
                 return;
             }
 
