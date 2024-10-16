@@ -16,7 +16,6 @@ import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.databinding.FragmentCreateAccountBinding;
-import com.example.projectgroup5.ui.search.DashboardFragment;
 import com.example.projectgroup5.users.UserSession;
 
 public class CreateAccountFragment extends Fragment {
@@ -51,8 +50,8 @@ public class CreateAccountFragment extends Fragment {
             }
 
             String password = binding.editTextTextPasswordUserCreate.getText().toString().trim();
-            if (password.isEmpty()){
-                binding.editTextTextPasswordUserCreate.setError("Please enter a password");
+            if (password.isEmpty() || password.length() < 6){
+                binding.editTextTextPasswordUserCreate.setError("Invalid password");
                 errorFlag =true;
             }
             String confirmPassword = binding.editTextTextConfirmPasswordUserCreate.getText().toString().trim();
@@ -174,8 +173,9 @@ public class CreateAccountFragment extends Fragment {
 
                     // show an error message
                     binding.editTextTextEmailAddressUserCreate.setError("Invalid email or password");
-                    String message = task.getException().getMessage();
-                    binding.editTextTextPasswordUserCreate.setError(message.substring(message.lastIndexOf("[") + 1).replaceAll("]", "").stripTrailing());
+                    binding.editTextTextPasswordUserCreate.setError("Invalid email or password");
+//                    String message = task.getException().getMessage();
+//                    binding.editTextTextPasswordUserCreate.setError(message.substring(message.lastIndexOf("[") + 1).replaceAll("]", "").stripTrailing());
                 }
             });
 
