@@ -1,7 +1,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="@android:color/white" />
     <!-- You can adjust the stroke color to match your design -->
-    <stroke android:width="2dp" android:color="@android:color/darker_gray" />
+    <stroke android:width="2dp" android:color="@android:color/transparent" />
     <!-- Adjust the corner radius to get a rounded effect -->
     <corners android:radius="16dp" />
     <padding

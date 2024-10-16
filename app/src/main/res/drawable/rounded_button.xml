@@ -5,5 +5,5 @@
         android:left="16dp"
         android:right="16dp"
         android:top="10dp"
-        android:bottom="10dp" />
+        android:bottom="10dp"/>
 </shape>
