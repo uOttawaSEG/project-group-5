@@ -12,7 +12,7 @@
         android:title="@string/title_dashboard" />
 
     <item
-        android:id="@+id/account_managment"
+        android:id="@+id/account_management"
         android:icon="@drawable/baseline_account_box_24"
         android:title="@string/userAccount" />
 

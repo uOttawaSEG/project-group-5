@@ -1,5 +1,6 @@
 package com.example.projectgroup5.users;
 
+import static com.example.projectgroup5.users.UserSession.USER_TYPE_ADMIN;
 import static com.example.projectgroup5.users.UserSession.USER_TYPE_ORGANIZER;
 import static com.example.projectgroup5.users.UserSession.USER_TYPE_USER;
 
@@ -34,6 +35,8 @@ public abstract class User {
             return new Organizer(userId);
         } else if (userType == USER_TYPE_USER) {
             return new Attendee(userId);
+        } else if (userType == USER_TYPE_ADMIN) {
+            return new Administrator(userId);
         }
         return null;
     }

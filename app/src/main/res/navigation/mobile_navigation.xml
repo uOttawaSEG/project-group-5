@@ -16,30 +16,37 @@
         android:name="com.example.projectgroup5.ui.search.DashboardFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_dashboard" />
+    <fragment
+        android:id="@id/account_management"
+        android:name="com.example.projectgroup5.ui.account.AccountManagementFragment"
+        android:label="@string/title_dashboard"
+        tools:layout="@layout/fragment_account_management">
+
+    </fragment>
 
     <fragment
-        android:id="@+id/account_managment"
+        android:id="@+id/account"
         android:name="com.example.projectgroup5.ui.account.AccountFragment"
         android:label="@string/userAccount"
         tools:layout="@layout/fragment_account">
         <action
-            android:id="@+id/action_to_account_managment"
-            app:destination="@id/account_managment"
-            app:popUpTo="@id/account_managment"/>
+            android:id="@+id/action_to_account"
+            app:destination="@id/account"
+            app:popUpTo="@id/account"/>
         <action
             android:id="@+id/action_login"
             app:destination="@+id/login"
-            app:popUpTo="@id/account_managment"
+            app:popUpTo="@id/account"
             app:popUpToInclusive="true"/>
         <action
             android:id="@+id/action_login_or_create_account"
             app:destination="@+id/login_or_create_account"
-            app:popUpTo="@id/account_managment"
+            app:popUpTo="@id/account"
             app:popUpToInclusive="true"/>
         <action
             android:id="@+id/action_create_account"
             app:destination="@+id/create_account"
-            app:popUpTo="@id/account_managment"
+            app:popUpTo="@id/account_management"
             app:popUpToInclusive="true"/>
     </fragment>
 
@@ -55,7 +62,7 @@
 
         <action
             android:id="@+id/action_go_back_to_login"
-            app:destination="@+id/account_managment"/>
+            app:destination="@+id/account_management"/>
     </fragment>
 
     <fragment
@@ -83,7 +90,7 @@
 
         <action
             android:id="@+id/action_create_account_to_account"
-            app:destination="@+id/account_managment"/>
+            app:destination="@+id/account"/>
     </fragment>
 
 </navigation>

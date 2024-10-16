@@ -16,4 +16,6 @@
     <string name="cancel">Cancel</string>
     <string name="create">Create</string>
     <string name="login">Login</string>
+    <string name="comfirm_password">Comfirm Password</string>
+    <string name="confirm_password">Confirm Password</string>
 </resources>
