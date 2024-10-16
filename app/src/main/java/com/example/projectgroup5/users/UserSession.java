@@ -1,12 +1,12 @@
 package com.example.projectgroup5.users;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
 
 import com.example.projectgroup5.MainActivity;
-import com.google.android.gms.tasks.Task;
+import com.example.projectgroup5.R;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,8 +20,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.annotations.Nullable;
 
-import java.util.concurrent.Executor;
-
 public class UserSession {
     public static final String USER_TYPE = "UserType";
     public static final String USER_UID = "UserUID";
@@ -34,11 +32,13 @@ public class UserSession {
     public final static int USER_TYPE_ADMIN = 0;
     private static FirebaseDatabase database;
     private static User userRepresentation;
+    private static NavController navController;
 
-    private UserSession() {
+    private UserSession(NavController navController) {
         // Initialize Firebase Auth
         database = FirebaseDatabase.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
+        this.navController = navController;
         // must setup the configuration of the firebase
         // check if the user is already logged in
         instantiateUserRepresentation();
@@ -51,7 +51,10 @@ public class UserSession {
      */
     public void instantiateUserRepresentation() {
         FirebaseUser user = firebaseAuth.getCurrentUser();
-        if (user != null) {
+        if (user == null) {
+            Log.e("UserSession", "User is null");
+            return;
+        }
             userId = user.getUid();
             Log.d("UserSession", "UserSession: " + userId);
             Log.d("UserSession", "UserSession: " + firebaseAuth.getCurrentUser());
@@ -62,14 +65,18 @@ public class UserSession {
                     if (userType != null) {
                         // Create a User representation based on the user type
                         userRepresentation = User.newUser(userId, (int)(long)((Long) userType));
+                        if (userRepresentation == null) {
+                            Log.e("UserSession", "User representation is null 1");
+//                            return;
+                        }
                         instantiateEmailForUser(user);
+                        navController.navigate(R.id.account);
                         Log.d("UserSession", "User type: " + userType);
                     } else {
                         Log.e("UserSession", "User type not found");
                     }
                 }
             });
-        }
     }
 
     private void instantiateEmailForUser(FirebaseUser user) {
@@ -92,9 +99,9 @@ public class UserSession {
         return userRepresentation;
     }
 
-    public static void initialize(MainActivity activity) {
+    public static void initialize(MainActivity activity, NavController navController) {
         if (instance == null) {
-            instance = new UserSession();
+            instance = new UserSession(navController);
             Log.d("UserSession", "initialize: " + instance);
             FirebaseApp.initializeApp(activity);
         }
@@ -102,7 +109,7 @@ public class UserSession {
 
     public static UserSession getInstance() {
         if (instance == null) {
-            instance = new UserSession();
+            instance = new UserSession(navController);
         }
         return instance;
     }
@@ -157,6 +164,7 @@ public class UserSession {
     // Logout the current user
     public void logout() {
         firebaseAuth.signOut();
+        userRepresentation = null;
         clear(); // Clear user ID
     }
 

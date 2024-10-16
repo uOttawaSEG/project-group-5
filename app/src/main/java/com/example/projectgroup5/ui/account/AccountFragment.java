@@ -48,7 +48,8 @@ public class AccountFragment extends Fragment {
 
         }*/
         NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
-        if(UserSession.getInstance().getUserId() == null){
+        // Currently this is fine, userId is not null but userRepresentation is null
+        if(UserSession.getInstance().getUserId() == null || UserSession.getInstance().getUserRepresentation() == null){
             navController.navigate(R.id.action_login_or_create_account);
         }else{
             navController.navigate(R.id.account_management);

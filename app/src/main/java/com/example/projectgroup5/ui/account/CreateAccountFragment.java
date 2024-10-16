@@ -91,7 +91,7 @@ public class CreateAccountFragment extends Fragment {
                             .replace(R.id.nav_host_fragment_activity_main, dashboardFragment)
                             .addToBackStack(dashboardFragment.getClass().getName())
                             .commit();*/
-                    navController.navigate(R.id.action_create_account_to_dashboard);
+                    navController.navigate(R.id.account);
                 } else {
                     Log.d("CreateAccountFragment", "onCreateView: " + task.getException());
                     // provide more information about the error
