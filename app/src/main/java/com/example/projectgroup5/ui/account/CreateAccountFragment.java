@@ -16,7 +16,6 @@ import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.databinding.FragmentCreateAccountBinding;
-import com.example.projectgroup5.ui.search.DashboardFragment;
 import com.example.projectgroup5.users.UserSession;
 
 public class CreateAccountFragment extends Fragment {
@@ -51,8 +50,8 @@ public class CreateAccountFragment extends Fragment {
             }
 
             String password = binding.editTextTextPasswordUserCreate.getText().toString().trim();
-            if (password.isEmpty()){
-                binding.editTextTextPasswordUserCreate.setError("Please enter a password");
+            if (password.isEmpty() || password.length() < 6){
+                binding.editTextTextPasswordUserCreate.setError("Invalid password");
                 errorFlag =true;
             }
             String confirmPassword = binding.editTextTextConfirmPasswordUserCreate.getText().toString().trim();
@@ -126,8 +125,39 @@ public class CreateAccountFragment extends Fragment {
                         } else {
                             Log.d("CreateAccountFragment", "storeUserTypeError: " + task1.getException());
                         }
+                    });
 
-                            });
+                    UserSession.getInstance().storeValue(UserSession.USER_ADDRESS, address, (task1) -> {
+                        if (task1.isSuccessful()) {
+                            Log.d("CreateAccountFragment", "Success: " + task1.getResult());
+                        } else {
+                            Log.d("CreateAccountFragment", "storeUserAddressError: " + task1.getException());
+                        }
+                    });
+
+                    UserSession.getInstance().storeValue(UserSession.USER_PHONE, phoneNumber, (task1) -> {
+                        if (task1.isSuccessful()) {
+                            Log.d("CreateAccountFragment", "Success: " + task1.getResult());
+                        } else {
+                            Log.d("CreateAccountFragment", "storeUserPhoneError: " + task1.getException());
+                        }
+                    });
+
+                    UserSession.getInstance().storeValue(UserSession.USER_FIRST_NAME, firstName, (task1) -> {
+                        if (task1.isSuccessful()) {
+                            Log.d("CreateAccountFragment", "Success: " + task1.getResult());
+                        } else {
+                            Log.d("CreateAccountFragment", "storeUserFirstNameError: " + task1.getException());
+                        }
+                    });
+
+                    UserSession.getInstance().storeValue(UserSession.USER_LAST_NAME, lastName, (task1) -> {
+                        if (task1.isSuccessful()) {
+                            Log.d("CreateAccountFragment", "Success: " + task1.getResult());
+                        } else {
+                            Log.d("CreateAccountFragment", "storeUserLastNameError: " + task1.getException());
+                        }
+                    });
 
                     /*getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.nav_host_fragment_activity_main, dashboardFragment)
@@ -143,8 +173,9 @@ public class CreateAccountFragment extends Fragment {
 
                     // show an error message
                     binding.editTextTextEmailAddressUserCreate.setError("Invalid email or password");
-                    String message = task.getException().getMessage();
-                    binding.editTextTextPasswordUserCreate.setError(message.substring(message.lastIndexOf("[") + 1).replaceAll("]", "").stripTrailing());
+                    binding.editTextTextPasswordUserCreate.setError("Invalid email or password");
+//                    String message = task.getException().getMessage();
+//                    binding.editTextTextPasswordUserCreate.setError(message.substring(message.lastIndexOf("[") + 1).replaceAll("]", "").stripTrailing());
                 }
             });
 

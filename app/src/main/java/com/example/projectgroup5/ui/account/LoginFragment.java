@@ -1,6 +1,5 @@
 package com.example.projectgroup5.ui.account;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,13 +11,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.projectgroup5.R;
-import com.example.projectgroup5.databinding.FragmentAccountBinding;
-import com.example.projectgroup5.databinding.FragmentDashboardBinding;
 import com.example.projectgroup5.databinding.FragmentLoginBinding;
-import com.example.projectgroup5.ui.search.DashboardFragment;
 import com.example.projectgroup5.users.UserSession;
 
 public class LoginFragment extends Fragment {
@@ -37,6 +32,7 @@ public class LoginFragment extends Fragment {
             // if the user is not logged in, show an error message
             UserSession.getInstance().login(binding.emailInput.getText().toString(), binding.passwordInput.getText().toString(), (task) -> {
                 if (task.isSuccessful()) {
+                    Log.e("LoginFragment", "login was successful");
                     UserSession.getInstance().instantiateUserRepresentation();
                     UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
                     // add a callback to userRepresentation to navigate to account once it exists

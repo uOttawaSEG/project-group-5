@@ -24,6 +24,10 @@ public class UserSession {
     public static final String USER_TYPE = "UserType";
     public static final String USER_UID = "UserUID";
     public static final String USER_EMAIL = "UserEmail";
+    public static final String USER_PHONE = "UserPhone";
+    public static final String USER_ADDRESS = "UserAddress";
+    public static final String USER_FIRST_NAME = "UserFirstName";
+    public static final String USER_LAST_NAME = "UserLastName";
     private static UserSession instance;
     private String userId;
     private final FirebaseAuth firebaseAuth;
@@ -32,7 +36,7 @@ public class UserSession {
     public final static int USER_TYPE_ADMIN = 0;
     private static FirebaseDatabase database;
     private static User userRepresentation;
-    private static NavController navController;
+    private static NavController navController; // TODO make this not static
 
     private UserSession(NavController navController) {
         // Initialize Firebase Auth
@@ -70,7 +74,7 @@ public class UserSession {
 //                            return;
                         }
                         instantiateEmailForUser(user);
-                        navController.navigate(R.id.account);
+                        navController.navigate(R.id.account_management);
                         Log.d("UserSession", "User type: " + userType);
                     } else {
                         Log.e("UserSession", "User type not found");
@@ -129,28 +133,37 @@ public class UserSession {
 
     // Login the user using email and password with Firebase
     public void login(String email, String password, OnCompleteListener<AuthResult> listener) {
+        if (firebaseAuth.getCurrentUser() != null) {
+            firebaseAuth.signOut();
+        }
+        if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
+            Log.e("UserSession", "Email or password is empty");
+            // make a call back to the listener with a no success
+            listener.onComplete(Tasks.forException(new Exception("Email or password is empty")));
+            return;
+        }
+        Log.d("UserSession", "Login: " + email + " " + password);
+
+
         firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(listener).addOnSuccessListener(task -> instantiateUserRepresentation());
     }
 
     // Create a new user with email and password
     public void createUser(String email, String password, OnCompleteListener<AuthResult> listener) {
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(listener).addOnSuccessListener(task -> {getUserData(USER_TYPE, new FirebaseCallback<Object>() {
-            @Override
-            public void onCallback(Object userType) {
-                if (userType != null) {
-                    // Create a User representation based on the user type
-                    userRepresentation = User.newUser(userId, (int)(long)((Long) userType));
-                    if (userRepresentation == null) {
-                        Log.e("UserSession", "User representation is null 1");
+        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(listener).addOnSuccessListener(task -> {getUserData(USER_TYPE, userType -> {
+            if (userType != null) {
+                // Create a User representation based on the user type
+                userRepresentation = User.newUser(userId, (int)(long)((Long) userType));
+                if (userRepresentation == null) {
+                    Log.e("UserSession", "User representation is null 1");
 //                            return;
-                    }
-                    instantiateEmailForUser(firebaseAuth.getCurrentUser());
-                    navController.navigate(R.id.account);
-                    Log.d("UserSession", "User type: " + userType);
-                } else {
-                    Log.e("UserSession", "User type not found");
                 }
+                instantiateEmailForUser(firebaseAuth.getCurrentUser());
+                navController.navigate(R.id.account);
+                Log.d("UserSession", "User type: " + userType);
+            } else {
+                Log.e("UserSession", "User type not found");
             }
         });});
 
