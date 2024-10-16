@@ -41,40 +41,30 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.navigation_home) {
                 navController.navigate(R.id.navigation_home);
-                setTitle("Home");
+//                setTitle("Home");
             } else if (item.getItemId() == R.id.search_event_dashboard) {
                 navController.navigate(R.id.search_event_dashboard);
-                setTitle("Search Events");
+//                setTitle("Search Events");
             } else if (item.getItemId() == R.id.account_management) {
-                // Toggle between AccountFragment and SettingsFragment
-//                if (isAccountFragmentActive) {
-//                    navController.navigate(R.id.account_management);
-//                    setTitle("Account Management");
-//                } else {
-                    navController.navigate(R.id.account_management);
-                    Log.e("MainActivity", "Account fragment is active manager");
-//                    bottomNavigationView.setSelectedItemId(R.id.account_management);
-
-//                }
-                // Toggle the state
-//                isAccountFragmentActive = !isAccountFragmentActive;
-            } else if (item.getItemId() == R.id.account) {
-                navController.navigate(R.id.account);
-                Log.e("MainActivity", "Account fragment is active");
-                bottomNavigationView.setSelectedItemId(R.id.account_management);
-            } else if (item.getItemId() == R.id.login_or_create_account) {
-                navController.navigate(R.id.login_or_create_account);
-                Log.e("MainActivity", "Account fragment is active login or create");
-                bottomNavigationView.setSelectedItemId(R.id.account_management);
-            } else if (item.getItemId() == R.id.login) {
-                navController.navigate(R.id.login);
-                Log.e("MainActivity", "Account fragment is active login");
-                bottomNavigationView.setSelectedItemId(R.id.account_management);
-            } else if (item.getItemId() == R.id.create_account) {
-                navController.navigate(R.id.create_account);
-                Log.e("MainActivity", "Account fragment is active create account");
-                bottomNavigationView.setSelectedItemId(R.id.account_management);
-            } else {
+                navController.navigate(R.id.account_management);
+            }
+//            } else if (item.getItemId() == R.id.account) {
+//                navController.navigate(R.id.account);
+//                Log.e("MainActivity", "Account fragment is active");
+//                bottomNavigationView.setSelectedItemId(R.id.account_management);
+//            } else if (item.getItemId() == R.id.login_or_create_account) {
+//                navController.navigate(R.id.login_or_create_account);
+//                Log.e("MainActivity", "Account fragment is active login or create");
+//                bottomNavigationView.setSelectedItemId(R.id.account_management);
+//            } else if (item.getItemId() == R.id.login) {
+//                navController.navigate(R.id.login);
+//                Log.e("MainActivity", "Account fragment is active login");
+//                bottomNavigationView.setSelectedItemId(R.id.account_management);
+//            } else if (item.getItemId() == R.id.create_account) {
+//                navController.navigate(R.id.create_account);
+//                Log.e("MainActivity", "Account fragment is active create account");
+//                bottomNavigationView.setSelectedItemId(R.id.account_management);
+             else {
                 return false;
             }
             return true;

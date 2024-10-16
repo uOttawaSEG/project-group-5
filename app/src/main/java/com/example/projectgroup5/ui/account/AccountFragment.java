@@ -30,23 +30,6 @@ public class AccountFragment extends Fragment {
 //        AccountViewModel accountViewModel =
 //                new ViewModelProvider(this).get(AccountViewModel.class);
 
-        // place the login in the center of the remaining space
-
-        /*if (UserSession.getInstance().getUserId() == null) {
-            Fragment loginOrCreateFragment = new LoginOrCreate();
-            // add the loginOrCreateFragment to the container
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.nav_host_fragment_activity_main, loginOrCreateFragment)
-                    .addToBackStack(loginOrCreateFragment.getClass().getName())
-                    .commit();
-        } else {
-            Fragment accountManagementFragment = new AccountManagementFragment();
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.nav_host_fragment_activity_main, accountManagementFragment)
-                    .addToBackStack(accountManagementFragment.getClass().getName())
-                    .commit();
-
-        }*/
         NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
         // Currently this is fine, userId is not null but userRepresentation is null
         if(UserSession.getInstance().getUserId() == null || UserSession.getInstance().getUserRepresentation() == null){
@@ -54,8 +37,6 @@ public class AccountFragment extends Fragment {
         }else{
             navController.navigate(R.id.account_management);
         }
-
-
 
         binding = FragmentAccountBinding.inflate(inflater, container, false);
         View root = binding.getRoot();

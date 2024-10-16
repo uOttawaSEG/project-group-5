@@ -35,8 +35,6 @@ public class AccountManagementFragment extends Fragment {
             Log.d("AccountManagementFragment", "User is not logged in");
             return root;
         }
-            // go back to the login fragment
-
 
         // get the user name (email) and the user type (organizer or user or admin)
         // change the text of userWelcomeMessage based on the previous
@@ -110,31 +108,19 @@ public class AccountManagementFragment extends Fragment {
             }
         });
 
-
-
-
         root.findViewById(R.id.logoutButton).setOnClickListener(v -> {
             // login the user using the email and password
-            // if the login is successful, navigate to the dashboard fragment
+            // if the login is successful, navigate to the account frag
             // if the login is not successful, show an error message
             // if the user is not logged in, show an error message
             UserSession.getInstance().logout();
             Log.d("AccountManagementFragment", "User is not logged in");
             // go back to the login fragment
-            /*Fragment loginFragment = new LoginFragment();
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.nav_host_fragment_activity_main, loginFragment)
-                    .addToBackStack(loginFragment.getClass().getName())
-                    .commit();*/
             navController.navigate(R.id.login);
-
-//
         });
 
         return root;
     }
-
-    //
 
 
     @Override
