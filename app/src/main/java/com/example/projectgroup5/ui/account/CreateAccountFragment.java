@@ -126,8 +126,39 @@ public class CreateAccountFragment extends Fragment {
                         } else {
                             Log.d("CreateAccountFragment", "storeUserTypeError: " + task1.getException());
                         }
+                    });
 
-                            });
+                    UserSession.getInstance().storeValue(UserSession.USER_ADDRESS, address, (task1) -> {
+                        if (task1.isSuccessful()) {
+                            Log.d("CreateAccountFragment", "Success: " + task1.getResult());
+                        } else {
+                            Log.d("CreateAccountFragment", "storeUserAddressError: " + task1.getException());
+                        }
+                    });
+
+                    UserSession.getInstance().storeValue(UserSession.USER_PHONE, phoneNumber, (task1) -> {
+                        if (task1.isSuccessful()) {
+                            Log.d("CreateAccountFragment", "Success: " + task1.getResult());
+                        } else {
+                            Log.d("CreateAccountFragment", "storeUserPhoneError: " + task1.getException());
+                        }
+                    });
+
+                    UserSession.getInstance().storeValue(UserSession.USER_FIRST_NAME, firstName, (task1) -> {
+                        if (task1.isSuccessful()) {
+                            Log.d("CreateAccountFragment", "Success: " + task1.getResult());
+                        } else {
+                            Log.d("CreateAccountFragment", "storeUserFirstNameError: " + task1.getException());
+                        }
+                    });
+
+                    UserSession.getInstance().storeValue(UserSession.USER_LAST_NAME, lastName, (task1) -> {
+                        if (task1.isSuccessful()) {
+                            Log.d("CreateAccountFragment", "Success: " + task1.getResult());
+                        } else {
+                            Log.d("CreateAccountFragment", "storeUserLastNameError: " + task1.getException());
+                        }
+                    });
 
                     /*getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.nav_host_fragment_activity_main, dashboardFragment)
@@ -159,7 +190,7 @@ public class CreateAccountFragment extends Fragment {
                     .replace(R.id.nav_host_fragment_activity_main, accountFragment)
                     .addToBackStack(accountFragment.getClass().getName())
                     .commit();*/
-            navController.navigate(R.id.action_create_account_to_account);
+            navController.navigate(R.id.account);
         });
         return root;
     }

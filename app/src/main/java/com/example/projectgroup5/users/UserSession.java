@@ -24,6 +24,10 @@ public class UserSession {
     public static final String USER_TYPE = "UserType";
     public static final String USER_UID = "UserUID";
     public static final String USER_EMAIL = "UserEmail";
+    public static final String USER_PHONE = "UserPhone";
+    public static final String USER_ADDRESS = "UserAddress";
+    public static final String USER_FIRST_NAME = "UserFirstName";
+    public static final String USER_LAST_NAME = "UserLastName";
     private static UserSession instance;
     private String userId;
     private final FirebaseAuth firebaseAuth;
