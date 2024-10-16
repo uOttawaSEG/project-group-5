@@ -194,6 +194,11 @@ public class UserSession {
      * </ul>
      */
     public void getUserData(String key, final FirebaseCallback<Object> callback) {
+        if (userId == null) {
+            Log.e("UserSession", "User ID is null");
+            callback.onCallback(null);
+            return;
+        }
         DatabaseReference ref = database.getReference("users").child(userId).child(key);
 
         Log.d("UserSession", "Fetching user data for key: " + key); // Add this line

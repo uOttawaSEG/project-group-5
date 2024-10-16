@@ -26,7 +26,16 @@ public class AccountManagementFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentAccountManagementBinding.inflate(inflater, container, false);
+        NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
         View root = binding.getRoot();
+
+        if (UserSession.getInstance().getUserId() == null) {
+            navController.navigate(R.id.account);
+            Log.d("AccountManagementFragment", "User is not logged in");
+            return root;
+        }
+            // go back to the login fragment
+
 
         // get the user name (email) and the user type (organizer or user or admin)
         // change the text of userWelcomeMessage based on the previous
@@ -85,7 +94,7 @@ public class AccountManagementFragment extends Fragment {
         });
 
 
-        NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
+
 
         root.findViewById(R.id.logoutButton).setOnClickListener(v -> {
             // login the user using the email and password
