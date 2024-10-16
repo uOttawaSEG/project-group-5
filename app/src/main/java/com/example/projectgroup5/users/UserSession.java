@@ -1,12 +1,12 @@
 package com.example.projectgroup5.users;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
 
 import com.example.projectgroup5.MainActivity;
-import com.google.android.gms.tasks.Task;
+import com.example.projectgroup5.R;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,8 +20,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.annotations.Nullable;
 
-import java.util.concurrent.Executor;
-
 public class UserSession {
     public static final String USER_TYPE = "UserType";
     public static final String USER_UID = "UserUID";
@@ -34,11 +32,13 @@ public class UserSession {
     public final static int USER_TYPE_ADMIN = 0;
     private static FirebaseDatabase database;
     private static User userRepresentation;
+    private static NavController navController;
 
-    private UserSession() {
+    private UserSession(NavController navController) {
         // Initialize Firebase Auth
         database = FirebaseDatabase.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
+        this.navController = navController;
         // must setup the configuration of the firebase
         // check if the user is already logged in
         instantiateUserRepresentation();
@@ -51,7 +51,10 @@ public class UserSession {
      */
     public void instantiateUserRepresentation() {
         FirebaseUser user = firebaseAuth.getCurrentUser();
-        if (user != null) {
+        if (user == null) {
+            Log.e("UserSession", "User is null");
+            return;
+        }
             userId = user.getUid();
             Log.d("UserSession", "UserSession: " + userId);
             Log.d("UserSession", "UserSession: " + firebaseAuth.getCurrentUser());
@@ -62,26 +65,31 @@ public class UserSession {
                     if (userType != null) {
                         // Create a User representation based on the user type
                         userRepresentation = User.newUser(userId, (int)(long)((Long) userType));
+                        if (userRepresentation == null) {
+                            Log.e("UserSession", "User representation is null 1");
+//                            return;
+                        }
                         instantiateEmailForUser(user);
+                        navController.navigate(R.id.account);
                         Log.d("UserSession", "User type: " + userType);
                     } else {
                         Log.e("UserSession", "User type not found");
                     }
                 }
             });
-        }
     }
 
     private void instantiateEmailForUser(FirebaseUser user) {
         //  set the user email
         storeValue(USER_EMAIL, user.getEmail(), (task) -> {
             if (task.isSuccessful()) {
-                Log.d("UserSession", "Success: " + task.getResult());
+                Log.d("UserSession", "Success instantiateEmailForUser: success");
             } else {
                 Log.d("UserSession", "storeUserEmailError: " + task.getException());
             }
         });
         if (userRepresentation != null) {
+            Log.d("UserSession", "Set the user email in the user representation to: " + user.getEmail());
             userRepresentation.setUserEmail(user.getEmail());
         } else {
             Log.e("UserSession", "User representation is null");
@@ -92,9 +100,9 @@ public class UserSession {
         return userRepresentation;
     }
 
-    public static void initialize(MainActivity activity) {
+    public static void initialize(MainActivity activity, NavController navController) {
         if (instance == null) {
-            instance = new UserSession();
+            instance = new UserSession(navController);
             Log.d("UserSession", "initialize: " + instance);
             FirebaseApp.initializeApp(activity);
         }
@@ -102,7 +110,7 @@ public class UserSession {
 
     public static UserSession getInstance() {
         if (instance == null) {
-            instance = new UserSession();
+            instance = new UserSession(navController);
         }
         return instance;
     }
@@ -127,19 +135,25 @@ public class UserSession {
 
     // Create a new user with email and password
     public void createUser(String email, String password, OnCompleteListener<AuthResult> listener) {
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(listener);
-        getUserData(USER_TYPE, new FirebaseCallback<Object>() {
+        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(listener).addOnSuccessListener(task -> {getUserData(USER_TYPE, new FirebaseCallback<Object>() {
             @Override
             public void onCallback(Object userType) {
                 if (userType != null) {
                     // Create a User representation based on the user type
                     userRepresentation = User.newUser(userId, (int)(long)((Long) userType));
+                    if (userRepresentation == null) {
+                        Log.e("UserSession", "User representation is null 1");
+//                            return;
+                    }
+                    instantiateEmailForUser(firebaseAuth.getCurrentUser());
+                    navController.navigate(R.id.account);
                     Log.d("UserSession", "User type: " + userType);
                 } else {
                     Log.e("UserSession", "User type not found");
                 }
             }
-        });
+        });});
+
 
     }
 
@@ -157,6 +171,7 @@ public class UserSession {
     // Logout the current user
     public void logout() {
         firebaseAuth.signOut();
+        userRepresentation = null;
         clear(); // Clear user ID
     }
 
@@ -194,6 +209,11 @@ public class UserSession {
      * </ul>
      */
     public void getUserData(String key, final FirebaseCallback<Object> callback) {
+        if (userId == null) {
+            Log.e("UserSession", "User ID is null");
+            callback.onCallback(null);
+            return;
+        }
         DatabaseReference ref = database.getReference("users").child(userId).child(key);
 
         Log.d("UserSession", "Fetching user data for key: " + key); // Add this line

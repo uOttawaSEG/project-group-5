@@ -2,6 +2,7 @@ package com.example.projectgroup5.ui.account;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,16 +37,14 @@ public class LoginFragment extends Fragment {
             // if the user is not logged in, show an error message
             UserSession.getInstance().login(binding.emailInput.getText().toString(), binding.passwordInput.getText().toString(), (task) -> {
                 if (task.isSuccessful()) {
+                    UserSession.getInstance().instantiateUserRepresentation();
                     UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
-                    //Fragment dashboardFragment = new DashboardFragment();
+                    // add a callback to userRepresentation to navigate to account once it exists
 
-                    /*getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.nav_host_fragment_activity_main, dashboardFragment)
-                            .addToBackStack(dashboardFragment.getClass().getName())
-                            .commit();*/
-                    navController.navigate(R.id.action_login_to_dashboard);
+//                    navController.navigate(R.id.account);
                 } else {
                     // show an error message
+                    Log.e("LoginFragment", "login was not successful");
                     binding.emailInput.setError("Invalid email or password");
                 }
                     });

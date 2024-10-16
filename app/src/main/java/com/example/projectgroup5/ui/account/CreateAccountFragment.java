@@ -2,6 +2,7 @@ package com.example.projectgroup5.ui.account;
 
 
 import android.os.Bundle;
+import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,14 +44,64 @@ public class CreateAccountFragment extends Fragment {
             // if the login is not successful, show an error message
             // if the user is not logged in, show an error message
             // first check if the data in the fields are valid
+            boolean errorFlag = false;
             if (binding.editTextTextEmailAddressUserCreate.getText().toString().isEmpty()) {
                 binding.editTextTextEmailAddressUserCreate.setError("Please enter an email");
-                return;
+                errorFlag =true;
             }
-            if (binding.editTextTextPasswordUserCreate.getText().toString().isEmpty()) {
+
+            String password = binding.editTextTextPasswordUserCreate.getText().toString().trim();
+            if (password.isEmpty()){
                 binding.editTextTextPasswordUserCreate.setError("Please enter a password");
+                errorFlag =true;
+            }
+            String confirmPassword = binding.editTextTextConfirmPasswordUserCreate.getText().toString().trim();
+
+            if (confirmPassword.isEmpty()) {
+                binding.editTextTextConfirmPasswordUserCreate.setError("Please comfirm your password");
+                errorFlag =true;
+            }
+
+            if(!password.equals(confirmPassword)){
+                binding.editTextTextConfirmPasswordUserCreate.setError("Incorrect password");
+                errorFlag =true;
+            }
+            String address = binding.editTextTextPostalAddressUserCreate.getText().toString().trim();
+            if (address.isEmpty()){
+                binding.editTextTextPostalAddressUserCreate.setError("Please enter an address");
+                errorFlag =true;
+            }
+
+            String phoneNumber = binding.editTextPhoneUserCreate.getText().toString().trim();
+            //The regex code was taken on stack overflow
+            if(!PhoneNumberUtils.isGlobalPhoneNumber(phoneNumber)){
+                binding.editTextPhoneUserCreate.setError("Invalid phone number");
+                errorFlag =true;
+            }
+
+            String firstName = binding.editTextTextUserCreate.getText().toString().trim().toLowerCase();
+            if (firstName.isEmpty()){
+                binding.editTextTextUserCreate.setError("Please enter a first name");
+                errorFlag =true;
+            }
+            if(!firstName.matches("[a-zA-Z]+")){
+                binding.editTextTextUserCreate.setError("Invalid first name");
+                errorFlag =true;
+            }
+
+            String lastName = binding.editTextText2UserCreate.getText().toString().trim().toLowerCase();
+            if (lastName.isEmpty()) {
+                binding.editTextText2UserCreate.setError("Please enter a last name");
+                errorFlag =true;
+            }
+            if(!lastName.matches("[a-zA-Z]+")){
+                binding.editTextText2UserCreate.setError("Invalid last name");
+                errorFlag =true;
+            }
+            if(errorFlag){
                 return;
             }
+
             UserSession.getInstance().createUser(binding.editTextTextEmailAddressUserCreate.getText().toString(), binding.editTextTextPasswordUserCreate.getText().toString(), (task) -> {
                 if (task.isSuccessful()) {
                     UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
@@ -70,7 +121,7 @@ public class CreateAccountFragment extends Fragment {
                             .replace(R.id.nav_host_fragment_activity_main, dashboardFragment)
                             .addToBackStack(dashboardFragment.getClass().getName())
                             .commit();*/
-                    navController.navigate(R.id.action_create_account_to_dashboard);
+
                 } else {
                     Log.d("CreateAccountFragment", "onCreateView: " + task.getException());
                     // provide more information about the error

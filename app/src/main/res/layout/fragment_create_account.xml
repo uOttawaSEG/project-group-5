@@ -21,16 +21,20 @@
         android:background="@drawable/rounded_rectangle_border"
         >
 
+
         <Space
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
+
         <LinearLayout
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:orientation="vertical">
+
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -122,6 +126,20 @@
                 android:inputType="textPassword"
                 android:minHeight="48dp"
                 android:textSize="@dimen/form_text_size" />
+          
+          <EditText
+            android:id="@+id/editTextTextConfirmPasswordUserCreate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5sp"
+            android:autofillHints="confirmPassword"
+            android:background="@drawable/rectangular_input"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="@string/confirm_password"
+            android:inputType="textPassword"
+            android:minHeight="48dp"
+            android:textSize="@dimen/form_text_size" />
 
             <EditText
                 android:id="@+id/editTextTextUserCreate"
@@ -193,6 +211,7 @@
                 />
             ]]>
             </LinearLayout>
+
         </LinearLayout>
 
         <Space
