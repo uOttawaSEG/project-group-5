@@ -159,6 +159,14 @@ public class CreateAccountFragment extends Fragment {
                         }
                     });
 
+                    UserSession.getInstance().storeValue(UserSession.USER_REGISTRATION_STATE, UserSession.WAITLISTED, (task1) -> {
+                        if (task1.isSuccessful()) {
+                            Log.d("CreateAccountFragment", "Success: " + task1.getResult());
+                        } else {
+                            Log.d("CreateAccountFragment", "storeUserUserRegistrationState: " + task1.getException());
+                        }
+                    });
+
                     /*getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.nav_host_fragment_activity_main, dashboardFragment)
                             .addToBackStack(dashboardFragment.getClass().getName())
