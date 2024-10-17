@@ -32,6 +32,7 @@ public class UserSession {
     public static final int REJECTED = 2;
     public static final int ACCEPTED = 1;
     public static final int WAITLISTED = 0;
+    public static final String CHANNEL_ID = "account_creation_channel";
     private static UserSession instance;
     private String userId;
     private final FirebaseAuth firebaseAuth;
@@ -41,6 +42,8 @@ public class UserSession {
     private static FirebaseDatabase database;
     private static User userRepresentation;
     private static NavController navController; // TODO make this not static
+
+
 
     private UserSession(NavController navController) {
         // Initialize Firebase Auth
