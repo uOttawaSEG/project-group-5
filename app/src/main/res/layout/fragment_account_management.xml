@@ -16,12 +16,28 @@
         tools:layout_editor_absoluteY="1dp">
 
         <TextView
-            android:id="@+id/userWelcomeMessage"
+            android:id="@+id/userAccountType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textSize="30sp"
             android:visibility="gone" />
+        <TextView
+            android:id="@+id/userCurrentEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="30sp"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/userCurrentState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="30sp"
+            android:visibility="gone" />
+
+
 
         <Button
             android:id="@+id/logoutButton"
