@@ -18,6 +18,7 @@ import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.databinding.FragmentAccountManagementBinding;
+import com.example.projectgroup5.users.DatabaseManager;
 import com.example.projectgroup5.users.UserSession;
 
 public class AccountManagementFragment extends Fragment {
@@ -37,8 +38,9 @@ public class AccountManagementFragment extends Fragment {
             return root;
         }
 
-        // get the user type (organizer or user or admin)
-        UserSession.getInstance().getUserData(USER_TYPE, new UserSession.FirebaseCallback<Object>() {
+        // get the user name (email) and the user type (organizer or user or admin)
+        // change the text of userWelcomeMessage based on the previous
+        DatabaseManager.getDatabaseManager().getUserData(USER_TYPE, new UserSession.FirebaseCallback<Object>() {
             @Override
             public void onCallback(Object userType) {
                 Log.d("UserSession", "In the onCallback: " + userType);
@@ -78,8 +80,9 @@ public class AccountManagementFragment extends Fragment {
             }
         });
 
-        // get the user name (email)
-        UserSession.getInstance().getUserData(USER_EMAIL, new UserSession.FirebaseCallback<Object>() {
+        // get the user name (email) and the user type (organizer or user or admin)
+        // change the text of userWelcomeMessage based on the previous
+        DatabaseManager.getDatabaseManager().getUserData(USER_EMAIL, new UserSession.FirebaseCallback<Object>() {
             @Override
             public void onCallback(Object userEmail) {
                 Log.d("AccountManagementFragment", "In the onCallback: " + userEmail);
@@ -106,7 +109,7 @@ public class AccountManagementFragment extends Fragment {
         });
 
         // get the user registration status
-        UserSession.getInstance().getUserData(USER_REGISTRATION_STATE, new UserSession.FirebaseCallback<Object>() {
+        DatabaseManager.getDatabaseManager().getUserData(USER_REGISTRATION_STATE, new UserSession.FirebaseCallback<Object>() {
             @Override
             public void onCallback(Object userState) {
                 Log.d("AccountManagementFragment", "In the onCallback: " + userState);

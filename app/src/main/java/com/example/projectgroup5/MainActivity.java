@@ -1,8 +1,12 @@
 package com.example.projectgroup5;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.example.projectgroup5.users.DatabaseListener;
 import com.example.projectgroup5.users.UserSession;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -48,22 +52,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (item.getItemId() == R.id.account_management) {
                 navController.navigate(R.id.account_management);
             }
-//            } else if (item.getItemId() == R.id.account) {
-//                navController.navigate(R.id.account);
-//                Log.e("MainActivity", "Account fragment is active");
-//                bottomNavigationView.setSelectedItemId(R.id.account_management);
-//            } else if (item.getItemId() == R.id.login_or_create_account) {
-//                navController.navigate(R.id.login_or_create_account);
-//                Log.e("MainActivity", "Account fragment is active login or create");
-//                bottomNavigationView.setSelectedItemId(R.id.account_management);
-//            } else if (item.getItemId() == R.id.login) {
-//                navController.navigate(R.id.login);
-//                Log.e("MainActivity", "Account fragment is active login");
-//                bottomNavigationView.setSelectedItemId(R.id.account_management);
-//            } else if (item.getItemId() == R.id.create_account) {
-//                navController.navigate(R.id.create_account);
-//                Log.e("MainActivity", "Account fragment is active create account");
-//                bottomNavigationView.setSelectedItemId(R.id.account_management);
+
              else {
                 return false;
             }
@@ -73,8 +62,25 @@ public class MainActivity extends AppCompatActivity {
         // Set the default selected item
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
         UserSession.initialize(this, navController);
+        createNotificationChannel();
+        DatabaseListener.addValueAccountCreationEventListener(this);
     }
 
+
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    UserSession.CHANNEL_ID,
+                    "Account Notifications",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
     @Override
     public boolean onSupportNavigateUp() {
         return navController.navigateUp() || super.onSupportNavigateUp();
