@@ -1,6 +1,7 @@
 package com.example.projectgroup5.ui.account;
 
 import static com.example.projectgroup5.users.UserSession.USER_EMAIL;
+import static com.example.projectgroup5.users.UserSession.USER_REGISTRATION_STATE;
 import static com.example.projectgroup5.users.UserSession.USER_TYPE;
 
 import android.os.Bundle;
@@ -51,29 +52,30 @@ public class AccountManagementFragment extends Fragment {
                     int intUserType = (int)(long)((Long) userType);
                     Log.d("firebase", "Retrieved user type: " + userType);
 //                    String currentText = binding.userWelcomeMessage.getText().toString();
-                    String newText = binding.userWelcomeMessage.getText().toString();
-                    Log.d("AccountManagementFragment", "newText before usertype: " + newText);
+                    String newText;
                     if (intUserType == UserSession.USER_TYPE_ORGANIZER) {
-                        binding.userWelcomeMessage.setVisibility(View.VISIBLE);
+                        binding.userAccountType.setVisibility(View.VISIBLE);
                         Log.d("AccountManagementFragment", "usertype: organizer");
-                        newText = "Welcome Organizer" + newText;
+                        newText = "Welcome Organizer";
                     } else if (intUserType == UserSession.USER_TYPE_USER) {
-                        binding.userWelcomeMessage.setVisibility(View.VISIBLE);
+                        binding.userAccountType.setVisibility(View.VISIBLE);
                         Log.d("AccountManagementFragment", "usertype: user");
-                        newText = "Welcome User" + newText;
+                        newText = "Welcome User";
                     } else if (intUserType == UserSession.USER_TYPE_ADMIN) {
-                        binding.userWelcomeMessage.setVisibility(View.VISIBLE);
-                        newText = "Welcome Admin" + newText;
+                        binding.userAccountType.setVisibility(View.VISIBLE);
+                        Log.d("AccountManagementFragment", "usertype: admin");
+                        newText = "Welcome Admin";
                     } else {
                         // unknown user type
-                        binding.userWelcomeMessage.setVisibility(View.GONE);
+                        Log.e("AccountManagementFragment", "usertype: unknown");
+                        binding.userAccountType.setVisibility(View.GONE);
+                        newText = null;
                     }
-
-                    Log.d("AccountManagementFragment", "newText after usertype: " + newText);
-                    binding.userWelcomeMessage.setText(newText);
+                    Log.d("AccountManagementFragment", "newText for userType: " + newText);
+                    binding.userAccountType.setText(newText);
 
                 } else {
-                    Log.e("UserSession", "User type not found");
+                    Log.e("AccountManagementFragment", "User type not found");
                 }
             }
         });
@@ -95,16 +97,47 @@ public class AccountManagementFragment extends Fragment {
                     }
                         // Append the user email to the current text
 
-                        Log.d("AccountManagementFragment", "useremail: " + String.valueOf(userEmail));
-                    Log.d("AccountManagementFragment", "userWelcomeMessage: " + binding.userWelcomeMessage.getText().toString());
-                        String newText = binding.userWelcomeMessage.getText().toString() + " " + String.valueOf(userEmail);
-                        Log.d("AccountManagementFragment", "newText email: " + newText);
-                        binding.userWelcomeMessage.setText(newText);
+                        Log.d("AccountManagementFragment", "userEmail: " + String.valueOf(userEmail));
+                        binding.userCurrentEmail.setText(String.valueOf(userEmail));
                         // set the visibility of the textview
-                        binding.userWelcomeMessage.setVisibility(View.VISIBLE);
+                        binding.userCurrentEmail.setVisibility(View.VISIBLE);
 
                 } else {
                     Log.e("AccountManagementFragment", "User email not found");
+                }
+            }
+        });
+
+        // get the user registration status
+        UserSession.getInstance().getUserData(USER_REGISTRATION_STATE, new UserSession.FirebaseCallback<Object>() {
+            @Override
+            public void onCallback(Object userState) {
+                Log.d("AccountManagementFragment", "In the onCallback: " + userState);
+                if (userState != null) {
+                    int intUserState = (int)(long)((Long) userState);
+                    String newText;
+                    if (intUserState == UserSession.WAITLISTED) {
+                        binding.userCurrentState.setVisibility(View.VISIBLE);
+                        Log.d("AccountManagementFragment", "userState: waitlisted");
+                        newText = "You are on the waitlist";
+                    } else if (intUserState == UserSession.ACCEPTED) {
+                        binding.userCurrentState.setVisibility(View.VISIBLE);
+                        Log.d("AccountManagementFragment", "userState: accepted");
+                        newText = "You are registered";
+                    } else if (intUserState == UserSession.REJECTED) {
+                        binding.userCurrentState.setVisibility(View.VISIBLE);
+                        Log.d("AccountManagementFragment", "userState: rejected");
+                        newText = "Your application was rejected, call 911 for help";
+                    } else {
+                        // unknown registration state
+                        binding.userCurrentState.setVisibility(View.GONE);
+                        newText = null;
+                    }
+                    // Append the userCurrentState to the current text
+                    Log.d("AccountManagementFragment", "userState: " + String.valueOf(userState));
+                    binding.userCurrentState.setText(newText);
+                } else {
+                    Log.e("AccountManagementFragment", "User registration state not found");
                 }
             }
         });

@@ -1,5 +1,8 @@
 package com.example.projectgroup5;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -73,8 +76,21 @@ public class MainActivity extends AppCompatActivity {
         // Set the default selected item
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
         UserSession.initialize(this, navController);
+        createNotificationChannel();
     }
-
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    UserSession.CHANNEL_ID,
+                    "Account Notifications",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
     @Override
     public boolean onSupportNavigateUp() {
         return navController.navigateUp() || super.onSupportNavigateUp();

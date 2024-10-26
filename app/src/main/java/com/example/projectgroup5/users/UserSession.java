@@ -29,6 +29,11 @@ public class UserSession {
     public static final String USER_ADDRESS = "UserAddress";
     public static final String USER_FIRST_NAME = "UserFirstName";
     public static final String USER_LAST_NAME = "UserLastName";
+    public static final String USER_REGISTRATION_STATE = "UserRegistrationState";
+    public static final int REJECTED = 2;
+    public static final int ACCEPTED = 1;
+    public static final int WAITLISTED = 0;
+    public static final String CHANNEL_ID = "account_creation_channel";
     public static final String USER_ORGANIZATION_NAME = "UserOrganizationName";
     private static UserSession instance;
     private String userId;
@@ -39,6 +44,8 @@ public class UserSession {
     public final static int USER_TYPE_ADMIN = 0;
     private static User userRepresentation;
     private static NavController navController; // TODO make this not static
+
+
 
     private UserSession(NavController navController) {
         // Initialize Firebase Auth
