@@ -1,5 +1,6 @@
 package com.example.projectgroup5.users;
 
+import static com.example.projectgroup5.users.UserSession.USER_REGISTRATION_STATE;
 import static com.example.projectgroup5.users.UserSession.USER_TYPE;
 
 import android.util.Log;
@@ -163,6 +164,11 @@ public class DatabaseManager {
 
     public void getUserData(String key, final UserSession.FirebaseCallback<Object> callback) {
         getUserData(UserSession.getInstance().getUserId(), key, callback);
+    }
+
+    public void addValueEventListener(ValueEventListener valueEventListener, String key) {
+        DatabaseReference ref = database.getReference("users").child(UserSession.getInstance().getUserId()).child(key);
+        ref.addValueEventListener(valueEventListener);
     }
 
     public interface DataCallback {

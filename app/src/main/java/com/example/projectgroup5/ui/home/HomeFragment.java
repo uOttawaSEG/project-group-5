@@ -32,10 +32,10 @@ public class HomeFragment extends Fragment {
         if(UserSession.getInstance().getUserId() == null || UserSession.getInstance().getUserRepresentation() == null){
 //            navController.navigate(R.id.action_login_or_create_account);
             navController.navigate(R.id.action_navigation_home_to_home_not_logged_in);
-
-        }else{
+        }else if (UserSession.getInstance().getUserRepresentation().getUserType() == UserSession.USER_TYPE_ADMIN) {
             navController.navigate(R.id.action_navigation_home_to_admin_lists_option_selector);
-
+        } else {
+            navController.navigate(R.id.action_navigation_home_to_home_not_logged_in);
         }
 
 

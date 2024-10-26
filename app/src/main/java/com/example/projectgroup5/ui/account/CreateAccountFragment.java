@@ -29,29 +29,29 @@ import com.example.projectgroup5.users.UserSession;
 
 public class CreateAccountFragment extends Fragment {
     private FragmentCreateAccountBinding binding;
-    public void sendNotification() {
-        Intent intent = new Intent(requireContext(), MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(requireContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), UserSession.CHANNEL_ID) // Use the correct channel ID
-                .setSmallIcon(R.drawable.ic_notifications)
-                .setContentTitle("Account Created")
-                .setContentText("Your account has been successfully created.")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(requireContext());
-
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // Handle the case where permission is not granted
-            Log.e("CreateAccountFragment", "Notification permission not granted.");
-            return;
-        }
-
-        notificationManager.notify(1001, builder.build());
-    }
+//    public void sendNotification() {
+//        Intent intent = new Intent(requireContext(), MainActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(requireContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+//
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), UserSession.CHANNEL_ID) // Use the correct channel ID
+//                .setSmallIcon(R.drawable.ic_notifications)
+//                .setContentTitle("Account Created")
+//                .setContentText("Your account has been successfully created.")
+//                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//                .setContentIntent(pendingIntent)
+//                .setAutoCancel(true);
+//
+//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(requireContext());
+//
+//        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+//            // Handle the case where permission is not granted
+//            Log.e("CreateAccountFragment", "Notification permission not granted.");
+//            return;
+//        }
+//
+//        notificationManager.notify(1001, builder.build());
+//    }
 
 
 
@@ -190,7 +190,7 @@ public class CreateAccountFragment extends Fragment {
                         if (task1.isSuccessful()) {
                             Log.d("CreateAccountFragment", "Success: " + task1.getResult());
                             // Call the notification method after successful account creation
-                            sendNotification();
+//                            sendNotification();
                         } else {
                             Log.d("CreateAccountFragment", "storeUserUserRegistrationState: " + task1.getException());
                         }
