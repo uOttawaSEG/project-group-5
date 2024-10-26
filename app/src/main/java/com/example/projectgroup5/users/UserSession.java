@@ -7,6 +7,7 @@ import androidx.navigation.NavController;
 
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.R;
+import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,24 +29,29 @@ public class UserSession {
     public static final String USER_ADDRESS = "UserAddress";
     public static final String USER_FIRST_NAME = "UserFirstName";
     public static final String USER_LAST_NAME = "UserLastName";
+    public static final String USER_ORGANIZATION_NAME = "UserOrganizationName";
     private static UserSession instance;
     private String userId;
-    private final FirebaseAuth firebaseAuth;
+//    private final FirebaseAuth firebaseAuth;
+    private static FirebaseDatabase database;
     public final static int USER_TYPE_ORGANIZER = 1;
     public final static int USER_TYPE_USER = 2;
     public final static int USER_TYPE_ADMIN = 0;
-    private static FirebaseDatabase database;
     private static User userRepresentation;
     private static NavController navController; // TODO make this not static
 
     private UserSession(NavController navController) {
         // Initialize Firebase Auth
-        database = FirebaseDatabase.getInstance();
-        firebaseAuth = FirebaseAuth.getInstance();
+//        database = FirebaseDatabase.getInstance();
+//        firebaseAuth = FirebaseAuth.getInstance();
         this.navController = navController;
         // must setup the configuration of the firebase
         // check if the user is already logged in
         instantiateUserRepresentation();
+    }
+
+    public interface FirebaseCallback<T> {
+        void onCallback(T value);
     }
 
     /**
@@ -54,16 +60,16 @@ public class UserSession {
      * For now it only updates the user type and email
      */
     public void instantiateUserRepresentation() {
-        FirebaseUser user = firebaseAuth.getCurrentUser();
+        FirebaseUser user = DatabaseManager.getDatabaseManager().getCurrentUser();
         if (user == null) {
             Log.e("UserSession", "User is null");
             return;
         }
             userId = user.getUid();
-            Log.d("UserSession", "UserSession: " + userId);
-            Log.d("UserSession", "UserSession: " + firebaseAuth.getCurrentUser());
+//            Log.d("UserSession", "UserSession: " + userId);
+//            Log.d("UserSession", "UserSession: " + firebaseAuth.getCurrentUser());
             // update all the data from the database
-            getUserData(USER_TYPE, new FirebaseCallback<Object>() {
+            DatabaseManager.getDatabaseManager().getUserData(userId, USER_TYPE, new FirebaseCallback<Object>() {
                 @Override
                 public void onCallback(Object userType) {
                     if (userType != null) {
@@ -83,9 +89,14 @@ public class UserSession {
             });
     }
 
+    // Login the user using email and password with the DatabaseManager
+    public void login(String email, String password, OnCompleteListener<AuthResult> listener) {
+        DatabaseManager.getDatabaseManager().login(email, password, listener);
+    }
+
     private void instantiateEmailForUser(FirebaseUser user) {
         //  set the user email
-        storeValue(USER_EMAIL, user.getEmail(), (task) -> {
+        DatabaseManager.getDatabaseManager().storeValue(USER_EMAIL, user.getEmail(), (task) -> {
             if (task.isSuccessful()) {
                 Log.d("UserSession", "Success instantiateEmailForUser: success");
             } else {
@@ -131,66 +142,41 @@ public class UserSession {
         userId = null;
     }
 
-    // Login the user using email and password with Firebase
-    public void login(String email, String password, OnCompleteListener<AuthResult> listener) {
-        if (firebaseAuth.getCurrentUser() != null) {
-            firebaseAuth.signOut();
-        }
-        if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
-            Log.e("UserSession", "Email or password is empty");
-            // make a call back to the listener with a no success
-            listener.onComplete(Tasks.forException(new Exception("Email or password is empty")));
-            return;
-        }
-        Log.d("UserSession", "Login: " + email + " " + password);
-
-
-        firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(listener).addOnSuccessListener(task -> instantiateUserRepresentation());
-    }
-
     // Create a new user with email and password
     public void createUser(String email, String password, OnCompleteListener<AuthResult> listener) {
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(listener).addOnSuccessListener(task -> {getUserData(USER_TYPE, userType -> {
-            if (userType != null) {
-                // Create a User representation based on the user type
-                userRepresentation = User.newUser(userId, (int)(long)((Long) userType));
-                if (userRepresentation == null) {
-                    Log.e("UserSession", "User representation is null 1");
+        DatabaseManager.getDatabaseManager().createUserWithEmailAndPassword(email, password, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                DatabaseManager.getDatabaseManager().getUserData(USER_TYPE, userType -> {
+                    if (userType != null) {
+                        // Create a User representation based on the user type
+                        UserSession.getInstance().userRepresentation = User.newUser(userId, (int)(long)((Long) userType));
+                        if (userRepresentation == null) {
+                            Log.e("UserSession", "User representation is null 1");
 //                            return;
-                }
-                instantiateEmailForUser(firebaseAuth.getCurrentUser());
-                navController.navigate(R.id.account);
-                Log.d("UserSession", "User type: " + userType);
-            } else {
-                Log.e("UserSession", "User type not found");
+                        }
+                        instantiateEmailForUser(DatabaseManager.getDatabaseManager().getCurrentUser());
+                        navController.navigate(R.id.account);
+                        Log.d("UserSession", "User type: " + userType);
+                    } else {
+                        Log.e("UserSession", "User type not found");
+                    }
+                });
             }
-        });});
-
-
+        });
     }
 
-    // Delete the current user
-    public void deleteUser(OnCompleteListener<Void> listener) {
-        FirebaseUser user = firebaseAuth.getCurrentUser();
-        if (user != null) {
-            user.delete().addOnCompleteListener(listener);
-        } else {
-            // Handle case where there is no current user
-            listener.onComplete(Tasks.forException(new Exception("No user logged in")));
-        }
-    }
 
     // Logout the current user
     public void logout() {
-        firebaseAuth.signOut();
+        DatabaseManager.getDatabaseManager().logout();
         userRepresentation = null;
         clear(); // Clear user ID
     }
 
     // Check if the user is currently logged in
     public boolean isLoggedIn() {
-        FirebaseUser user = firebaseAuth.getCurrentUser();
+        FirebaseUser user = DatabaseManager.getDatabaseManager().getCurrentUser();
         return user != null;
     }
 
@@ -198,59 +184,10 @@ public class UserSession {
         this.userRepresentation.setUserType(userType);
     }
 
-    public interface FirebaseCallback<T> {
-        void onCallback(T value);
-    }
-
-    public void storeValue(String type, @Nullable Object value, OnCompleteListener<Void> listener) {
-        DatabaseReference ref = database.getReference().child("users").child(userId).child(type);
-        ref.setValue(value).addOnCompleteListener(listener);
-    }
 
 
-    /**
-     * @param key
-     * @param callback
-     * The allowed return types for the data are as follows:
-     * <ul>
-     *   <li><code>Boolean</code></li>
-     *   <li><code>String</code></li>
-     *   <li><code>Long</code></li>
-     *   <li><code>Double</code></li>
-     *   <li><code>Map&lt;String, Object&gt;</code></li>
-     *   <li><code>List&lt;Object&gt;</code></li>
-     * </ul>
-     */
-    public void getUserData(String key, final FirebaseCallback<Object> callback) {
-        if (userId == null) {
-            Log.e("UserSession", "User ID is null");
-            callback.onCallback(null);
-            return;
-        }
-        DatabaseReference ref = database.getReference("users").child(userId).child(key);
 
-        Log.d("UserSession", "Fetching user data for key: " + key); // Add this line
 
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    Object data = snapshot.getValue();
-                    Log.d("UserSession", "Data retrieved: " + data); // Add this line
-                    callback.onCallback(data);
-                } else {
-                    Log.e("UserSession", "Snapshot does not exist for key: " + key); // Add this line
-                    callback.onCallback(null);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("FirebaseError", error.getMessage());
-                callback.onCallback(null);
-            }
-        });
-    }
 
 }
 

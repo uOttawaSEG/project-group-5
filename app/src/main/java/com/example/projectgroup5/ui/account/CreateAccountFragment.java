@@ -16,6 +16,7 @@ import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.databinding.FragmentCreateAccountBinding;
+import com.example.projectgroup5.users.DatabaseManager;
 import com.example.projectgroup5.users.UserSession;
 
 public class CreateAccountFragment extends Fragment {
@@ -119,7 +120,7 @@ public class CreateAccountFragment extends Fragment {
 
                     //Fragment dashboardFragment = new DashboardFragment();
                     // add the user type to the database
-                    UserSession.getInstance().storeValue(UserSession.USER_TYPE, binding.OrganizerVSUserSwitch.isChecked() ? UserSession.USER_TYPE_ORGANIZER : UserSession.USER_TYPE_USER, (task1) -> {
+                    DatabaseManager.getDatabaseManager().storeValue(UserSession.USER_TYPE, binding.OrganizerVSUserSwitch.isChecked() ? UserSession.USER_TYPE_ORGANIZER : UserSession.USER_TYPE_USER, (task1) -> {
                         if (task1.isSuccessful()) {
                             Log.d("CreateAccountFragment", "Success: " + task1.getResult());
                         } else {
@@ -127,7 +128,7 @@ public class CreateAccountFragment extends Fragment {
                         }
                     });
 
-                    UserSession.getInstance().storeValue(UserSession.USER_ADDRESS, address, (task1) -> {
+                    DatabaseManager.getDatabaseManager().storeValue(UserSession.USER_ADDRESS, address, (task1) -> {
                         if (task1.isSuccessful()) {
                             Log.d("CreateAccountFragment", "Success: " + task1.getResult());
                         } else {
@@ -135,7 +136,7 @@ public class CreateAccountFragment extends Fragment {
                         }
                     });
 
-                    UserSession.getInstance().storeValue(UserSession.USER_PHONE, phoneNumber, (task1) -> {
+                    DatabaseManager.getDatabaseManager().storeValue(UserSession.USER_PHONE, phoneNumber, (task1) -> {
                         if (task1.isSuccessful()) {
                             Log.d("CreateAccountFragment", "Success: " + task1.getResult());
                         } else {
@@ -143,7 +144,7 @@ public class CreateAccountFragment extends Fragment {
                         }
                     });
 
-                    UserSession.getInstance().storeValue(UserSession.USER_FIRST_NAME, firstName, (task1) -> {
+                    DatabaseManager.getDatabaseManager().storeValue(UserSession.USER_FIRST_NAME, firstName, (task1) -> {
                         if (task1.isSuccessful()) {
                             Log.d("CreateAccountFragment", "Success: " + task1.getResult());
                         } else {
@@ -151,7 +152,7 @@ public class CreateAccountFragment extends Fragment {
                         }
                     });
 
-                    UserSession.getInstance().storeValue(UserSession.USER_LAST_NAME, lastName, (task1) -> {
+                    DatabaseManager.getDatabaseManager().storeValue(UserSession.USER_LAST_NAME, lastName, (task1) -> {
                         if (task1.isSuccessful()) {
                             Log.d("CreateAccountFragment", "Success: " + task1.getResult());
                         } else {

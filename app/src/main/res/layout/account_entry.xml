@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/userIdentificationEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/firstNameEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="First Name"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:padding="8dp" />
+
+    <TextView
+        android:id="@+id/lastNameEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Last Name"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:padding="8dp" />
+
+    <TextView
+        android:id="@+id/emailAddressEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Email Address"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:padding="8dp" />
+
+    <TextView
+        android:id="@+id/phoneNumberEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Phone Number"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:padding="8dp" />
+
+    <TextView
+        android:id="@+id/homeAddressEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Address"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:padding="8dp" />
+
+    <TextView
+        android:id="@+id/organizationNameEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Organization Name"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:padding="8dp"
+        android:visibility="gone" /> <!-- Initially gone -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="16dp">
+
+        <Button
+            android:id="@+id/rejectUserButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reject"
+            android:visibility="visible" /> <!-- Initially gone -->
+
+        <Button
+            android:id="@+id/acceptUserButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Accept"
+            android:layout_marginStart="16dp" />
+    </LinearLayout>
+
+</LinearLayout>

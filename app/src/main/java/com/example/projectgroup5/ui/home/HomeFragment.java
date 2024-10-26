@@ -30,9 +30,12 @@ public class HomeFragment extends Fragment {
         // Currently this isateException: Binary XML file line #30 in com.example.projectgroup5:l fine, userId is not null but userRepresentation is null
         //TODO
         if(UserSession.getInstance().getUserId() == null || UserSession.getInstance().getUserRepresentation() == null){
-            navController.navigate(R.id.action_navigation_home_to_admin_lists_option_selector);
+//            navController.navigate(R.id.action_login_or_create_account);
+            navController.navigate(R.id.action_navigation_home_to_home_not_logged_in);
+
         }else{
-            navController.navigate(R.id.navigation_home);
+            navController.navigate(R.id.action_navigation_home_to_admin_lists_option_selector);
+
         }
 
 
