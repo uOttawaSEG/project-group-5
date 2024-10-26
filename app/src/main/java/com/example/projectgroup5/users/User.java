@@ -1,14 +1,18 @@
 package com.example.projectgroup5.users;
 
+import static com.example.projectgroup5.users.UserSession.ACCEPTED;
+import static com.example.projectgroup5.users.UserSession.REJECTED;
 import static com.example.projectgroup5.users.UserSession.USER_ADDRESS;
 import static com.example.projectgroup5.users.UserSession.USER_EMAIL;
 import static com.example.projectgroup5.users.UserSession.USER_FIRST_NAME;
 import static com.example.projectgroup5.users.UserSession.USER_LAST_NAME;
 import static com.example.projectgroup5.users.UserSession.USER_ORGANIZATION_NAME;
 import static com.example.projectgroup5.users.UserSession.USER_PHONE;
+import static com.example.projectgroup5.users.UserSession.USER_REGISTRATION_STATE;
 import static com.example.projectgroup5.users.UserSession.USER_TYPE_ADMIN;
 import static com.example.projectgroup5.users.UserSession.USER_TYPE_ORGANIZER;
 import static com.example.projectgroup5.users.UserSession.USER_TYPE_USER;
+import static com.example.projectgroup5.users.UserSession.WAITLISTED;
 
 import android.content.Context;
 import android.location.Address;
@@ -141,6 +145,7 @@ public abstract class User {
                     if (value.containsKey(USER_ORGANIZATION_NAME)) {
                         setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
                         TextView userOrganizationNameTextView = customView.findViewById(R.id.organizationNameEntry);
+                        userOrganizationNameTextView.setVisibility(View.VISIBLE);
                         userOrganizationNameTextView.setText(userOrganizationName);
                     }
                     if (value.containsKey(USER_ADDRESS)) {
@@ -168,6 +173,26 @@ public abstract class User {
                         TextView userPhoneNumberTextView = customView.findViewById(R.id.phoneNumberEntry);
                         userPhoneNumberTextView.setText(userPhoneNumber);
                     }
+                    if (value.containsKey(USER_REGISTRATION_STATE)) {
+                        int userRegistrationState = (int) (long) value.get(USER_REGISTRATION_STATE);
+                        if (userRegistrationState == REJECTED) {
+                            Button rejectButton = customView.findViewById(R.id.rejectUserButton);
+                            rejectButton.setVisibility(View.GONE);
+                            Button acceptButton = customView.findViewById(R.id.acceptUserButton);
+                            acceptButton.setVisibility(View.VISIBLE);
+                        } else if (userRegistrationState == ACCEPTED) {
+                            Button rejectButton = customView.findViewById(R.id.rejectUserButton);
+                            rejectButton.setVisibility(View.GONE);
+                            Button acceptButton = customView.findViewById(R.id.acceptUserButton);
+                            acceptButton.setVisibility(View.GONE);
+                        } else if (userRegistrationState == WAITLISTED) {
+                            Button rejectButton = customView.findViewById(R.id.rejectUserButton);
+                            rejectButton.setVisibility(View.VISIBLE);
+                            Button acceptButton = customView.findViewById(R.id.acceptUserButton);
+                            acceptButton.setVisibility(View.VISIBLE);
+                        }
+                    }
+
 
                 }
             }

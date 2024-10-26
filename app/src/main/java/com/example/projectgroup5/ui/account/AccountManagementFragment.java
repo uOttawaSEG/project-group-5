@@ -109,7 +109,7 @@ public class AccountManagementFragment extends Fragment {
         });
 
         // get the user registration status
-        UserSession.getInstance().getUserData(USER_REGISTRATION_STATE, new UserSession.FirebaseCallback<Object>() {
+        DatabaseManager.getDatabaseManager().getUserData(USER_REGISTRATION_STATE, new UserSession.FirebaseCallback<Object>() {
             @Override
             public void onCallback(Object userState) {
                 Log.d("AccountManagementFragment", "In the onCallback: " + userState);

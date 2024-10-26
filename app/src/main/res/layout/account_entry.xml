@@ -4,13 +4,9 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    android:gravity="center">
+    android:gravity="center"
+    android:background="@drawable/rectangular_input">
 
-    <TextView
-        android:id="@+id/userIdentificationEntry"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/firstNameEntry"
@@ -78,8 +74,7 @@
             android:id="@+id/rejectUserButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Reject"
-            android:visibility="visible" /> <!-- Initially gone -->
+            android:text="Reject" />
 
         <Button
             android:id="@+id/acceptUserButton"
