@@ -74,12 +74,14 @@
             android:id="@+id/rejectUserButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:text="Reject" />
 
         <Button
             android:id="@+id/acceptUserButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:text="Accept"
             android:layout_marginStart="16dp" />
     </LinearLayout>

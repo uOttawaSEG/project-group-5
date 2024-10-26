@@ -207,6 +207,7 @@ public abstract class User {
             public void onClick(View v) {
                 removeUserFromLayout(layout);
                 // Handle reject button click
+                DatabaseManager.getDatabaseManager().storeValue(userId, USER_REGISTRATION_STATE, REJECTED, null);
             }
         });
         Button acceptButton = customView.findViewById(R.id.acceptUserButton);
@@ -215,6 +216,7 @@ public abstract class User {
             public void onClick(View v) {
                 removeUserFromLayout(layout);
                 // Handle accept button click
+                DatabaseManager.getDatabaseManager().storeValue(userId, USER_REGISTRATION_STATE, ACCEPTED, null);
             }
         });
 

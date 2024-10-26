@@ -9,43 +9,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserOptions {
 
-    public interface PendingUsersCallback {
+    public interface UsersCallback {
         void onDataReceived(List<User> userIds);
     }
 
-//    public static void getPendingUsers(PendingUsersCallback callback) {
-//        // TODO get pending users from database
-//        List<User> pendingUsers = new ArrayList<>();
-//        DatabaseManager databaseManager = DatabaseManager.getDatabaseManager();
-//        Log.d("UserOptions", "Getting pending users");
-//        databaseManager.getUserIdByMatchingData("UserRegistrationState", "0", new DatabaseManager.DataCallback() {
-//            @Override
-//            public void onDataReceived(List<String> userIds) {
-//                Log.d("UserOptions", "User IDs: " + userIds);
-//                Log.d("UserOptions", "User IDs: " + userIds);
-//                for (String userId : userIds) {
-//                    Log.d("UserOptions", "User ID: " + userId);
-//                    DatabaseManager.getDatabaseManager().getUserData(userId, UserSession.USER_TYPE, new UserSession.FirebaseCallback<Object>() {
-//                        @Override
-//                        public void onCallback(Object userType) {
-//                            Log.d("UserOptions", "User type: " + userType);
-//                            User user = User.newUser(userId, (int) (long) ((Long) userType));
-//                            pendingUsers.add(user);
-//                        }
-//                    });
-//                }
-//                Log.d("UserOptions", "Pending users: " + pendingUsers);
-//            }
-//            callback.onDataReceived(pendingUsers);
-//    }
-//}
-
-    public static void getPendingUsers(PendingUsersCallback callback) {
+    public static void getUsers(UsersCallback callback, int userRegistrationState) {
         List<User> pendingUsers = new ArrayList<>();
         DatabaseManager databaseManager = DatabaseManager.getDatabaseManager();
         Log.d("UserOptions", "Getting pending users");
 
-        databaseManager.getUserIdByMatchingData("UserRegistrationState", "0", new DatabaseManager.DataCallback() {
+        databaseManager.getUserIdByMatchingData("UserRegistrationState", ""+userRegistrationState, new DatabaseManager.DataCallback() {
             @Override
             public void onDataReceived(List<String> userIds) {
                 Log.d("UserOptions", "User IDs: " + userIds);
@@ -79,6 +52,16 @@ public class UserOptions {
                 }
             }
         });
+    }
+
+    public static void getAcceptedUsers(UsersCallback callback) {
+        getUsers(callback, UserSession.ACCEPTED);
+    }
+    public static void getPendingUsers(UsersCallback callback) {
+        getUsers(callback, UserSession.WAITLISTED);
+    }
+    public static void getRejectedUsers(UsersCallback callback) {
+        getUsers(callback, UserSession.REJECTED);
     }
 
 }

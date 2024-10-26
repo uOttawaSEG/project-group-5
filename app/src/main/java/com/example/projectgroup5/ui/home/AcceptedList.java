@@ -11,6 +11,25 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
+import com.example.projectgroup5.databinding.FragmentPendingListBinding;
+import com.example.projectgroup5.users.User;
+import com.example.projectgroup5.users.UserOptions;
+import com.example.projectgroup5.users.UserSession;
+
 public class AcceptedList extends Fragment{
+    private FragmentAcceptedListBinding binding;
+
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentAcceptedListBinding.inflate(inflater, container, false);
+//        UserSession.getInstance().getUserRepresentation().addUserToLayout(binding.acceptedListLinearLayout, getContext());
+        UserOptions.getAcceptedUsers(userIds -> {
+            for (User user : userIds) {
+                user.addUserToLayout(binding.acceptedListLinearLayout, getContext());
+            }
+        });
+
+        View root = binding.getRoot();
+        return root;
+    }
 
 }

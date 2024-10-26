@@ -220,10 +220,12 @@ public class DatabaseManager {
     }
 
 
-
+    public void storeValue(String userId, String type, @Nullable Object value, OnCompleteListener<Void> listener) {
+        DatabaseReference ref = database.getReference().child("users").child(userId).child(type);
+        ref.setValue(value).addOnCompleteListener(listener);
+    }
 
     public void storeValue(String type, @Nullable Object value, OnCompleteListener<Void> listener) {
-        DatabaseReference ref = database.getReference().child("users").child(UserSession.getInstance().getUserId()).child(type);
-        ref.setValue(value).addOnCompleteListener(listener);
+        storeValue(UserSession.getInstance().getUserId(), type, value, listener);
     }
 }
