@@ -6,10 +6,32 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserOptions {
 
+    /**
+     * Callback interface for receiving a list of users.
+     * <p>
+     * This interface defines a method to be called when a list of user objects is available,
+     * typically after querying a database or performing an asynchronous operation.
+     */
     public interface UsersCallback {
+        /**
+         * Called when the data retrieval is complete and the user list is available.
+         *
+         * @param userIds A list of User objects that were retrieved.
+         */
         void onDataReceived(List<User> userIds);
     }
 
+    /**
+     * Retrieves a list of users with a specific registration status.
+     * <p>
+     * This method queries the database for user IDs matching the specified registration state
+     * and then retrieves the user type for each user. It collects the user instances into a list
+     * and invokes the provided callback once all user data has been retrieved.
+     *
+     * @param callback              The callback to be invoked with the list of users once the data retrieval is complete.
+     * @param userRegistrationState The registration state to filter users by. This should correspond to
+     *                              the values defined in the user registration state enumeration.
+     */
     public static void getUsersWithRegistrationStatus(UsersCallback callback, int userRegistrationState) {
         List<User> pendingUsers = new ArrayList<>();
         DatabaseManager databaseManager = DatabaseManager.getDatabaseManager();
@@ -17,7 +39,7 @@ public class UserOptions {
             // Create a counter to track completed user data retrieval
             AtomicInteger remainingCalls = new AtomicInteger(userIds.size());
             for (String userId : userIds) {
-                DatabaseManager.getDatabaseManager().getUserData(userId, UserSession.USER_TYPE, userType -> {
+                DatabaseManager.getDatabaseManager().getUserData(userId, DatabaseManager.USER_TYPE, userType -> {
                     User user = User.newUser(userId, (int) (long) ((Long) userType));
                     pendingUsers.add(user);
                     // Decrement the counter and check if all callbacks are complete
@@ -34,12 +56,41 @@ public class UserOptions {
         });
     }
 
+    /**
+     * Retrieves a list of users who have been accepted.
+     * <p>
+     * This method invokes the {@link #getUsersWithRegistrationStatus(UsersCallback, int)} method
+     * with the registration state set to accepted. It passes the provided callback to receive
+     * the list of accepted users.
+     *
+     * @param callback The callback to be invoked with the list of accepted users once the data retrieval is complete.
+     */
     public static void getAcceptedUsers(UsersCallback callback) {
         getUsersWithRegistrationStatus(callback, UserSession.ACCEPTED);
     }
+
+    /**
+     * Retrieves a list of users who are pending approval (waitlisted).
+     * <p>
+     * This method invokes the {@link #getUsersWithRegistrationStatus(UsersCallback, int)} method
+     * with the registration state set to waitlisted. It passes the provided callback to receive
+     * the list of pending users.
+     *
+     * @param callback The callback to be invoked with the list of pending users once the data retrieval is complete.
+     */
     public static void getPendingUsers(UsersCallback callback) {
         getUsersWithRegistrationStatus(callback, UserSession.WAITLISTED);
     }
+
+    /**
+     * Retrieves a list of users who have been rejected.
+     * <p>
+     * This method invokes the {@link #getUsersWithRegistrationStatus(UsersCallback, int)} method
+     * with the registration state set to rejected. It passes the provided callback to receive
+     * the list of rejected users.
+     *
+     * @param callback The callback to be invoked with the list of rejected users once the data retrieval is complete.
+     */
     public static void getRejectedUsers(UsersCallback callback) {
         getUsersWithRegistrationStatus(callback, UserSession.REJECTED);
     }

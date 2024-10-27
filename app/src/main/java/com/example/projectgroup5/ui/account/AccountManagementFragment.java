@@ -1,9 +1,5 @@
 package com.example.projectgroup5.ui.account;
 
-import static com.example.projectgroup5.users.UserSession.USER_EMAIL;
-import static com.example.projectgroup5.users.UserSession.USER_REGISTRATION_STATE;
-import static com.example.projectgroup5.users.UserSession.USER_TYPE;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +15,7 @@ import androidx.navigation.Navigation;
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.databinding.FragmentAccountManagementBinding;
 import com.example.projectgroup5.users.DatabaseManager;
+import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
 
 public class AccountManagementFragment extends Fragment {
@@ -28,7 +25,7 @@ public class AccountManagementFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentAccountManagementBinding.inflate(inflater, container, false);
-        NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
         View root = binding.getRoot();
 
         // user representation comes out as null
@@ -56,11 +53,19 @@ public class AccountManagementFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Displays the user's registration status based on data retrieved from the database.
+     * <p>
+     * This method fetches the user's registration state from the database and updates the UI
+     * accordingly. It handles different states such as waitlisted, accepted, and rejected,
+     * setting the visibility and text of the userCurrentState view. If the user state is unknown,
+     * it hides the view.
+     */
     private void displayUserRegistrationStatus() {
-        DatabaseManager.getDatabaseManager().getUserData(USER_REGISTRATION_STATE, userState -> {
+        DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_REGISTRATION_STATE, userState -> {
             Log.d("AccountManagementFragment", "In the onCallback: " + userState);
             if (userState != null) {
-                int intUserState = (int)(long)((Long) userState);
+                int intUserState = (int) (long) ((Long) userState);
                 String newText;
                 switch (intUserState) {
                     case UserSession.WAITLISTED:
@@ -85,7 +90,7 @@ public class AccountManagementFragment extends Fragment {
                         break;
                 }
                 // Append the userCurrentState to the current text
-                Log.d("AccountManagementFragment", "userState: " + String.valueOf(userState));
+                Log.d("AccountManagementFragment", "userState: " + userState);
                 binding.userCurrentState.setText(newText);
             } else {
                 Log.e("AccountManagementFragment", "User registration state not found");
@@ -93,8 +98,16 @@ public class AccountManagementFragment extends Fragment {
         });
     }
 
+    /**
+     * Retrieves and displays the user's email address from the database.
+     * <p>
+     * This method fetches the user's email and updates the corresponding UI element.
+     * If the email is found, it also updates the user representation with the email.
+     * The visibility of the userCurrentEmail view is set to VISIBLE. If the email is not found,
+     * an error log is generated.
+     */
     private void displayUserEmail() {
-        DatabaseManager.getDatabaseManager().getUserData(USER_EMAIL, userEmail -> {
+        DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_EMAIL, userEmail -> {
             if (userEmail != null) {
                 // Create a User representation based on the user type
                 if (UserSession.getInstance().getUserRepresentation() != null) {
@@ -109,28 +122,36 @@ public class AccountManagementFragment extends Fragment {
         });
     }
 
+    /**
+     * Retrieves and displays the user's account type from the database.
+     * <p>
+     * This method fetches the user's account type and updates the corresponding UI element
+     * based on the retrieved value. It sets the visibility of the userAccountType view to
+     * VISIBLE or GONE depending on the user type (organizer, user, or admin).
+     * If the user type is not found, an error log is generated.
+     */
     private void displayUserType() {
-        DatabaseManager.getDatabaseManager().getUserData(USER_TYPE, userType -> {
+        DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_TYPE, userType -> {
             Log.d("UserSession", "In the onCallback: " + userType);
             if (userType != null) {
                 // Create a User representation based on the user type
                 Log.d("UserSession", "User type UPDATED: " + userType);
-                UserSession.getInstance().getUserRepresentation().setUserType((int)(long)((Long) userType));
-                int intUserType = (int)(long)((Long) userType);
+                UserSession.getInstance().getUserRepresentation().setUserType((int) (long) ((Long) userType));
+                int intUserType = (int) (long) ((Long) userType);
                 Log.d("firebase", "Retrieved user type: " + userType);
                 String newText;
                 switch (intUserType) {
-                    case UserSession.USER_TYPE_ORGANIZER:
+                    case User.USER_TYPE_ORGANIZER:
                         binding.userAccountType.setVisibility(View.VISIBLE);
                         Log.d("AccountManagementFragment", "usertype: organizer");
                         newText = "Welcome Organizer";
                         break;
-                    case UserSession.USER_TYPE_USER:
+                    case User.USER_TYPE_USER:
                         binding.userAccountType.setVisibility(View.VISIBLE);
                         Log.d("AccountManagementFragment", "usertype: user");
                         newText = "Welcome User";
                         break;
-                    case UserSession.USER_TYPE_ADMIN:
+                    case User.USER_TYPE_ADMIN:
                         binding.userAccountType.setVisibility(View.VISIBLE);
                         Log.d("AccountManagementFragment", "usertype: admin");
                         newText = "Welcome Admin";

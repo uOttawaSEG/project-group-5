@@ -11,8 +11,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
-import com.example.projectgroup5.databinding.FragmentAccountBinding;
-import com.example.projectgroup5.databinding.FragmentLoginBinding;
 import com.example.projectgroup5.databinding.LoginOrCreateAccountFragmentBinding;
 
 public class LoginOrCreate extends Fragment {
@@ -26,17 +24,13 @@ public class LoginOrCreate extends Fragment {
         params.width = ViewGroup.LayoutParams.MATCH_PARENT;
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
         binding.getRoot().setLayoutParams(params);
-        NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
 
         // set the buttons on click listeners for the login button and the create account button
-        binding.getRoot().findViewById(R.id.loginButton).setOnClickListener(v -> {
-            navController.navigate(R.id.action_login_or_create_account_to_login);
-        });
+        binding.getRoot().findViewById(R.id.loginButton).setOnClickListener(v -> navController.navigate(R.id.action_login_or_create_account_to_login));
 
         // same for the create account button
-        binding.getRoot().findViewById(R.id.createAccountButton).setOnClickListener(v -> {
-            navController.navigate(R.id.action_login_or_create_account_to_create_account);
-        });
+        binding.getRoot().findViewById(R.id.createAccountButton).setOnClickListener(v -> navController.navigate(R.id.action_login_or_create_account_to_create_account));
 
         return binding.getRoot();
     }

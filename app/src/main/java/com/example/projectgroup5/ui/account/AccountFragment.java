@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -23,21 +22,18 @@ public class AccountFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-
-        NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
         // Currently this is fine, userId is not null but userRepresentation is null
-        if(UserSession.getInstance().getUserId() == null || UserSession.getInstance().getUserRepresentation() == null){
+        if (UserSession.getInstance().getUserId() == null || UserSession.getInstance().getUserRepresentation() == null) {
             navController.navigate(R.id.action_login_or_create_account);
-        }else{
+        } else {
             navController.navigate(R.id.account_management);
         }
 
         binding = FragmentAccountBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-
-        final TextView textView = binding.accountSettings;
-        return root;
+        return binding.getRoot();
     }
+
 
     @Override
     public void onDestroyView() {

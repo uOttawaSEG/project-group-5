@@ -20,25 +20,16 @@ public class AdminListsOptionSelector extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentAdminListsOptionSelectorBinding.inflate(inflater, container, false);
-        ViewGroup.LayoutParams params = binding.getRoot().getLayoutParams();
-        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
-        binding.getRoot().setLayoutParams(params);
-        NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
 
-        // set the buttons on click listeners for the login button and the create account button
-        binding.getRoot().findViewById(R.id.acceptedListButton).setOnClickListener(v -> {
-            navController.navigate(R.id.action_list_options_selector_to_accepted_list);
-        });
+        // set the buttons on click listeners for the accepted list button
+        binding.getRoot().findViewById(R.id.acceptedListButton).setOnClickListener(v -> navController.navigate(R.id.action_list_options_selector_to_accepted_list));
 
-        // same for the create account button
-        binding.getRoot().findViewById(R.id.rejectedListButton).setOnClickListener(v -> {
-            navController.navigate(R.id.action_list_options_selector_to_rejected_list);
-        });
+        // same for the rejected list button
+        binding.getRoot().findViewById(R.id.rejectedListButton).setOnClickListener(v -> navController.navigate(R.id.action_list_options_selector_to_rejected_list));
 
-        binding.getRoot().findViewById(R.id.pendingListButton).setOnClickListener(v -> {
-            navController.navigate(R.id.action_list_options_selector_to_pending_list);
-        });
+        // and finally the pending list button
+        binding.getRoot().findViewById(R.id.pendingListButton).setOnClickListener(v -> navController.navigate(R.id.action_list_options_selector_to_pending_list));
 
         return binding.getRoot();
     }
