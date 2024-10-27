@@ -45,10 +45,8 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.navigation_home) {
                 navController.navigate(R.id.navigation_home);
-//                setTitle("Home");
             } else if (item.getItemId() == R.id.search_event_dashboard) {
                 navController.navigate(R.id.search_event_dashboard);
-//                setTitle("Search Events");
             } else if (item.getItemId() == R.id.account_management) {
                 navController.navigate(R.id.account_management);
             }
@@ -61,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Set the default selected item
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
+
         UserSession.initialize(this, navController);
         createNotificationChannel();
         DatabaseListener.addValueAccountCreationEventListener(this);

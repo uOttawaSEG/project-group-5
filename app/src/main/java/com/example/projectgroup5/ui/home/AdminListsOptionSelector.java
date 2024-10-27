@@ -25,33 +25,18 @@ public class AdminListsOptionSelector extends Fragment {
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
         binding.getRoot().setLayoutParams(params);
         NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
+
         // set the buttons on click listeners for the login button and the create account button
         binding.getRoot().findViewById(R.id.acceptedListButton).setOnClickListener(v -> {
-            //Fragment loginFragment = new LoginFragment();
-            /*getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.nav_host_fragment_activity_main, loginFragment)
-                    .addToBackStack(loginFragment.getClass().getName())
-                    .commit();*/
             navController.navigate(R.id.action_list_options_selector_to_accepted_list);
-
         });
 
         // same for the create account button
         binding.getRoot().findViewById(R.id.rejectedListButton).setOnClickListener(v -> {
-            //Fragment createAccountFragment = new CreateAccountFragment();
-            /*getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.nav_host_fragment_activity_main, createAccountFragment)
-                    .addToBackStack(createAccountFragment.getClass().getName())
-                    .commit();*/
             navController.navigate(R.id.action_list_options_selector_to_rejected_list);
         });
 
         binding.getRoot().findViewById(R.id.pendingListButton).setOnClickListener(v -> {
-            //Fragment createAccountFragment = new CreateAccountFragment();
-            /*getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.nav_host_fragment_activity_main, createAccountFragment)
-                    .addToBackStack(createAccountFragment.getClass().getName())
-                    .commit();*/
             navController.navigate(R.id.action_list_options_selector_to_pending_list);
         });
 

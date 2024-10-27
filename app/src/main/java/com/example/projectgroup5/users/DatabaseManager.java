@@ -1,13 +1,9 @@
 package com.example.projectgroup5.users;
 
-import static com.example.projectgroup5.users.UserSession.USER_REGISTRATION_STATE;
-import static com.example.projectgroup5.users.UserSession.USER_TYPE;
-
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.projectgroup5.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.AuthResult;
@@ -22,14 +18,12 @@ import com.google.firebase.database.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DatabaseManager {
 
     private static final DatabaseManager databaseManager = new DatabaseManager();
-
     private final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
@@ -37,15 +31,13 @@ public class DatabaseManager {
         return databaseManager;
     }
 
-    // make it impossible to create more than one instance of the database manager
+    // hide the constructor
     private DatabaseManager() {
     }
 
     // Login the user using email and password with Firebase
     public void login(String email, String password, OnCompleteListener<AuthResult> listener) {
-        if (firebaseAuth.getCurrentUser() != null) {
-            firebaseAuth.signOut();
-        }
+        logout();
         if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
             Log.e("UserSession", "Email or password is empty");
             // make a call back to the listener with a no success
@@ -53,55 +45,54 @@ public class DatabaseManager {
             return;
         }
         Log.d("UserSession", "Login: " + email + " " + password);
-
-
         firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(listener).addOnSuccessListener(task -> UserSession.getInstance().instantiateUserRepresentation());
     }
 
     public void logout() {
-        firebaseAuth.signOut();
+        if (firebaseAuth.getCurrentUser() != null) {
+            firebaseAuth.signOut();
+        }
     }
 
-
-    // get current user
     public FirebaseUser getCurrentUser() {
         return firebaseAuth.getCurrentUser();
     }
-
 
     public void createUserWithEmailAndPassword(String email, String password, OnCompleteListener<AuthResult> listener) {
         if (firebaseAuth.getCurrentUser() != null) {
             firebaseAuth.signOut();
             firebaseAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(listener).addOnSuccessListener(task -> UserSession.getInstance().instantiateUserRepresentation());
+                    .addOnCompleteListener(listener).addOnSuccessListener(task -> UserSession.getInstance().instantiateUserRepresentation());
         }
     }
 
-    // Delete the current user
     public void deleteUser(OnCompleteListener<Void> listener) {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
+            DatabaseReference ref = database.getReference("users").child(user.getUid());
+            ref.removeValue().addOnCompleteListener(listener);
+            // Delete the user from Firebase Authentication
             user.delete().addOnCompleteListener(listener);
+            // Clear the user session
+            UserSession.getInstance().clear();
         } else {
-            // Handle case where there is no current user
+            // Edge case where no user is logged in
             listener.onComplete(Tasks.forException(new Exception("No user logged in")));
         }
     }
 
-
     /**
      * @param key
-     * @param callback
-     * The allowed return types for the data are as follows:
-     * <ul>
-     *   <li><code>Boolean</code></li>
-     *   <li><code>String</code></li>
-     *   <li><code>Long</code></li>
-     *   <li><code>Double</code></li>
-     *   <li><code>Map&lt;String, Object&gt;</code></li>
-     *   <li><code>List&lt;Object&gt;</code></li>
-     * </ul>
+     * @param callback The allowed return types for the data are as follows:
+     *                 <ul>
+     *                   <li><code>Boolean</code></li>
+     *                   <li><code>String</code></li>
+     *                   <li><code>Long</code></li>
+     *                   <li><code>Double</code></li>
+     *                   <li><code>Map&lt;String, Object&gt;</code></li>
+     *                   <li><code>List&lt;Object&gt;</code></li>
+     *                 </ul>
      */
     public void getUserData(String userId, String key, final UserSession.FirebaseCallback<Object> callback) {
         if (userId == null) {
@@ -175,7 +166,7 @@ public class DatabaseManager {
         void onDataReceived(List<String> userIds);
     }
 
-    public void getUserIdByMatchingData(String entry, String pattern, DataCallback callback) {
+    public void getUserIdByMatchingData(String key, String matchingValue, DataCallback callback) {
         DatabaseReference ref = database.getReference("users");
         List<String> userIds = new ArrayList<>();
 
@@ -193,16 +184,16 @@ public class DatabaseManager {
                             }
 
                             Map<String, Object> userMap = (Map<String, Object>) userEntry.getValue();
-                            if (!userMap.containsKey(entry)) {
+                            if (!userMap.containsKey(key)) {
                                 continue;
                             }
 
-                            Object userEntryValue = userMap.get(entry);
+                            Object userEntryValue = userMap.get(key);
                             if (userEntryValue == null) {
                                 continue;
                             }
 
-                            if (!userEntryValue.toString().equals(pattern)) {
+                            if (!userEntryValue.toString().equals(matchingValue)) {
                                 continue;
                             }
 
@@ -224,7 +215,6 @@ public class DatabaseManager {
             }
         });
     }
-
 
     public void storeValue(String userId, String type, @Nullable Object value, OnCompleteListener<Void> listener) {
         DatabaseReference ref = database.getReference().child("users").child(userId).child(type);

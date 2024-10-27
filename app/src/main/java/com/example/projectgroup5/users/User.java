@@ -1,22 +1,8 @@
 package com.example.projectgroup5.users;
 
-import static com.example.projectgroup5.users.UserSession.ACCEPTED;
-import static com.example.projectgroup5.users.UserSession.REJECTED;
-import static com.example.projectgroup5.users.UserSession.USER_ADDRESS;
-import static com.example.projectgroup5.users.UserSession.USER_EMAIL;
-import static com.example.projectgroup5.users.UserSession.USER_FIRST_NAME;
-import static com.example.projectgroup5.users.UserSession.USER_LAST_NAME;
-import static com.example.projectgroup5.users.UserSession.USER_ORGANIZATION_NAME;
-import static com.example.projectgroup5.users.UserSession.USER_PHONE;
-import static com.example.projectgroup5.users.UserSession.USER_REGISTRATION_STATE;
-import static com.example.projectgroup5.users.UserSession.USER_TYPE_ADMIN;
-import static com.example.projectgroup5.users.UserSession.USER_TYPE_ORGANIZER;
-import static com.example.projectgroup5.users.UserSession.USER_TYPE_USER;
-import static com.example.projectgroup5.users.UserSession.WAITLISTED;
+import static com.example.projectgroup5.users.UserSession.*;
 
 import android.content.Context;
-import android.location.Address;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -124,14 +110,6 @@ public abstract class User {
 
         View customView = LayoutInflater.from(context).inflate(R.layout.account_entry, layout, false);
         customView.setId(userId.hashCode());
-//        TextView userFirstNameTextView = customView.findViewById(R.id.firstNameEntry);
-//        userFirstNameTextView.setText(userFirstName);
-//        TextView userLastNameTextView = customView.findViewById(R.id.lastNameEntry);
-//        userLastNameTextView.setText(userLastName);
-//        TextView userEmailTextView = customView.findViewById(R.id.emailAddressEntry);
-//        userEmailTextView.setText(userEmail);
-//        TextView userPhoneNumberTextView = customView.findViewById(R.id.phoneNumberEntry);
-//        userPhoneNumberTextView.setText(userPhoneNumber);
         // set get the data from firebase if possible
         DatabaseManager.getDatabaseManager().getAllUserData(userId, new UserSession.FirebaseCallback<Map<String, Object>>() {
             @Override
@@ -175,21 +153,28 @@ public abstract class User {
                     }
                     if (value.containsKey(USER_REGISTRATION_STATE)) {
                         int userRegistrationState = (int) (long) value.get(USER_REGISTRATION_STATE);
-                        if (userRegistrationState == REJECTED) {
-                            Button rejectButton = customView.findViewById(R.id.rejectUserButton);
-                            rejectButton.setVisibility(View.GONE);
-                            Button acceptButton = customView.findViewById(R.id.acceptUserButton);
-                            acceptButton.setVisibility(View.VISIBLE);
-                        } else if (userRegistrationState == ACCEPTED) {
-                            Button rejectButton = customView.findViewById(R.id.rejectUserButton);
-                            rejectButton.setVisibility(View.GONE);
-                            Button acceptButton = customView.findViewById(R.id.acceptUserButton);
-                            acceptButton.setVisibility(View.GONE);
-                        } else if (userRegistrationState == WAITLISTED) {
-                            Button rejectButton = customView.findViewById(R.id.rejectUserButton);
-                            rejectButton.setVisibility(View.VISIBLE);
-                            Button acceptButton = customView.findViewById(R.id.acceptUserButton);
-                            acceptButton.setVisibility(View.VISIBLE);
+                        switch (userRegistrationState) {
+                            case REJECTED: {
+                                Button rejectButton = customView.findViewById(R.id.rejectUserButton);
+                                rejectButton.setVisibility(View.GONE);
+                                Button acceptButton = customView.findViewById(R.id.acceptUserButton);
+                                acceptButton.setVisibility(View.VISIBLE);
+                                break;
+                            }
+                            case ACCEPTED: {
+                                Button rejectButton = customView.findViewById(R.id.rejectUserButton);
+                                rejectButton.setVisibility(View.GONE);
+                                Button acceptButton = customView.findViewById(R.id.acceptUserButton);
+                                acceptButton.setVisibility(View.GONE);
+                                break;
+                            }
+                            case WAITLISTED: {
+                                Button rejectButton = customView.findViewById(R.id.rejectUserButton);
+                                rejectButton.setVisibility(View.VISIBLE);
+                                Button acceptButton = customView.findViewById(R.id.acceptUserButton);
+                                acceptButton.setVisibility(View.VISIBLE);
+                                break;
+                            }
                         }
                     }
 
@@ -197,27 +182,18 @@ public abstract class User {
                 }
             }
         });
-//        TextView userAddressTextView = customView.findViewById(R.id.homeAddressEntry);
-//        userAddressTextView.setText(userAddress);
-
 
         Button rejectButton = customView.findViewById(R.id.rejectUserButton);
-        rejectButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                removeUserFromLayout(layout);
-                // Handle reject button click
-                DatabaseManager.getDatabaseManager().storeValue(userId, USER_REGISTRATION_STATE, REJECTED, null);
-            }
+        rejectButton.setOnClickListener(v -> {
+            removeUserFromLayout(layout);
+            // Handle reject button click
+            DatabaseManager.getDatabaseManager().storeValue(userId, USER_REGISTRATION_STATE, REJECTED, null);
         });
         Button acceptButton = customView.findViewById(R.id.acceptUserButton);
-        acceptButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                removeUserFromLayout(layout);
-                // Handle accept button click
-                DatabaseManager.getDatabaseManager().storeValue(userId, USER_REGISTRATION_STATE, ACCEPTED, null);
-            }
+        acceptButton.setOnClickListener(v -> {
+            removeUserFromLayout(layout);
+            // Handle accept button click
+            DatabaseManager.getDatabaseManager().storeValue(userId, USER_REGISTRATION_STATE, ACCEPTED, null);
         });
 
 

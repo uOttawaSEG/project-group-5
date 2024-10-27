@@ -21,15 +21,13 @@ public class AcceptedList extends Fragment{
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentAcceptedListBinding.inflate(inflater, container, false);
-//        UserSession.getInstance().getUserRepresentation().addUserToLayout(binding.acceptedListLinearLayout, getContext());
         UserOptions.getAcceptedUsers(userIds -> {
             for (User user : userIds) {
                 user.addUserToLayout(binding.acceptedListLinearLayout, getContext());
             }
         });
 
-        View root = binding.getRoot();
-        return root;
+        return binding.getRoot();
     }
 
 }

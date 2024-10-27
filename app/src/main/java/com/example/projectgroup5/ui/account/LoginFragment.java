@@ -26,43 +26,24 @@ public class LoginFragment extends Fragment {
         View root = binding.getRoot();
         NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
         root.findViewById(R.id.confirmCredentialAndLoginButton).setOnClickListener(v -> {
-            // login the user using the email and password
-            // if the login is successful, navigate to the dashboard fragment
-            // if the login is not successful, show an error message
-            // if the user is not logged in, show an error message
             UserSession.getInstance().login(binding.emailInput.getText().toString(), binding.passwordInput.getText().toString(), (task) -> {
                 if (task.isSuccessful()) {
                     Log.e("LoginFragment", "login was successful");
                     UserSession.getInstance().instantiateUserRepresentation();
                     UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
-                    // add a callback to userRepresentation to navigate to account once it exists
-
-//                    navController.navigate(R.id.account);
                 } else {
                     // show an error message
                     Log.e("LoginFragment", "login was not successful");
                     binding.emailInput.setError("Invalid email or password");
                 }
-                    });
+            });
 
-
-//
         });
         root.findViewById(R.id.cancelButton).setOnClickListener(v -> {
-            // go back
-            //Fragment accountFragment = new AccountFragment();
-
-            /*getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.nav_host_fragment_activity_main, accountFragments)
-                    .addToBackStack(accountFragment.getClass().getName())
-                    .commit();*/
             navController.navigate(R.id.action_go_back_to_login);
         });
         return root;
     }
-
-    //
-
 
     @Override
     public void onDestroyView() {

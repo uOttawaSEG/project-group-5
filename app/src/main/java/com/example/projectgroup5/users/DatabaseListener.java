@@ -17,35 +17,27 @@ public class DatabaseListener {
         DatabaseManager.getDatabaseManager().addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // Check if the value exists and equals 1
-                if (dataSnapshot.exists()) {
-                    Integer value = dataSnapshot.getValue(Integer.class);
-                    if (value == null || value != 1) {
-                        DatabaseManager.getDatabaseManager().addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                // Check if the value exists and equals 1
-                                if (dataSnapshot.exists()) {
-                                    Integer value = dataSnapshot.getValue(Integer.class);
-                                    if (value != null && value == 1) {
-                                        Notification.sendNotification(context);
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                // Handle possible errors.
-                                Log.e("FirebaseError", databaseError.getMessage());
-                            }
-                        }, USER_REGISTRATION_STATE);
+                // Check if the value exists and is not equal 1
+                if (!dataSnapshot.exists()) return;
+                Integer value = dataSnapshot.getValue(Integer.class);
+                if (!(value == null || value != 1)) return;
+                DatabaseManager.getDatabaseManager().addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        // Check if the value exists and equals 1 (this means it has been updated to 1)
+                        if (!dataSnapshot.exists()) return;
+                        Integer value = dataSnapshot.getValue(Integer.class);
+                        if (value != null && value == 1)
+                            Notification.sendNotification(context);
                     }
-                }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.e("FirebaseError", databaseError.getMessage());
+                    }
+                }, USER_REGISTRATION_STATE);
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle possible errors.
                 Log.e("FirebaseError", databaseError.getMessage());
             }
         }, USER_REGISTRATION_STATE);

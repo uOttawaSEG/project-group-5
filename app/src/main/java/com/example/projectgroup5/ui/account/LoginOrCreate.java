@@ -27,24 +27,14 @@ public class LoginOrCreate extends Fragment {
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
         binding.getRoot().setLayoutParams(params);
         NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
+
         // set the buttons on click listeners for the login button and the create account button
         binding.getRoot().findViewById(R.id.loginButton).setOnClickListener(v -> {
-            //Fragment loginFragment = new LoginFragment();
-            /*getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.nav_host_fragment_activity_main, loginFragment)
-                    .addToBackStack(loginFragment.getClass().getName())
-                    .commit();*/
             navController.navigate(R.id.action_login_or_create_account_to_login);
-
         });
 
         // same for the create account button
         binding.getRoot().findViewById(R.id.createAccountButton).setOnClickListener(v -> {
-            //Fragment createAccountFragment = new CreateAccountFragment();
-            /*getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.nav_host_fragment_activity_main, createAccountFragment)
-                    .addToBackStack(createAccountFragment.getClass().getName())
-                    .commit();*/
             navController.navigate(R.id.action_login_or_create_account_to_create_account);
         });
 
