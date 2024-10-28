@@ -3,13 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/search_event_dashboard">
 
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.example.projectgroup5.ui.home.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_navigation_home_to_admin_lists_option_selector"
+            app:destination="@id/admin_lists_option_selector" />
+        <action
+            android:id="@+id/action_navigation_home_to_home_not_logged_in"
+            app:destination="@id/home_not_logged_in" />
+    </fragment>
 
     <fragment
         android:id="@+id/search_event_dashboard"
@@ -92,5 +99,44 @@
             android:id="@+id/action_create_account_to_account"
             app:destination="@+id/account"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/admin_lists_option_selector"
+        android:name="com.example.projectgroup5.ui.home.AdminListsOptionSelector"
+        android:label="Home"
+        tools:layout="@layout/fragment_admin_lists_option_selector">
+        <action
+            android:id="@+id/action_list_options_selector_to_accepted_list"
+            app:destination="@+id/accepted_list"/>
+        <action
+            android:id="@+id/action_list_options_selector_to_rejected_list"
+            app:destination="@+id/rejected_list"/>
+        <action
+            android:id="@+id/action_list_options_selector_to_pending_list"
+            app:destination="@+id/pending_list"/>
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/accepted_list"
+        android:name="com.example.projectgroup5.ui.home.AcceptedList"
+        android:label="Home"
+        tools:layout="@layout/fragment_accepted_list"/>
+    <fragment
+        android:id="@+id/rejected_list"
+        android:name="com.example.projectgroup5.ui.home.RejectedList"
+        android:label="Home"
+        tools:layout="@layout/fragment_rejected_list"/>
+    <fragment
+        android:id="@+id/pending_list"
+        android:name="com.example.projectgroup5.ui.home.PendingList"
+        android:label="Home"
+        tools:layout="@layout/fragment_pending_list"/>
+    <fragment
+        android:id="@+id/home_not_logged_in"
+        android:name="com.example.projectgroup5.ui.home.HomeNotLoggedInFragment"
+        android:label="Home"
+        tools:layout="@layout/not_logged_in_home" />
+
 
 </navigation>

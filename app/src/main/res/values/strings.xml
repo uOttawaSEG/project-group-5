@@ -18,4 +18,7 @@
     <string name="login">Login</string>
     <string name="comfirm_password">Comfirm Password</string>
     <string name="confirm_password">Confirm Password</string>
+    <string name="pending_list">Pending List</string>
+    <string name="rejected_list">Rejected List</string>
+    <string name="accepted_list">Accepted List</string>
 </resources>

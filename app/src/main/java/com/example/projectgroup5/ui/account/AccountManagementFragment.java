@@ -1,9 +1,5 @@
 package com.example.projectgroup5.ui.account;
 
-import static com.example.projectgroup5.users.UserSession.USER_EMAIL;
-import static com.example.projectgroup5.users.UserSession.USER_REGISTRATION_STATE;
-import static com.example.projectgroup5.users.UserSession.USER_TYPE;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +14,8 @@ import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.databinding.FragmentAccountManagementBinding;
+import com.example.projectgroup5.users.DatabaseManager;
+import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
 
 public class AccountManagementFragment extends Fragment {
@@ -27,7 +25,7 @@ public class AccountManagementFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentAccountManagementBinding.inflate(inflater, container, false);
-        NavController navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment_activity_main);
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
         View root = binding.getRoot();
 
         // user representation comes out as null
@@ -37,120 +35,141 @@ public class AccountManagementFragment extends Fragment {
             return root;
         }
 
-        // get the user type (organizer or user or admin)
-        UserSession.getInstance().getUserData(USER_TYPE, new UserSession.FirebaseCallback<Object>() {
-            @Override
-            public void onCallback(Object userType) {
-                Log.d("UserSession", "In the onCallback: " + userType);
-                if (userType != null) {
-                    // Create a User representation based on the user type
+        // get the user type
+        displayUserType();
 
-                    Log.d("UserSession", "User type UPDATED: " + userType);
-                    UserSession.getInstance().getUserRepresentation().setUserType((int)(long)((Long) userType));
-                    int intUserType = (int)(long)((Long) userType);
-                    Log.d("firebase", "Retrieved user type: " + userType);
-//                    String currentText = binding.userWelcomeMessage.getText().toString();
-                    String newText;
-                    if (intUserType == UserSession.USER_TYPE_ORGANIZER) {
-                        binding.userAccountType.setVisibility(View.VISIBLE);
-                        Log.d("AccountManagementFragment", "usertype: organizer");
-                        newText = "Welcome Organizer";
-                    } else if (intUserType == UserSession.USER_TYPE_USER) {
-                        binding.userAccountType.setVisibility(View.VISIBLE);
-                        Log.d("AccountManagementFragment", "usertype: user");
-                        newText = "Welcome User";
-                    } else if (intUserType == UserSession.USER_TYPE_ADMIN) {
-                        binding.userAccountType.setVisibility(View.VISIBLE);
-                        Log.d("AccountManagementFragment", "usertype: admin");
-                        newText = "Welcome Admin";
-                    } else {
-                        // unknown user type
-                        Log.e("AccountManagementFragment", "usertype: unknown");
-                        binding.userAccountType.setVisibility(View.GONE);
-                        newText = null;
-                    }
-                    Log.d("AccountManagementFragment", "newText for userType: " + newText);
-                    binding.userAccountType.setText(newText);
-
-                } else {
-                    Log.e("AccountManagementFragment", "User type not found");
-                }
-            }
-        });
-
-        // get the user name (email)
-        UserSession.getInstance().getUserData(USER_EMAIL, new UserSession.FirebaseCallback<Object>() {
-            @Override
-            public void onCallback(Object userEmail) {
-                Log.d("AccountManagementFragment", "In the onCallback: " + userEmail);
-                if (userEmail != null) {
-                    // Create a User representation based on the user type
-
-                    Log.d("AccountManagementFragment", "User type UPDATED: " + userEmail);
-                    if (UserSession.getInstance().getUserRepresentation() != null) {
-                        UserSession.getInstance().getUserRepresentation().setUserEmail(String.valueOf(userEmail));
-                    } else {
-                        Log.e("AccountManagementFragment", "User representation not found");
-                    }
-                        // Append the user email to the current text
-
-                        Log.d("AccountManagementFragment", "userEmail: " + String.valueOf(userEmail));
-                        binding.userCurrentEmail.setText(String.valueOf(userEmail));
-                        // set the visibility of the textview
-                        binding.userCurrentEmail.setVisibility(View.VISIBLE);
-
-                } else {
-                    Log.e("AccountManagementFragment", "User email not found");
-                }
-            }
-        });
+        // get the user email
+        displayUserEmail();
 
         // get the user registration status
-        UserSession.getInstance().getUserData(USER_REGISTRATION_STATE, new UserSession.FirebaseCallback<Object>() {
-            @Override
-            public void onCallback(Object userState) {
-                Log.d("AccountManagementFragment", "In the onCallback: " + userState);
-                if (userState != null) {
-                    int intUserState = (int)(long)((Long) userState);
-                    String newText;
-                    if (intUserState == UserSession.WAITLISTED) {
-                        binding.userCurrentState.setVisibility(View.VISIBLE);
-                        Log.d("AccountManagementFragment", "userState: waitlisted");
-                        newText = "You are on the waitlist";
-                    } else if (intUserState == UserSession.ACCEPTED) {
-                        binding.userCurrentState.setVisibility(View.VISIBLE);
-                        Log.d("AccountManagementFragment", "userState: accepted");
-                        newText = "You are registered";
-                    } else if (intUserState == UserSession.REJECTED) {
-                        binding.userCurrentState.setVisibility(View.VISIBLE);
-                        Log.d("AccountManagementFragment", "userState: rejected");
-                        newText = "Your application was rejected, call 911 for help";
-                    } else {
-                        // unknown registration state
-                        binding.userCurrentState.setVisibility(View.GONE);
-                        newText = null;
-                    }
-                    // Append the userCurrentState to the current text
-                    Log.d("AccountManagementFragment", "userState: " + String.valueOf(userState));
-                    binding.userCurrentState.setText(newText);
-                } else {
-                    Log.e("AccountManagementFragment", "User registration state not found");
-                }
-            }
-        });
+        displayUserRegistrationStatus();
 
         root.findViewById(R.id.logoutButton).setOnClickListener(v -> {
-            // login the user using the email and password
-            // if the login is successful, navigate to the account frag
-            // if the login is not successful, show an error message
-            // if the user is not logged in, show an error message
             UserSession.getInstance().logout();
-            Log.d("AccountManagementFragment", "User is not logged in");
             // go back to the login fragment
             navController.navigate(R.id.login);
         });
 
         return root;
+    }
+
+    /**
+     * Displays the user's registration status based on data retrieved from the database.
+     * <p>
+     * This method fetches the user's registration state from the database and updates the UI
+     * accordingly. It handles different states such as waitlisted, accepted, and rejected,
+     * setting the visibility and text of the userCurrentState view. If the user state is unknown,
+     * it hides the view.
+     */
+    private void displayUserRegistrationStatus() {
+        DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_REGISTRATION_STATE, userState -> {
+            Log.d("AccountManagementFragment", "In the onCallback: " + userState);
+            if (userState != null) {
+                int intUserState = (int) (long) ((Long) userState);
+                String newText;
+                switch (intUserState) {
+                    case UserSession.WAITLISTED:
+                        binding.userCurrentState.setVisibility(View.VISIBLE);
+                        Log.d("AccountManagementFragment", "userState: waitlisted");
+                        newText = "You are on the waitlist";
+                        break;
+                    case UserSession.ACCEPTED:
+                        binding.userCurrentState.setVisibility(View.VISIBLE);
+                        Log.d("AccountManagementFragment", "userState: accepted");
+                        newText = "You are registered";
+                        break;
+                    case UserSession.REJECTED:
+                        binding.userCurrentState.setVisibility(View.VISIBLE);
+                        Log.d("AccountManagementFragment", "userState: rejected");
+                        newText = "Your application was rejected, call 911 for help";
+                        break;
+                    default:
+                        // unknown registration state
+                        binding.userCurrentState.setVisibility(View.GONE);
+                        newText = null;
+                        break;
+                }
+                // Append the userCurrentState to the current text
+                Log.d("AccountManagementFragment", "userState: " + userState);
+                binding.userCurrentState.setText(newText);
+            } else {
+                Log.e("AccountManagementFragment", "User registration state not found");
+            }
+        });
+    }
+
+    /**
+     * Retrieves and displays the user's email address from the database.
+     * <p>
+     * This method fetches the user's email and updates the corresponding UI element.
+     * If the email is found, it also updates the user representation with the email.
+     * The visibility of the userCurrentEmail view is set to VISIBLE. If the email is not found,
+     * an error log is generated.
+     */
+    private void displayUserEmail() {
+        DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_EMAIL, userEmail -> {
+            if (userEmail != null) {
+                // Create a User representation based on the user type
+                if (UserSession.getInstance().getUserRepresentation() != null) {
+                    UserSession.getInstance().getUserRepresentation().setUserEmail(String.valueOf(userEmail));
+                }
+                binding.userCurrentEmail.setText(String.valueOf(userEmail));
+                // set the visibility of the textview
+                binding.userCurrentEmail.setVisibility(View.VISIBLE);
+            } else {
+                Log.e("AccountManagementFragment", "User email not found");
+            }
+        });
+    }
+
+    /**
+     * Retrieves and displays the user's account type from the database.
+     * <p>
+     * This method fetches the user's account type and updates the corresponding UI element
+     * based on the retrieved value. It sets the visibility of the userAccountType view to
+     * VISIBLE or GONE depending on the user type (organizer, user, or admin).
+     * If the user type is not found, an error log is generated.
+     */
+    private void displayUserType() {
+        DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_TYPE, userType -> {
+            Log.d("UserSession", "In the onCallback: " + userType);
+            if (userType != null) {
+                // Create a User representation based on the user type
+                Log.d("UserSession", "User type UPDATED: " + userType);
+                UserSession.getInstance().getUserRepresentation().setUserType((int) (long) ((Long) userType));
+                int intUserType = (int) (long) ((Long) userType);
+                Log.d("firebase", "Retrieved user type: " + userType);
+                String newText;
+                switch (intUserType) {
+                    case User.USER_TYPE_ORGANIZER:
+                        binding.userAccountType.setVisibility(View.VISIBLE);
+                        Log.d("AccountManagementFragment", "usertype: organizer");
+                        newText = "Welcome Organizer";
+                        break;
+                    case User.USER_TYPE_USER:
+                        binding.userAccountType.setVisibility(View.VISIBLE);
+                        Log.d("AccountManagementFragment", "usertype: user");
+                        newText = "Welcome User";
+                        break;
+                    case User.USER_TYPE_ADMIN:
+                        binding.userAccountType.setVisibility(View.VISIBLE);
+                        Log.d("AccountManagementFragment", "usertype: admin");
+                        newText = "Welcome Admin";
+                        break;
+                    default:
+                        // unknown user type
+                        Log.e("AccountManagementFragment", "usertype: unknown");
+                        binding.userAccountType.setVisibility(View.GONE);
+                        newText = null;
+                        break;
+                }
+                Log.d("AccountManagementFragment", "newText for userType: " + newText);
+                binding.userAccountType.setText(newText);
+
+            } else {
+                Log.e("AccountManagementFragment", "User type not found");
+            }
+        });
     }
 
 
