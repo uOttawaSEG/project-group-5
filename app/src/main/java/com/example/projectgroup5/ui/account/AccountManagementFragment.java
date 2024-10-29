@@ -68,17 +68,17 @@ public class AccountManagementFragment extends Fragment {
                 int intUserState = (int) (long) ((Long) userState);
                 String newText;
                 switch (intUserState) {
-                    case UserSession.WAITLISTED:
+                    case User.WAITLISTED:
                         binding.userCurrentState.setVisibility(View.VISIBLE);
                         Log.d("AccountManagementFragment", "userState: waitlisted");
                         newText = "You are on the waitlist";
                         break;
-                    case UserSession.ACCEPTED:
+                    case User.ACCEPTED:
                         binding.userCurrentState.setVisibility(View.VISIBLE);
                         Log.d("AccountManagementFragment", "userState: accepted");
                         newText = "You are registered";
                         break;
-                    case UserSession.REJECTED:
+                    case User.REJECTED:
                         binding.userCurrentState.setVisibility(View.VISIBLE);
                         Log.d("AccountManagementFragment", "userState: rejected");
                         newText = "Your application was rejected, call 911 for help";
@@ -146,7 +146,7 @@ public class AccountManagementFragment extends Fragment {
                         Log.d("AccountManagementFragment", "usertype: organizer");
                         newText = "Welcome Organizer";
                         break;
-                    case User.USER_TYPE_USER:
+                    case User.USER_TYPE_ATTENDEE:
                         binding.userAccountType.setVisibility(View.VISIBLE);
                         Log.d("AccountManagementFragment", "usertype: user");
                         newText = "Welcome User";

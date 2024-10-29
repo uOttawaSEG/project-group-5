@@ -5,15 +5,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.projectgroup5.databinding.FragmentNotLoggedInHomeBinding;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-public class HomeNotLoggedInFragment extends Fragment {
+import com.example.projectgroup5.databinding.FragmentNotRegisteredHomeBinding;
+
+public class HomeNotRegisteredFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        FragmentNotLoggedInHomeBinding binding = FragmentNotLoggedInHomeBinding.inflate(inflater, container, false);
+        FragmentNotRegisteredHomeBinding binding = FragmentNotRegisteredHomeBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 

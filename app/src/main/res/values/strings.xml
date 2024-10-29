@@ -21,4 +21,5 @@
     <string name="pending_list">Pending List</string>
     <string name="rejected_list">Rejected List</string>
     <string name="accepted_list">Accepted List</string>
+    <string name="you_are_not_registered">You are not registered</string>
 </resources>
