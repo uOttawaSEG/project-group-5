@@ -1,5 +1,6 @@
 package com.example.projectgroup5.users;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import androidx.navigation.NavController;
@@ -20,7 +21,8 @@ public class UserSession {
     private String userId;
 
     private static User userRepresentation;
-    private static NavController navController; // TODO make this not static
+    @SuppressLint("StaticFieldLeak")
+    private static NavController navController;
 
     /**
      * Constructs a new instance of the UserSession class and initializes it with a navigation controller.
