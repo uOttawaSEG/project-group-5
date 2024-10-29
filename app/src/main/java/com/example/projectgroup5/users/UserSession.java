@@ -212,6 +212,8 @@ public class UserSession {
         DatabaseManager.getDatabaseManager().logout();
         if (userRepresentation != null)
             userRepresentation = null;
+        // clear all the event listeners
+        DatabaseListener.clearListeners();
         userId = null;
     }
 

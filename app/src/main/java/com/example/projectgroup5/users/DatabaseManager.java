@@ -272,8 +272,28 @@ public class DatabaseManager {
      * @param key                The key for the user data to listen to.
      */
     public void addValueEventListener(ValueEventListener valueEventListener, String key) {
+        if (UserSession.getInstance().getUserId() == null) {
+            Log.e("UserSession", "User ID is null");
+            return;
+        }
         DatabaseReference ref = database.getReference("users").child(UserSession.getInstance().getUserId()).child(key);
         ref.addValueEventListener(valueEventListener);
+    }
+
+    /**
+     * Removes a previously attached ValueEventListener from the Firebase Realtime Database reference.
+     *
+     * <p>This method is used to detach a listener that was previously registered with
+     * {@link #addValueEventListener(ValueEventListener, String)}. It is important to call this
+     * method when the listener is no longer needed to avoid memory leaks and
+     * unintended behavior, especially in lifecycle-aware components such as Activities or Fragments.</p>
+     *
+     * @param valueEventListener The ValueEventListener to be removed.
+     *                           It must be the same instance that was previously added.
+     *                           If the listener was not added, this method has no effect.
+     */
+    public void removeEventListener(ValueEventListener valueEventListener) {
+        database.getReference().removeEventListener(valueEventListener);
     }
 
     /**
