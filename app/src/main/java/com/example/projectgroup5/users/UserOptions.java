@@ -35,7 +35,7 @@ public class UserOptions {
     public static void getUsersWithRegistrationStatus(UsersCallback callback, int userRegistrationState) {
         List<User> pendingUsers = new ArrayList<>();
         DatabaseManager databaseManager = DatabaseManager.getDatabaseManager();
-        databaseManager.getUserIdByMatchingData("UserRegistrationState", String.valueOf(userRegistrationState), userIds -> {
+        databaseManager.getUserIdByMatchingData(DatabaseManager.USER_REGISTRATION_STATE, String.valueOf(userRegistrationState), userIds -> {
             // Create a counter to track completed user data retrieval
             AtomicInteger remainingCalls = new AtomicInteger(userIds.size());
             for (String userId : userIds) {
@@ -66,7 +66,7 @@ public class UserOptions {
      * @param callback The callback to be invoked with the list of accepted users once the data retrieval is complete.
      */
     public static void getAcceptedUsers(UsersCallback callback) {
-        getUsersWithRegistrationStatus(callback, UserSession.ACCEPTED);
+        getUsersWithRegistrationStatus(callback, User.ACCEPTED);
     }
 
     /**
@@ -79,7 +79,7 @@ public class UserOptions {
      * @param callback The callback to be invoked with the list of pending users once the data retrieval is complete.
      */
     public static void getPendingUsers(UsersCallback callback) {
-        getUsersWithRegistrationStatus(callback, UserSession.WAITLISTED);
+        getUsersWithRegistrationStatus(callback, User.WAITLISTED);
     }
 
     /**
@@ -92,7 +92,7 @@ public class UserOptions {
      * @param callback The callback to be invoked with the list of rejected users once the data retrieval is complete.
      */
     public static void getRejectedUsers(UsersCallback callback) {
-        getUsersWithRegistrationStatus(callback, UserSession.REJECTED);
+        getUsersWithRegistrationStatus(callback, User.REJECTED);
     }
 
 }

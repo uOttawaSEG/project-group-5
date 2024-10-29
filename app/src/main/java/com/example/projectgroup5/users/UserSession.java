@@ -12,10 +12,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseUser;
 
 public class UserSession {
-    public static final int REJECTED = 2;
-    public static final int ACCEPTED = 1;
-    public static final int WAITLISTED = 0;
-    public static final String USER_ORGANIZATION_NAME = "UserOrganizationName";
     private static UserSession instance;
     private String userId;
 

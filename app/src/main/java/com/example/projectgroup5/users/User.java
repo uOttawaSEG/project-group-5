@@ -1,6 +1,6 @@
 package com.example.projectgroup5.users;
 
-import static com.example.projectgroup5.users.UserSession.*;
+import static com.example.projectgroup5.users.DatabaseManager.USER_ORGANIZATION_NAME;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,8 +13,11 @@ import com.example.projectgroup5.R;
 
 public abstract class User {
     public final static int USER_TYPE_ORGANIZER = 1;
-    public final static int USER_TYPE_USER = 2;
+    public final static int USER_TYPE_ATTENDEE = 2;
     public final static int USER_TYPE_ADMIN = 0;
+    public static final int REJECTED = 2;
+    public static final int ACCEPTED = 1;
+    public static final int WAITLISTED = 0;
     private final String userId;
     private String userFirstName;
     private String userLastName;
@@ -54,7 +57,7 @@ public abstract class User {
         final User user;
         if (userType == USER_TYPE_ORGANIZER) {
             user = new Organizer(userId);
-        } else if (userType == USER_TYPE_USER) {
+        } else if (userType == USER_TYPE_ATTENDEE) {
             user = new Attendee(userId);
         } else if (userType == USER_TYPE_ADMIN) {
             user = new Administrator(userId);

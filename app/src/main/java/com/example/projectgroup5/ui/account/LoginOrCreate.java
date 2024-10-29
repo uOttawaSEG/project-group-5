@@ -11,15 +11,15 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
-import com.example.projectgroup5.databinding.LoginOrCreateAccountFragmentBinding;
+import com.example.projectgroup5.databinding.FragmentLoginOrCreateAccountBinding;
 
 public class LoginOrCreate extends Fragment {
 
-    private LoginOrCreateAccountFragmentBinding binding;
+    private FragmentLoginOrCreateAccountBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        binding = LoginOrCreateAccountFragmentBinding.inflate(inflater, container, false);
+        binding = FragmentLoginOrCreateAccountBinding.inflate(inflater, container, false);
         ViewGroup.LayoutParams params = binding.getRoot().getLayoutParams();
         params.width = ViewGroup.LayoutParams.MATCH_PARENT;
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;

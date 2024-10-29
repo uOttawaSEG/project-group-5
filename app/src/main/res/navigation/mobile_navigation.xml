@@ -16,6 +16,15 @@
         <action
             android:id="@+id/action_navigation_home_to_home_not_logged_in"
             app:destination="@id/home_not_logged_in" />
+        <action
+            android:id="@+id/action_navigation_home_to_home_not_registered_in"
+            app:destination="@id/home_not_registered" />
+        <action
+            android:id="@+id/action_navigation_home_to_organizer_option_selector"
+            app:destination="@id/organizer_option_selector" />
+        <action
+            android:id="@+id/action_navigation_home_to_attendee_option_selector"
+            app:destination="@id/attendee_option_selector" />
     </fragment>
 
     <fragment
@@ -76,7 +85,7 @@
         android:id="@+id/login_or_create_account"
         android:name="com.example.projectgroup5.ui.account.LoginOrCreate"
         android:label="@string/userAccount"
-        tools:layout="@layout/login_or_create_account_fragment" >
+        tools:layout="@layout/fragment_login_or_create_account" >
         <action
             android:id="@+id/action_login_or_create_account_to_login"
             app:destination="@+id/login"/>
@@ -136,7 +145,22 @@
         android:id="@+id/home_not_logged_in"
         android:name="com.example.projectgroup5.ui.home.HomeNotLoggedInFragment"
         android:label="Home"
-        tools:layout="@layout/not_logged_in_home" />
+        tools:layout="@layout/fragment_not_logged_in_home" />
+    <fragment
+        android:id="@+id/home_not_registered"
+        android:name="com.example.projectgroup5.ui.home.HomeNotRegisteredFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_not_registered_home" />
+    <fragment
+        android:id="@+id/organizer_option_selector"
+        android:name="com.example.projectgroup5.ui.home.OrganizerOptionSelector"
+        android:label="Home"
+        tools:layout="@layout/fragment_organizer_option_selector" />
+    <fragment
+        android:id="@+id/attendee_option_selector"
+        android:name="com.example.projectgroup5.ui.home.AttendeeOptionSelector"
+        android:label="Home"
+        tools:layout="@layout/fragment_attendee_option_selector" />
 
 
 </navigation>

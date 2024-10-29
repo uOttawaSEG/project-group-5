@@ -30,6 +30,7 @@ public class DatabaseManager {
     public static final String USER_FIRST_NAME = "UserFirstName";
     public static final String USER_LAST_NAME = "UserLastName";
     public static final String USER_REGISTRATION_STATE = "UserRegistrationState";
+    public static final String USER_ORGANIZATION_NAME = "UserOrganizationName";
     private static final DatabaseManager databaseManager = new DatabaseManager();
     private final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final FirebaseDatabase database = FirebaseDatabase.getInstance();
