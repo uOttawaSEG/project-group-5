@@ -1,5 +1,6 @@
 package com.example.projectgroup5.users;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -69,7 +70,7 @@ public class DatabaseManager {
      * @param password The password of the user attempting to log in.
      * @param listener A listener that will be notified when the login operation is complete.
      */
-    public void login(String email, String password, OnCompleteListener<AuthResult> listener) {
+    public void login(String email, String password, Context context, OnCompleteListener<AuthResult> listener) {
         logout();
         if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
             Log.e("UserSession", "Email or password is empty");
@@ -79,7 +80,7 @@ public class DatabaseManager {
         }
         Log.d("UserSession", "Login: " + email + " " + password);
         firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(listener).addOnSuccessListener(task -> UserSession.getInstance().instantiateUserRepresentation());
+                .addOnCompleteListener(listener).addOnSuccessListener(task -> UserSession.getInstance().instantiateUserRepresentation(context));
     }
 
     /**
@@ -117,11 +118,11 @@ public class DatabaseManager {
      * @param password The password for the new user account.
      * @param listener A listener that will be notified when the account creation operation is complete.
      */
-    public void createUserWithEmailAndPassword(String email, String password, OnCompleteListener<AuthResult> listener) {
+    public void createUserWithEmailAndPassword(String email, String password, Context context, OnCompleteListener<AuthResult> listener) {
         if (firebaseAuth.getCurrentUser() != null) {
             firebaseAuth.signOut();
             firebaseAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(listener).addOnSuccessListener(task -> UserSession.getInstance().instantiateUserRepresentation());
+                    .addOnCompleteListener(listener).addOnSuccessListener(task -> UserSession.getInstance().instantiateUserRepresentation(context));
         }
     }
 
