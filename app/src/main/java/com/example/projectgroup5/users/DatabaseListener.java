@@ -6,7 +6,9 @@ import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
 
+import com.example.projectgroup5.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -38,29 +40,61 @@ public class DatabaseListener {
      *
      * @param context The context in which the notification should be sent.
      */
-    public static void addValueAccountCreationEventListener(Context context) {
+    public static void addValueAccountCreationEventListener(Context context, NavController navController) {
         ValueEventListener firstListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // Check if the value exists and is not equal 1
                 if (!dataSnapshot.exists()) return;
                 Integer value = dataSnapshot.getValue(Integer.class);
-                if (!(value == null || value != 1)) return;
-                ValueEventListener secondListener = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        // Check if the value exists and equals 1 (this means it has been updated to 1)
-                        if (!dataSnapshot.exists()) return;
-                        Integer value = dataSnapshot.getValue(Integer.class);
-                        if (value != null && value == 1)
-                            Notification.sendNotification(context);
-                    }
+                ValueEventListener secondListener;
+                if (value == null || value == 1)
+                    return;
+                else if (value == 0) {
+                    secondListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            // Check if the value exists and equals 1 (this means it has been updated to 1)
+                            if (!dataSnapshot.exists()) return;
+                            Integer value = dataSnapshot.getValue(Integer.class);
+                            if (value != null && value == 1)
+                                Notification.sendAcceptedNotification(context);
+                            if (value != null && value == 2)
+                                Notification.sendRejectedNotification(context);
+                            // DO NOT TOUCH THIS!!!!!!!!!!!!!
+                            if (value != null && (value == 2 || value == 1))
+                                navController.navigate(R.id.account);
+                        }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.e("FirebaseError", databaseError.getMessage());
-                    }
-                };
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Log.e("FirebaseError", databaseError.getMessage());
+                        }
+                    };
+                } else if (value == 2) {
+                    secondListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            // Check if the value exists and equals 1 (this means it has been updated to 1)
+                            if (!dataSnapshot.exists()) return;
+                            Integer value = dataSnapshot.getValue(Integer.class);
+                            if (value != null && value == 1)
+                                Notification.sendAcceptedNotification(context);
+                            // DO NOT TOUCH THIS!!!!!!!!!!!!!!!!!
+                            navController.navigate(R.id.account);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Log.e("FirebaseError", databaseError.getMessage());
+                        }
+                    };
+                } else {
+                    Log.e("FirebaseError", "Invalid value: " + value);
+                    return;
+                }
+
+//                if (value != null && value == 2) return;
                 listeners.add(secondListener);
                 DatabaseManager.getDatabaseManager().addValueEventListener(secondListener, USER_REGISTRATION_STATE);
             }

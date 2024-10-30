@@ -72,7 +72,7 @@ public class UserSession {
                 instantiateEmailForUser(user);
                 // Notification for prelogged in user
                 DatabaseListener.clearListeners();
-                DatabaseListener.addValueAccountCreationEventListener(context);
+                DatabaseListener.addValueAccountCreationEventListener(context, navController);
                 //This was not working for some reason after 2 accounts logged in sequentially
 //                navController.navigate(R.id.account_management);
                 navController.navigate(R.id.account);
@@ -98,7 +98,7 @@ public class UserSession {
     public void login(String email, String password, OnCompleteListener<AuthResult> listener) {
         DatabaseManager.getDatabaseManager().login(email, password, context, listener);
         DatabaseListener.clearListeners();
-        DatabaseListener.addValueAccountCreationEventListener(context);
+        DatabaseListener.addValueAccountCreationEventListener(context, navController);
     }
 
     /**

@@ -35,14 +35,14 @@ public class AccountManagementFragment extends Fragment {
             return root;
         }
 
-        // get the user type
-        displayUserType();
+            // get the user type
+            displayUserType();
 
-        // get the user email
-        displayUserEmail();
+            // get the user email
+            displayUserEmail();
 
-        // get the user registration status
-        displayUserRegistrationStatus();
+            // get the user registration status
+            displayUserRegistrationStatus();
 
         root.findViewById(R.id.logoutButton).setOnClickListener(v -> {
             UserSession.getInstance().logout();
@@ -62,8 +62,9 @@ public class AccountManagementFragment extends Fragment {
      * it hides the view.
      */
     private void displayUserRegistrationStatus() {
+        Log.d("AccountManagementFragment", "In the displayUserRegistrationStatus method");
         DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_REGISTRATION_STATE, userState -> {
-            Log.d("AccountManagementFragment", "In the onCallback: " + userState);
+            Log.d("AccountManagementFragment", "In the onCallback of displayUserRegistrationStatus: " + userState);
             if (userState != null) {
                 int intUserState = (int) (long) ((Long) userState);
                 String newText;
@@ -86,12 +87,12 @@ public class AccountManagementFragment extends Fragment {
                     default:
                         // unknown registration state
                         binding.userCurrentState.setVisibility(View.GONE);
-                        newText = null;
+                        newText = "";
                         break;
                 }
                 // Append the userCurrentState to the current text
                 Log.d("AccountManagementFragment", "userState: " + userState);
-                binding.userCurrentState.setText(newText);
+                    binding.userCurrentState.setText(newText);
             } else {
                 Log.e("AccountManagementFragment", "User registration state not found");
             }
@@ -107,6 +108,7 @@ public class AccountManagementFragment extends Fragment {
      * an error log is generated.
      */
     private void displayUserEmail() {
+        Log.d("AccountManagementFragment", "In the displayUserEmail method");
         DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_EMAIL, userEmail -> {
             if (userEmail != null) {
                 // Create a User representation based on the user type
@@ -131,8 +133,9 @@ public class AccountManagementFragment extends Fragment {
      * If the user type is not found, an error log is generated.
      */
     private void displayUserType() {
+        Log.d("AccountManagementFragment", "In the displayUserType method");
         DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_TYPE, userType -> {
-            Log.d("UserSession", "In the onCallback: " + userType);
+            Log.d("AccountManagementFragment", "In the onCallback of displayUserType: " + userType);
             if (userType != null) {
                 // Create a User representation based on the user type
                 Log.d("UserSession", "User type UPDATED: " + userType);
@@ -142,29 +145,29 @@ public class AccountManagementFragment extends Fragment {
                 String newText;
                 switch (intUserType) {
                     case User.USER_TYPE_ORGANIZER:
-                        binding.userAccountType.setVisibility(View.VISIBLE);
                         Log.d("AccountManagementFragment", "usertype: organizer");
+                        binding.userAccountType.setVisibility(View.VISIBLE);
                         newText = "Welcome Organizer";
                         break;
                     case User.USER_TYPE_ATTENDEE:
-                        binding.userAccountType.setVisibility(View.VISIBLE);
                         Log.d("AccountManagementFragment", "usertype: user");
+                        binding.userAccountType.setVisibility(View.VISIBLE);
                         newText = "Welcome User";
                         break;
                     case User.USER_TYPE_ADMIN:
-                        binding.userAccountType.setVisibility(View.VISIBLE);
                         Log.d("AccountManagementFragment", "usertype: admin");
+                        binding.userAccountType.setVisibility(View.VISIBLE);
                         newText = "Welcome Admin";
                         break;
                     default:
                         // unknown user type
                         Log.e("AccountManagementFragment", "usertype: unknown");
                         binding.userAccountType.setVisibility(View.GONE);
-                        newText = null;
+                        newText = "";
                         break;
                 }
                 Log.d("AccountManagementFragment", "newText for userType: " + newText);
-                binding.userAccountType.setText(newText);
+                    binding.userAccountType.setText(newText);
 
             } else {
                 Log.e("AccountManagementFragment", "User type not found");
