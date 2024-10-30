@@ -1,6 +1,7 @@
 package com.example.projectgroup5.users;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.util.Log;
 
 import androidx.navigation.NavController;
@@ -14,6 +15,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class UserSession {
     private static UserSession instance;
+    private static Context context;
     private String userId;
 
     private static User userRepresentation;
@@ -24,7 +26,7 @@ public class UserSession {
      * Constructs a new instance of the UserSession class and initializes it with a navigation controller.
      * <p>
      * This constructor sets the provided {@link NavController} for the session and checks if
-     * a user is already logged in by invoking {@link #instantiateUserRepresentation()}.
+     * a user is already logged in by invoking {@link #instantiateUserRepresentation(Context)}.
      *
      * @param navController The navigation controller used for navigating between fragments or activities.
      *                      It must not be null.
@@ -32,7 +34,7 @@ public class UserSession {
     private UserSession(NavController navController) {
         UserSession.navController = navController;
         // check if the user is already logged in
-        instantiateUserRepresentation();
+        instantiateUserRepresentation(context);
     }
 
     public interface FirebaseCallback<T> {
@@ -50,7 +52,8 @@ public class UserSession {
      * <p>
      * If no user is currently logged in, an error message is logged.
      */
-    public void instantiateUserRepresentation() {
+    public void instantiateUserRepresentation(Context context) {
+        UserSession.context = context;
         FirebaseUser user = DatabaseManager.getDatabaseManager().getCurrentUser();
         if (user == null) {
             Log.e("UserSession", "User is null");
@@ -67,7 +70,12 @@ public class UserSession {
 //                            return;
                 }
                 instantiateEmailForUser(user);
-                navController.navigate(R.id.account_management);
+                // Notification for prelogged in user
+                DatabaseListener.clearListeners();
+                DatabaseListener.addValueAccountCreationEventListener(context);
+                //This was not working for some reason after 2 accounts logged in sequentially
+//                navController.navigate(R.id.account_management);
+                navController.navigate(R.id.account);
                 Log.d("UserSession", "User type: " + userType);
             } else {
                 Log.e("UserSession", "User type not found");
@@ -88,7 +96,9 @@ public class UserSession {
      *                 containing the result of the authentication attempt.
      */
     public void login(String email, String password, OnCompleteListener<AuthResult> listener) {
-        DatabaseManager.getDatabaseManager().login(email, password, listener);
+        DatabaseManager.getDatabaseManager().login(email, password, context, listener);
+        DatabaseListener.clearListeners();
+        DatabaseListener.addValueAccountCreationEventListener(context);
     }
 
     /**
@@ -134,7 +144,8 @@ public class UserSession {
      * @param activity      The main activity context used to initialize Firebase.
      * @param navController The {@link NavController} used for navigation within the app.
      */
-    public static void initialize(MainActivity activity, NavController navController) {
+    public static void initialize(MainActivity activity, NavController navController, Context context) {
+        UserSession.context = context;
         if (instance == null) {
             instance = new UserSession(navController);
             Log.d("UserSession", "initialize: " + instance);
@@ -184,7 +195,7 @@ public class UserSession {
      * @param password The password for the new user.
      */
     public void createUser(String email, String password) {
-        DatabaseManager.getDatabaseManager().createUserWithEmailAndPassword(email, password, task -> DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_TYPE, userType -> {
+        DatabaseManager.getDatabaseManager().createUserWithEmailAndPassword(email, password, context, task -> DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_TYPE, userType -> {
             if (userType != null) {
                 // Create a User representation based on the user type
                 userRepresentation = User.newUser(userId, (int) (long) ((Long) userType));
