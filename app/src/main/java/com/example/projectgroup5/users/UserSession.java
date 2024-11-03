@@ -1,40 +1,33 @@
 package com.example.projectgroup5.users;
 
-import android.content.Context;
 import android.util.Log;
 
 import androidx.navigation.NavController;
 
 import com.example.projectgroup5.MainActivity;
-import com.example.projectgroup5.R;
 import com.example.projectgroup5.database.DatabaseListener;
 import com.example.projectgroup5.database.DatabaseManager;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseUser;
 
 public class UserSession {
     private static UserSession instance;
-    private static Context context;
     private String userId;
-
     private static User userRepresentation;
-    private static NavController navController;
 
     /**
      * Constructs a new instance of the UserSession class and initializes it with a navigation controller.
      * <p>
      * This constructor sets the provided {@link NavController} for the session and checks if
-     * a user is already logged in by invoking {@link #instantiateUserRepresentation(Context)}.
-     *
-     * @param navController The navigation controller used for navigating between fragments or activities.
-     *                      It must not be null.
+     * a user is already logged in by invoking {@link #instantiateUserRepresentation(MainActivity, OnCompleteListener)}.
      */
-    private UserSession(NavController navController) {
-        UserSession.navController = navController;
+    private UserSession(MainActivity context, OnCompleteListener<AuthResult> listener) {
+//        UserSession.navController = navController;
         // check if the user is already logged in
-        instantiateUserRepresentation(context);
+        instantiateUserRepresentation(context, listener);
     }
 
     public interface FirebaseCallback<T> {
@@ -52,8 +45,7 @@ public class UserSession {
      * <p>
      * If no user is currently logged in, an error message is logged.
      */
-    public void instantiateUserRepresentation(Context context) {
-        UserSession.context = context;
+    public void instantiateUserRepresentation(MainActivity context, OnCompleteListener<AuthResult> listener) {
         FirebaseUser user = DatabaseManager.getDatabaseManager().getCurrentUser();
         if (user == null) {
             Log.e("UserSession", "User is null");
@@ -69,17 +61,18 @@ public class UserSession {
                             return;
                 }
                 userRepresentation = User.newUser(userId, (int) (long) ((Long) userType));
-                instantiateEmailForUser(user);
                 // Notification for prelogged in user
                 DatabaseListener.clearListeners();
                 Log.d("DatabaseListener", "User type: " + userType);
-                DatabaseListener.addValueAccountCreationEventListener(context, navController);
+                DatabaseListener.addValueAccountCreationEventListener(context);
                 //This was not working for some reason after 2 accounts logged in sequentially
-//                navController.navigate(R.id.account_management);
-                navController.navigate(R.id.account);
                 Log.d("UserSession", "User type: " + userType);
+                // success on the listener
+                listener.onComplete(Tasks.forResult(null));
             } else {
                 Log.e("UserSession", "User type not found");
+                // failure on the listener
+                listener.onComplete(Tasks.forException(new Exception("User type not found")));
             }
         });
     }
@@ -96,37 +89,35 @@ public class UserSession {
      * @param listener The listener to be notified of the login operation's completion,
      *                 containing the result of the authentication attempt.
      */
-    public void login(String email, String password, OnCompleteListener<AuthResult> listener) {
+    public void login(String email, String password, MainActivity context, OnCompleteListener<AuthResult> listener) {
         DatabaseManager.getDatabaseManager().login(email, password, context, listener);
-        DatabaseListener.clearListeners();
-//        DatabaseListener.addValueAccountCreationEventListener(context, navController);
     }
 
-    /**
-     * Instantiates and stores the email for the specified user in the user representation and database.
-     * <p>
-     * This method retrieves the email of the provided {@link FirebaseUser} and stores it in the database.
-     * It also updates the email in the user representation if it exists.
-     *
-     * @param user The {@link FirebaseUser} whose email is to be instantiated.
-     *             Must not be null.
-     */
-    private void instantiateEmailForUser(FirebaseUser user) {
-        //  set the user email
-        DatabaseManager.getDatabaseManager().storeUserValueToFirestore(DatabaseManager.USER_EMAIL, user.getEmail(), (task) -> {
-            if (task.isSuccessful()) {
-                Log.d("UserSession", "Success instantiateEmailForUser: success");
-            } else {
-                Log.d("UserSession", "storeUserEmailError: " + task.getException());
-            }
-        });
-        if (userRepresentation != null) {
-            Log.d("UserSession", "Set the user email in the user representation to: " + user.getEmail());
-            userRepresentation.setUserEmail(user.getEmail());
-        } else {
-            Log.e("UserSession", "User representation is null");
-        }
-    }
+//    /**
+//     * Instantiates and stores the email for the specified user in the user representation and database.
+//     * <p>
+//     * This method retrieves the email of the provided {@link FirebaseUser} and stores it in the database.
+//     * It also updates the email in the user representation if it exists.
+//     *
+//     * @param user The {@link FirebaseUser} whose email is to be instantiated.
+//     *             Must not be null.
+//     */
+//    private void instantiateEmailForUser(FirebaseUser user) {
+//        //  set the user email
+//        DatabaseManager.getDatabaseManager().storeUserValueToFirestore(DatabaseManager.USER_EMAIL, user.getEmail(), (task) -> {
+//            if (task.isSuccessful()) {
+//                Log.d("UserSession", "Success instantiateEmailForUser: success");
+//            } else {
+//                Log.d("UserSession", "storeUserEmailError: " + task.getException());
+//            }
+//        });
+//        if (userRepresentation != null) {
+//            Log.d("UserSession", "Set the user email in the user representation to: " + user.getEmail());
+//            userRepresentation.setUserEmail(user.getEmail());
+//        } else {
+//            Log.e("UserSession", "User representation is null");
+//        }
+//    }
 
     /**
      * Retrieves the user representation associated with the current user session.
@@ -143,12 +134,10 @@ public class UserSession {
      * This method sets up the Firebase application and ensures that the user session is instantiated only once.
      *
      * @param activity      The main activity context used to initialize Firebase.
-     * @param navController The {@link NavController} used for navigation within the app.
      */
-    public static void initialize(MainActivity activity, NavController navController, Context context) {
-        UserSession.context = context;
+    public static void initialize(MainActivity activity, OnCompleteListener<AuthResult> listener) {
         if (instance == null) {
-            instance = new UserSession(navController);
+            instance = new UserSession(activity, listener);
             Log.d("UserSession", "initialize: " + instance);
             FirebaseApp.initializeApp(activity);
         }
@@ -162,7 +151,8 @@ public class UserSession {
      */
     public static UserSession getInstance() {
         if (instance == null) {
-            instance = new UserSession(navController);
+            System.err.println("UserSession is null");
+//            instance = new UserSession();
         }
         return instance;
     }
@@ -186,7 +176,7 @@ public class UserSession {
     }
 
 
-    /**
+    /*
      * Creates a new user with the specified email and password.
      * <p>
      * This method uses Firebase Authentication to create the user account and
@@ -195,29 +185,37 @@ public class UserSession {
      * @param email    The email address for the new user.
      * @param password The password for the new user.
      */
-    public void createUser(String email, String password) {
+//    public void createUser(String email, String password, MainActivity context, OnCompleteListener<AuthResult> listener) {
         // TODO check this out
-        Log.d("UserSession", "createUser: " + email + " " + password);
-        DatabaseManager.getDatabaseManager().createUserWithEmailAndPassword(email, password, context, task -> DatabaseManager.getDatabaseManager().getUserDataFromFirestore(DatabaseManager.USER_TYPE, userType -> {
-            if (userType != null) {
-                Log.d("UserSession", "User type: " + userType);
-                // Create a User representation based on the user type
-                userRepresentation = User.newUser(userId, (int) (long) ((Long) userType));
-                if (userRepresentation == null) {
-                    Log.e("UserSession", "User representation is null 1");
-//                            return;
-                }
-                Log.d("UserSession", "The user representation is: " + userRepresentation.toString() + " with user type: " + userType);
-                instantiateEmailForUser(DatabaseManager.getDatabaseManager().getCurrentUser());
-                navController.navigate(R.id.account);
-                Log.d("UserSession", "User type: " + userType);
-            } else {
-                Log.e("UserSession", "User type not found");
-            }
-            Log.d("UserSession", "aaaaaaaaa: " + userType);
-        }));
-        Log.d("UserSession", "created User: " + email + " " + password);
-    }
+//        Log.d("UserSession", "createUser: " + email + " " + password);
+//        DatabaseManager.getDatabaseManager().createUserWithEmailAndPassword(email, password, context, task -> DatabaseManager.getDatabaseManager().getUserDataFromFirestore(DatabaseManager.USER_TYPE, userType -> {
+//            if (userType != null) {
+//                Log.d("UserSession", "User type: " + userType);
+//                // Create a User representation based on the user type
+//                userRepresentation = User.newUser(userId, (int) (long) ((Long) userType));
+//                if (userRepresentation == null) {
+//                    Log.e("UserSession", "User representation is null 1");
+////                            return;
+//                }
+//                Log.d("UserSession", "The user representation is: " + userRepresentation.toString() + " with user type: " + userType);
+//                instantiateEmailForUser(DatabaseManager.getDatabaseManager().getCurrentUser());
+////                navController.navigate(R.id.account);
+//                Log.d("UserSession", "User type: " + userType);
+//            } else {
+//                Log.e("UserSession", "User type not found");
+//            }
+//            Log.d("UserSession", "aaaaaaaaa: " + userType);
+//            if (task.isSuccessful()) {
+//                Log.d("UserSession", "createUserWithEmail:success");
+//                listener.onComplete(task);
+//            }
+//            else {
+//                Log.w("UserSession", "createUserWithEmail:failure", task.getException());
+//                listener.onComplete(task);
+//            }
+//        }));
+//        Log.d("UserSession", "created User: " + email + " " + password);
+//    }
 
     /**
      * Logs out the current user from the application.

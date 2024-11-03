@@ -38,6 +38,9 @@
         android:label="@string/userAccount"
         tools:layout="@layout/fragment_account_management">
 
+        <action
+            android:id="@+id/action_account_management_to_login_or_create_account"
+            app:destination="@id/login_or_create_account" />
     </fragment>
 
     <fragment
@@ -46,24 +49,13 @@
         android:label="@string/userAccount"
         tools:layout="@layout/fragment_account">
         <action
-            android:id="@+id/action_to_account"
-            app:destination="@id/account"
-            app:popUpTo="@id/account"/>
-        <action
-            android:id="@+id/action_login"
-            app:destination="@+id/login"
-            app:popUpTo="@id/account"
-            app:popUpToInclusive="true"/>
-        <action
             android:id="@+id/action_login_or_create_account"
             app:destination="@+id/login_or_create_account"
             app:popUpTo="@id/account"
             app:popUpToInclusive="true"/>
         <action
-            android:id="@+id/action_create_account"
-            app:destination="@+id/create_account"
-            app:popUpTo="@id/account_management"
-            app:popUpToInclusive="true"/>
+            android:id="@+id/action_account_to_account_management"
+            app:destination="@id/account_management" />
     </fragment>
 
     <fragment
@@ -73,12 +65,9 @@
         tools:layout="@layout/fragment_login">
 
         <action
-            android:id="@+id/action_login_to_dashboard"
-            app:destination="@+id/search_event_dashboard"/>
+            android:id="@+id/action_login_to_account_management"
+            app:destination="@id/account_management" />
 
-        <action
-            android:id="@+id/action_go_back_to_login"
-            app:destination="@+id/account_management"/>
     </fragment>
 
     <fragment
@@ -99,14 +88,9 @@
         android:name="com.example.projectgroup5.ui.account.CreateAccountFragment"
         android:label="@string/userAccount"
         tools:layout="@layout/fragment_create_account">
-
         <action
-            android:id="@+id/action_create_account_to_dashboard"
-            app:destination="@+id/search_event_dashboard"/>
-
-        <action
-            android:id="@+id/action_create_account_to_account"
-            app:destination="@+id/account"/>
+            android:id="@+id/action_create_account_to_account_management"
+            app:destination="@id/account_management" />
     </fragment>
 
     <fragment
