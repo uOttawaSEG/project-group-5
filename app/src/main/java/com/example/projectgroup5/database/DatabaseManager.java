@@ -68,6 +68,32 @@ public class DatabaseManager {
                     }
                 });
         Log.d("DatabaseManager", "test() finished");
+        test2();
+    }
+
+    private void test2() {
+        // test of the storeUserValueToFirestore method
+        Log.d("DatabaseManager", "test2() called");
+        storeUserValueToFirestore("userIdvaluetest", "testkey", "testvalue", null);
+        Log.d("DatabaseManager", "test2() finished");
+
+        // test of the getUserDataFromFirestore method
+        Log.d("DatabaseManager", "test2() called");
+        getUserDataFromFirestore("userIdvaluetest", "testkey", (Object data) -> {
+                    if (data != null) {
+                        Log.d("DatabaseManager", "test2() finished: " + data);
+                    } else {
+                        Log.d("DatabaseManager", "test2() finished: null");
+                    }
+                });
+        getUserDataFromFirestore("userIdvaluetest", "nokey", (Object data) -> {
+            if (data != null) {
+                Log.d("DatabaseManager", "test2() finished: " + data);
+            } else {
+                Log.d("DatabaseManager", "test2() finished for key \"noKey\": null");
+            }
+        });
+        Log.d("DatabaseManager", "test2() finished");
     }
 
 
@@ -158,14 +184,16 @@ public class DatabaseManager {
      * @param listener A listener that will be notified when the account creation operation is complete.
      */
     public void createUserWithEmailAndPassword(String email, String password, Context context, OnCompleteListener<AuthResult> listener) {
-        if (firebaseAuth.getCurrentUser() != null) {
+        if (firebaseAuth.getCurrentUser() != null)
             firebaseAuth.signOut();
-            firebaseAuth.createUserWithEmailAndPassword(email, password)
+        firebaseAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(listener).addOnCompleteListener(listener).addOnSuccessListener(task -> {
-                        if (UserSession.getInstance().getUserRepresentation() == null)
+                        if (UserSession.getInstance().getUserRepresentation() == null) {
+                            Log.d("UserSession", "User representation is null instantiating user representation");
                             UserSession.getInstance().instantiateUserRepresentation(context);
+                        }
                     });
-        }
+
     }
 
     /**
@@ -665,9 +693,11 @@ public class DatabaseManager {
      */
     public void storeUserValueToFirestore(String userId, String type, @Nullable Object value, @Nullable OnCompleteListener<Void> listener) {
         DocumentReference docRef = firestoreDatabase.collection("users").document(type).collection("userData").document(userId);
+        docRef = firestoreDatabase.collection("users").document(userId);
 
+        Log.d("DatabaseManager", "Storing data in the storeUserValueToFirestore " + value.toString()); // Log completion
         // Use set() to store the value
-        docRef.set(value)
+        docRef.set(Collections.singletonMap(type, value))
                 .addOnCompleteListener(task1 -> {
                     if (listener != null) {
                         listener.onComplete(task1); // Notify listener on completion
@@ -680,6 +710,7 @@ public class DatabaseManager {
                         listener.onComplete(failedTask); // Notify listener with failure
                     }
                 });
+        Log.d("DatabaseManager", "Done storing data"); // Log completion
     }
 
     /**

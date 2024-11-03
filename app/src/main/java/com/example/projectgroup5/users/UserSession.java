@@ -196,21 +196,27 @@ public class UserSession {
      * @param password The password for the new user.
      */
     public void createUser(String email, String password) {
+        // TODO check this out
+        Log.d("UserSession", "createUser: " + email + " " + password);
         DatabaseManager.getDatabaseManager().createUserWithEmailAndPassword(email, password, context, task -> DatabaseManager.getDatabaseManager().getUserDataFromFirestore(DatabaseManager.USER_TYPE, userType -> {
             if (userType != null) {
+                Log.d("UserSession", "User type: " + userType);
                 // Create a User representation based on the user type
                 userRepresentation = User.newUser(userId, (int) (long) ((Long) userType));
                 if (userRepresentation == null) {
                     Log.e("UserSession", "User representation is null 1");
 //                            return;
                 }
+                Log.d("UserSession", "The user representation is: " + userRepresentation.toString() + " with user type: " + userType);
                 instantiateEmailForUser(DatabaseManager.getDatabaseManager().getCurrentUser());
                 navController.navigate(R.id.account);
                 Log.d("UserSession", "User type: " + userType);
             } else {
                 Log.e("UserSession", "User type not found");
             }
+            Log.d("UserSession", "aaaaaaaaa: " + userType);
         }));
+        Log.d("UserSession", "created User: " + email + " " + password);
     }
 
     /**
