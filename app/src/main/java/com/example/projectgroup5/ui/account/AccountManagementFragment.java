@@ -141,7 +141,7 @@ public class AccountManagementFragment extends Fragment {
         cachedDisplayUserEmail();
         Log.d("AccountManagementFragment", "In the displayUserEmail method");
         DatabaseManager.getDatabaseManager().getUserDataFromFirestore(DatabaseManager.USER_EMAIL, userEmail -> {
-            if (userEmail != null) {
+            if (userEmail != null && !userEmail.toString().isEmpty()) {
                 // Create a User representation based on the user type
                 if (UserSession.getInstance().getUserRepresentation() != null) {
                     UserSession.getInstance().getUserRepresentation().setUserEmail(String.valueOf(userEmail));
@@ -151,15 +151,19 @@ public class AccountManagementFragment extends Fragment {
                 binding.userCurrentEmail.setVisibility(View.VISIBLE);
             } else {
                 Log.e("AccountManagementFragment", "User email not found");
+                binding.userCurrentEmail.setVisibility(View.GONE);
             }
         });
     }
 
     private void cachedDisplayUserEmail() {
-        if (UserSession.getInstance().getUserRepresentation() != null) {
+        User userRepresentation = UserSession.getInstance().getUserRepresentation();
+        if (userRepresentation != null && userRepresentation.getUserEmail() != null && !userRepresentation.getUserEmail().isEmpty()) {
             binding.userCurrentEmail.setText(UserSession.getInstance().getUserRepresentation().getUserEmail());
             // set the visibility of the textview
             binding.userCurrentEmail.setVisibility(View.VISIBLE);
+        } else {
+            binding.userCurrentEmail.setVisibility(View.GONE);
         }
     }
 
