@@ -5,7 +5,8 @@ import android.app.NotificationManager;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.example.projectgroup5.users.Notification;
+import com.example.projectgroup5.database.DatabaseManager;
+import com.example.projectgroup5.database.Notification;
 import com.example.projectgroup5.users.UserSession;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -51,9 +52,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Set the default selected item
-        bottomNavigationView.setSelectedItemId(R.id.navigation_home);
+        bottomNavigationView.setSelectedItemId(R.id.search_event_dashboard);
         createNotificationChannel();
-        UserSession.initialize(this, navController, this);
+        UserSession.initialize(this, task -> {
+            if (task.isSuccessful()) {
+                System.out.println("UserSession initialized successfully");
+            } else {
+                System.out.println("UserSession initialization failed");
+            }
+        });
+        DatabaseManager.getDatabaseManager().test();
     }
 
     /**
@@ -82,5 +90,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         return navController.navigateUp() || super.onSupportNavigateUp();
+    }
+
+    public NavController getNavController() {
+        return navController;
     }
 }

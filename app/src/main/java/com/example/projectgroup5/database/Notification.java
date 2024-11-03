@@ -1,4 +1,4 @@
-package com.example.projectgroup5.users;
+package com.example.projectgroup5.database;
 
 import android.Manifest;
 import android.app.PendingIntent;

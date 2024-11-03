@@ -27,7 +27,7 @@ public class AccountFragment extends Fragment {
         if (UserSession.getInstance().getUserId() == null || UserSession.getInstance().getUserRepresentation() == null) {
             navController.navigate(R.id.action_login_or_create_account);
         } else {
-            navController.navigate(R.id.account_management);
+            navController.navigate(R.id.action_account_to_account_management);
         }
 
         binding = FragmentAccountBinding.inflate(inflater, container, false);

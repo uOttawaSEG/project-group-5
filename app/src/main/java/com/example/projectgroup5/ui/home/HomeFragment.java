@@ -13,7 +13,7 @@ import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.databinding.FragmentHomeBinding;
-import com.example.projectgroup5.users.DatabaseManager;
+import com.example.projectgroup5.database.DatabaseManager;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
 
@@ -31,7 +31,7 @@ public class HomeFragment extends Fragment {
         if (UserSession.getInstance().getUserId() == null || UserSession.getInstance().getUserRepresentation() == null) {
             navController.navigate(R.id.action_navigation_home_to_home_not_logged_in);
         } else {
-            DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_REGISTRATION_STATE, userRegistrationState -> {
+            DatabaseManager.getDatabaseManager().getUserDataFromFirestore(DatabaseManager.USER_REGISTRATION_STATE, userRegistrationState -> {
                 if (Integer.parseInt(userRegistrationState.toString()) != (User.ACCEPTED)) {
                     navController.navigate(R.id.action_navigation_home_to_home_not_registered_in);
                 } else if (UserSession.getInstance().getUserRepresentation().getUserType() == User.USER_TYPE_ADMIN) {

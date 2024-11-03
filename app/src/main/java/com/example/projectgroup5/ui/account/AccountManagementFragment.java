@@ -14,7 +14,7 @@ import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.databinding.FragmentAccountManagementBinding;
-import com.example.projectgroup5.users.DatabaseManager;
+import com.example.projectgroup5.database.DatabaseManager;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
 
@@ -30,7 +30,7 @@ public class AccountManagementFragment extends Fragment {
 
         // user representation comes out as null
         if (UserSession.getInstance().getUserId() == null || UserSession.getInstance().getUserRepresentation() == null) {
-            navController.navigate(R.id.account);
+            navController.navigate(R.id.action_account_management_to_login_or_create_account);
             Log.d("AccountManagementFragment", "User is not logged in");
             return root;
         }
@@ -47,7 +47,7 @@ public class AccountManagementFragment extends Fragment {
         root.findViewById(R.id.logoutButton).setOnClickListener(v -> {
             UserSession.getInstance().logout();
             // go back to the login fragment
-            navController.navigate(R.id.login);
+            navController.navigate(R.id.action_account_management_to_login_or_create_account);
         });
 
         return root;
@@ -63,7 +63,8 @@ public class AccountManagementFragment extends Fragment {
      */
     private void displayUserRegistrationStatus() {
         Log.d("AccountManagementFragment", "In the displayUserRegistrationStatus method");
-        DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_REGISTRATION_STATE, userState -> {
+        cachedDisplayRegistrationStatus();
+        DatabaseManager.getDatabaseManager().getUserDataFromFirestore(DatabaseManager.USER_REGISTRATION_STATE, userState -> {
             Log.d("AccountManagementFragment", "In the onCallback of displayUserRegistrationStatus: " + userState);
             if (userState != null) {
                 int intUserState = (int) (long) ((Long) userState);
@@ -99,6 +100,35 @@ public class AccountManagementFragment extends Fragment {
         });
     }
 
+    private void cachedDisplayRegistrationStatus() {
+        if (UserSession.getInstance().getUserRepresentation() != null) {
+            String newText;
+            switch (UserSession.getInstance().getUserRepresentation().getUserRegistrationState()) {
+                case User.WAITLISTED:
+                    binding.userCurrentState.setVisibility(View.VISIBLE);
+                    Log.d("AccountManagementFragment", "userState: waitlisted");
+                    newText = "You are on the waitlist";
+                    break;
+                case User.ACCEPTED:
+                    binding.userCurrentState.setVisibility(View.VISIBLE);
+                    Log.d("AccountManagementFragment", "userState: accepted");
+                    newText = "You are registered";
+                    break;
+                case User.REJECTED:
+                    binding.userCurrentState.setVisibility(View.VISIBLE);
+                    Log.d("AccountManagementFragment", "userState: rejected");
+                    newText = "Your application was rejected, call 911 for help";
+                    break;
+                default:
+                    // unknown registration state
+                    binding.userCurrentState.setVisibility(View.GONE);
+                    newText = "";
+                    break;
+            }
+            binding.userCurrentState.setText(newText);
+        }
+    }
+
     /**
      * Retrieves and displays the user's email address from the database.
      * <p>
@@ -108,9 +138,10 @@ public class AccountManagementFragment extends Fragment {
      * an error log is generated.
      */
     private void displayUserEmail() {
+        cachedDisplayUserEmail();
         Log.d("AccountManagementFragment", "In the displayUserEmail method");
-        DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_EMAIL, userEmail -> {
-            if (userEmail != null) {
+        DatabaseManager.getDatabaseManager().getUserDataFromFirestore(DatabaseManager.USER_EMAIL, userEmail -> {
+            if (userEmail != null && !userEmail.toString().isEmpty()) {
                 // Create a User representation based on the user type
                 if (UserSession.getInstance().getUserRepresentation() != null) {
                     UserSession.getInstance().getUserRepresentation().setUserEmail(String.valueOf(userEmail));
@@ -120,8 +151,20 @@ public class AccountManagementFragment extends Fragment {
                 binding.userCurrentEmail.setVisibility(View.VISIBLE);
             } else {
                 Log.e("AccountManagementFragment", "User email not found");
+                binding.userCurrentEmail.setVisibility(View.GONE);
             }
         });
+    }
+
+    private void cachedDisplayUserEmail() {
+        User userRepresentation = UserSession.getInstance().getUserRepresentation();
+        if (userRepresentation != null && userRepresentation.getUserEmail() != null && !userRepresentation.getUserEmail().isEmpty()) {
+            binding.userCurrentEmail.setText(UserSession.getInstance().getUserRepresentation().getUserEmail());
+            // set the visibility of the textview
+            binding.userCurrentEmail.setVisibility(View.VISIBLE);
+        } else {
+            binding.userCurrentEmail.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -134,7 +177,8 @@ public class AccountManagementFragment extends Fragment {
      */
     private void displayUserType() {
         Log.d("AccountManagementFragment", "In the displayUserType method");
-        DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_TYPE, userType -> {
+        cachedDisplayUserType();
+        DatabaseManager.getDatabaseManager().getUserDataFromFirestore(DatabaseManager.USER_TYPE, userType -> {
             Log.d("AccountManagementFragment", "In the onCallback of displayUserType: " + userType);
             if (userType != null) {
                 // Create a User representation based on the user type
@@ -173,6 +217,36 @@ public class AccountManagementFragment extends Fragment {
                 Log.e("AccountManagementFragment", "User type not found");
             }
         });
+    }
+
+    private void cachedDisplayUserType() {
+        if (UserSession.getInstance().getUserRepresentation() == null) return;
+        String newText;
+        switch (UserSession.getInstance().getUserRepresentation().getUserType()) {
+            case User.USER_TYPE_ORGANIZER:
+                Log.d("AccountManagementFragment", "usertype: organizer");
+                binding.userAccountType.setVisibility(View.VISIBLE);
+                newText = "Welcome Organizer";
+                break;
+            case User.USER_TYPE_ATTENDEE:
+                Log.d("AccountManagementFragment", "usertype: user");
+                binding.userAccountType.setVisibility(View.VISIBLE);
+                newText = "Welcome User";
+                break;
+            case User.USER_TYPE_ADMIN:
+                Log.d("AccountManagementFragment", "usertype: admin");
+                binding.userAccountType.setVisibility(View.VISIBLE);
+                newText = "Welcome Admin";
+                break;
+            default:
+                // unknown user type
+                Log.e("AccountManagementFragment", "usertype: unknown");
+                binding.userAccountType.setVisibility(View.GONE);
+                newText = "";
+                break;
+        }
+        Log.d("AccountManagementFragment", "newText for userType: " + newText);
+        binding.userAccountType.setText(newText);
     }
 
 

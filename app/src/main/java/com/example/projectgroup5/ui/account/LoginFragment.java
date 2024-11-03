@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.databinding.FragmentLoginBinding;
 import com.example.projectgroup5.users.UserSession;
@@ -25,19 +26,17 @@ public class LoginFragment extends Fragment {
         binding = FragmentLoginBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-        root.findViewById(R.id.confirmCredentialAndLoginButton).setOnClickListener(v -> UserSession.getInstance().login(binding.emailInput.getText().toString(), binding.passwordInput.getText().toString(), (task) -> {
+        root.findViewById(R.id.confirmCredentialAndLoginButton).setOnClickListener(v -> UserSession.getInstance().login(binding.emailInput.getText().toString(), binding.passwordInput.getText().toString(), (MainActivity) getContext(), (task) -> {
             if (task.isSuccessful()) {
                 Log.e("LoginFragment", "login was successful");
-                if (UserSession.getInstance().getUserRepresentation() == null)
-                    UserSession.getInstance().instantiateUserRepresentation(getContext());
-                UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
+                navController.navigate(R.id.action_login_to_account_management);
             } else {
                 // show an error message
                 Log.e("LoginFragment", "login was not successful");
                 binding.emailInput.setError("Invalid email or password");
             }
         }));
-        root.findViewById(R.id.cancelButton).setOnClickListener(v -> navController.navigate(R.id.action_go_back_to_login));
+        root.findViewById(R.id.cancelButton).setOnClickListener(v -> navController.popBackStack());
         return root;
     }
 

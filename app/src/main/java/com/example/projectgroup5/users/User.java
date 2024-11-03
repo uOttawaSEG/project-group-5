@@ -1,6 +1,6 @@
 package com.example.projectgroup5.users;
 
-import static com.example.projectgroup5.users.DatabaseManager.USER_ORGANIZATION_NAME;
+import static com.example.projectgroup5.database.DatabaseManager.USER_ORGANIZATION_NAME;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.projectgroup5.R;
+import com.example.projectgroup5.database.DatabaseManager;
 
 public abstract class User {
     public final static int USER_TYPE_ORGANIZER = 1;
@@ -22,9 +23,10 @@ public abstract class User {
     private String userFirstName;
     private String userLastName;
     private String userEmail;
-    private String userPhoneNumber;
+    private long userPhoneNumber;
     private String userAddress;
     private String userOrganizationName;
+    private int userRegistrationState;
     private int userType;
 
     /**
@@ -64,7 +66,41 @@ public abstract class User {
         } else {
             return null;
         }
+        DatabaseManager.getDatabaseManager().getAllUserDataFromFirestore(userId, value ->{
+            if (value != null) {
+                if (value.containsKey(DatabaseManager.USER_FIRST_NAME)) {
+                    user.setUserFirstName(value.get(DatabaseManager.USER_FIRST_NAME).toString());
+                }
+                if (value.containsKey(DatabaseManager.USER_LAST_NAME)) {
+                    user.setUserLastName(value.get(DatabaseManager.USER_LAST_NAME).toString());
+                }
+                if (value.containsKey(DatabaseManager.USER_EMAIL)) {
+                    user.setUserEmail(value.get(DatabaseManager.USER_EMAIL).toString());
+                }
+                if (value.containsKey(DatabaseManager.USER_PHONE)) {
+                    user.setUserPhoneNumber(Long.valueOf(value.get(DatabaseManager.USER_PHONE).toString().replace("\"", "")));
+                }
+                if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
+                    user.setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
+                }
+                if (value.containsKey(USER_ORGANIZATION_NAME)) {
+                    user.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
+                }
+                if (value.containsKey(DatabaseManager.USER_REGISTRATION_STATE)) {
+                    user.setUserRegistrationState((int) (long) value.get(DatabaseManager.USER_REGISTRATION_STATE));
+                }
+                user.setUserType(userType);
+            }
+        });
         return user;
+    }
+
+    private void setUserRegistrationState(int userRegistrationState) {
+        this.userRegistrationState = userRegistrationState;
+    }
+
+    public int getUserRegistrationState() {
+        return userRegistrationState;
     }
 
     /**
@@ -96,7 +132,7 @@ public abstract class User {
      *
      * @param userPhoneNumber The phone number to be set for the user.
      */
-    public void setUserPhoneNumber(String userPhoneNumber) {
+    public void setUserPhoneNumber(long userPhoneNumber) {
         this.userPhoneNumber = userPhoneNumber;
     }
 
@@ -153,6 +189,10 @@ public abstract class User {
         this.userEmail = email;
     }
 
+    public String getUserEmail() {
+        return userEmail;
+    }
+
     /**
      * Adds a user entry to the specified layout, populating it with user data from the database.
      * <p>
@@ -169,7 +209,7 @@ public abstract class User {
         View customView = LayoutInflater.from(context).inflate(R.layout.account_entry, layout, false);
         customView.setId(userId.hashCode());
         // set get the data from firebase if possible
-        DatabaseManager.getDatabaseManager().getAllUserData(userId, value -> {
+        DatabaseManager.getDatabaseManager().getAllUserDataFromFirestore(userId, value -> {
             if (value != null) {
                 if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
                     setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
@@ -203,9 +243,9 @@ public abstract class User {
                     userEmailTextView.setText(userEmail);
                 }
                 if (value.containsKey(DatabaseManager.USER_PHONE)) {
-                    setUserPhoneNumber(value.get(DatabaseManager.USER_PHONE).toString());
+                    setUserPhoneNumber(Long.valueOf(value.get(DatabaseManager.USER_PHONE).toString().replace("\"", "")));
                     TextView userPhoneNumberTextView = customView.findViewById(R.id.phoneNumberEntry);
-                    userPhoneNumberTextView.setText(userPhoneNumber);
+                    userPhoneNumberTextView.setText(userPhoneNumber + "");
                 }
                 if (value.containsKey(DatabaseManager.USER_REGISTRATION_STATE)) {
                     int userRegistrationState = (int) (long) value.get(DatabaseManager.USER_REGISTRATION_STATE);
@@ -242,13 +282,13 @@ public abstract class User {
         rejectButton.setOnClickListener(v -> {
             removeUserFromLayout(layout);
             // Handle reject button click
-            DatabaseManager.getDatabaseManager().storeUserValue(userId, DatabaseManager.USER_REGISTRATION_STATE, REJECTED, null);
+            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(userId, DatabaseManager.USER_REGISTRATION_STATE, REJECTED, null);
         });
         Button acceptButton = customView.findViewById(R.id.acceptUserButton);
         acceptButton.setOnClickListener(v -> {
             removeUserFromLayout(layout);
             // Handle accept button click
-            DatabaseManager.getDatabaseManager().storeUserValue(userId, DatabaseManager.USER_REGISTRATION_STATE, ACCEPTED, null);
+            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(userId, DatabaseManager.USER_REGISTRATION_STATE, ACCEPTED, null);
         });
 
 

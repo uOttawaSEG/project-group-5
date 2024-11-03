@@ -20,10 +20,6 @@ public class LoginOrCreate extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentLoginOrCreateAccountBinding.inflate(inflater, container, false);
-        ViewGroup.LayoutParams params = binding.getRoot().getLayoutParams();
-        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
-        binding.getRoot().setLayoutParams(params);
         NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
 
         // set the buttons on click listeners for the login button and the create account button
