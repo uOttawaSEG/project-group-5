@@ -21,8 +21,8 @@ public class Event {
     /**
      * This constructor is used to create a new event.
      * It should not be called directly.
-     * Instead use the {@link EventOption#newEvent(String, String, Timestamp, Timestamp, Timestamp, List<User>)}
-     * <p> or {@link EventOption#oldEvent(String, String, Timestamp, Timestamp, Timestamp)}</p>
+     * Instead use the {@link EventOption#newEvent(String, String, Timestamp, Timestamp, Timestamp, List)}
+     * <p> or {@link EventOption#oldEvent(String, String, Timestamp, Timestamp, Timestamp, List)}</p>
      * @param title
      * @param address
      * @param startTime

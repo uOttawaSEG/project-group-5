@@ -23,6 +23,7 @@ public class EventOption {
     }
 
     /**
+     * This constructor is used to create a new event option. For an event that has already occurred.
      * Returns one of the following:
      * {@link #event} contained in EventOption if {@link #holdsAnEvent} is true
      * <p>
@@ -47,6 +48,8 @@ public class EventOption {
     }
 
     /**
+     * This creates a new event option. For an event that has not yet occurred. It is more strict than {@link #oldEvent}
+     * Since it makes sure that the event is not in the past.
      * Returns one of the following:
      * {@link #event} contained in EventOption if {@link #holdsAnEvent} is true
      * <p>
