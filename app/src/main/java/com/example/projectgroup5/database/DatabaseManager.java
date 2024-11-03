@@ -18,6 +18,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.annotations.Nullable;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +37,8 @@ public class DatabaseManager {
     public static final String USER_ORGANIZATION_NAME = "UserOrganizationName";
     private static final DatabaseManager databaseManager = new DatabaseManager();
     private final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-    private final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private final FirebaseDatabase realTimeDatabase = FirebaseDatabase.getInstance();
+    private final FirebaseFirestore firestoreDatabase = FirebaseFirestore.getInstance();
 
     /**
      * Retrieves the singleton instance of the DatabaseManager.
@@ -134,7 +137,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Deletes the currently authenticated user account.
+     * Deletes the currently authenticated user account from the {@link #realTimeDatabase}.
      * <p>
      * This method first retrieves the currently signed-in user. If a user is logged in, it removes
      * their data from the database and deletes the user from Firebase Authentication. After the
@@ -143,10 +146,10 @@ public class DatabaseManager {
      *
      * @param listener A listener that will be notified when the user deletion operation is complete.
      */
-    public void deleteUser(OnCompleteListener<Void> listener) {
+    public void deleteUserFromRealtime(OnCompleteListener<Void> listener) {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
-            DatabaseReference ref = database.getReference("users").child(user.getUid());
+            DatabaseReference ref = realTimeDatabase.getReference("users").child(user.getUid());
             ref.removeValue().addOnCompleteListener(listener);
             // Delete the user from Firebase Authentication
             user.delete().addOnCompleteListener(listener);
@@ -156,6 +159,20 @@ public class DatabaseManager {
             // Edge case where no user is logged in
             listener.onComplete(Tasks.forException(new Exception("No user logged in")));
         }
+    }
+
+    /**
+     * Deletes the currently authenticated user account from the {@link #firestoreDatabase}.
+     * <p>
+     * This method first retrieves the currently signed-in user. If a user is logged in, it removes
+     * their data from the database and deletes the user from Firebase Authentication. After the
+     * deletion, it logs out the user. If no user is logged in, it calls the provided listener
+     * with an exception indicating that no user is logged in.
+     *
+     * @param listener A listener that will be notified when the user deletion operation is complete.
+     */
+    public void deleteUserFromFirestore(OnCompleteListener<Void> listener) {
+        //TODO: Implement this method
     }
 
     /**
@@ -171,13 +188,13 @@ public class DatabaseManager {
      *                   <li><code>List&lt;Object&gt;</code></li>
      *                 </ul>
      */
-    public void getUserData(String userId, String key, final UserSession.FirebaseCallback<Object> callback) {
+    public void getUserDataFromRealTime(String userId, String key, final UserSession.FirebaseCallback<Object> callback) {
         if (userId == null) {
             Log.e("UserSession", "User ID is null");
             callback.onCallback(null);
             return;
         }
-        DatabaseReference ref = database.getReference("users").child(userId).child(key);
+        DatabaseReference ref = realTimeDatabase.getReference("users").child(userId).child(key);
 
         Log.d("UserSession", "Fetching user data for key: " + key); // Add this line
 
@@ -203,7 +220,48 @@ public class DatabaseManager {
     }
 
     /**
-     * Retrieves all user data for the specified user ID.
+     * TODO definitions
+     */
+    public void getUserDataFromFirestore(String userId, String key, final UserSession.FirebaseCallback<Object> callback) {
+        //TODO: Implement this method
+    }
+
+    /**
+     * Retrieves user data from {@link #firestoreDatabase} for the currently authenticated user using the specified key.
+     * <p>
+     * This method calls another version of `getUserDataFromRealTime` with the current user's ID and the provided key.
+     * It is a convenience method for accessing user data without requiring the caller to provide the user ID.
+     *
+     * @param key      The key for the user data to be retrieved.
+     * @param callback A callback to be invoked with the retrieved user data or null if an error occurs.
+     *                 The allowed return types for the data are as follows:
+     *                 <ul>
+     *                   <li><code>Boolean</code></li>
+     *                   <li><code>String</code></li>
+     *                   <li><code>Long</code></li>
+     *                   <li><code>Double</code></li>
+     *                   <li><code>Map&lt;String, Object&gt;</code></li>
+     *                   <li><code>List&lt;Object&gt;</code></li>
+     *                 </ul>
+     */
+    public void getUserDataFromRealTime(String key, final UserSession.FirebaseCallback<Object> callback) {
+        getUserDataFromRealTime(UserSession.getInstance().getUserId(), key, callback);
+    }
+
+    /**
+     * Retrieves user data from {@link #firestoreDatabase} for the currently authenticated user using the specified key.
+     * <p>
+     * This method calls another version of `getUserDataFromRealTime` with the current user's ID and the provided key.
+     * It is a convenience method for accessing user data without requiring the caller to provide the user ID.
+     *
+     * TODO: add documentation
+     */
+    public void getUserDataFromFirestore(String key, final UserSession.FirebaseCallback<Object> callback) {
+        //TODO: Implement this method
+    }
+
+    /**
+     * Retrieves all user data from {@link #realTimeDatabase} for the specified user ID.
      * <p>
      * This method checks if the provided user ID is null. If it is, it logs an error and invokes
      * the callback with null. If the user ID is valid, it adds a listener to a database reference
@@ -219,13 +277,13 @@ public class DatabaseManager {
      *                   <li><code>null</code></li>
      *                 </ul>
      */
-    public void getAllUserData(String userId, final UserSession.FirebaseCallback<Map<String, Object>> callback) {
+    public void getAllUserDataFromRealTime(String userId, final UserSession.FirebaseCallback<Map<String, Object>> callback) {
         if (userId == null) {
             Log.e("UserSession", "User ID is null");
             callback.onCallback(null);
             return;
         }
-        DatabaseReference ref = database.getReference("users").child(userId);
+        DatabaseReference ref = realTimeDatabase.getReference("users").child(userId);
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -248,29 +306,30 @@ public class DatabaseManager {
     }
 
     /**
-     * Retrieves user data for the currently authenticated user using the specified key.
+     * Retrieves all user data from {@link #firestoreDatabase} for the specified user ID.
      * <p>
-     * This method calls another version of `getUserData` with the current user's ID and the provided key.
-     * It is a convenience method for accessing user data without requiring the caller to provide the user ID.
+     * This method checks if the provided user ID is null. If it is, it logs an error and invokes
+     * the callback with null. If the user ID is valid, it adds a listener to a database reference
+     * to retrieve the user's data. On successful retrieval, it passes the data to the callback.
+     * If the user data does not exist or if the database operation is cancelled, it calls the callback
+     * with null.
      *
-     * @param key      The key for the user data to be retrieved.
+     * @param userId   The ID of the user whose data is to be retrieved.
      * @param callback A callback to be invoked with the retrieved user data or null if an error occurs.
      *                 The allowed return types for the data are as follows:
      *                 <ul>
-     *                   <li><code>Boolean</code></li>
-     *                   <li><code>String</code></li>
-     *                   <li><code>Long</code></li>
-     *                   <li><code>Double</code></li>
      *                   <li><code>Map&lt;String, Object&gt;</code></li>
-     *                   <li><code>List&lt;Object&gt;</code></li>
+     *                   <li><code>null</code></li>
      *                 </ul>
      */
-    public void getUserData(String key, final UserSession.FirebaseCallback<Object> callback) {
-        getUserData(UserSession.getInstance().getUserId(), key, callback);
+    public void getAllUserDataFromFirestore(String userId, final UserSession.FirebaseCallback<Map<String, Object>> callback) {
+        //TODO: Implement this method
     }
 
+
+
     /**
-     * Adds a ValueEventListener to the specified key for the currently authenticated user.
+     * Adds a ValueEventListener from the {@link #realTimeDatabase} to the specified key for the currently authenticated user.
      * <p>
      * This method retrieves a reference to the user's data in the database using their user ID
      * and the specified key, then attaches the provided ValueEventListener to listen for changes.
@@ -279,20 +338,34 @@ public class DatabaseManager {
      * @param valueEventListener The listener to be added for value events.
      * @param key                The key for the user data to listen to.
      */
-    public void addValueEventListener(ValueEventListener valueEventListener, String key) {
+    public void addValueEventListenerToRealTime(ValueEventListener valueEventListener, String key) {
         if (UserSession.getInstance().getUserId() == null) {
             Log.e("UserSession", "User ID is null");
             return;
         }
-        DatabaseReference ref = database.getReference("users").child(UserSession.getInstance().getUserId()).child(key);
+        DatabaseReference ref = realTimeDatabase.getReference("users").child(UserSession.getInstance().getUserId()).child(key);
         ref.addValueEventListener(valueEventListener);
+    }
+
+    /**
+     * Adds a ValueEventListener from the {@link #firestoreDatabase} to the specified key for the currently authenticated user.
+     * <p>
+     * This method retrieves a reference to the user's data in the database using their user ID
+     * and the specified key, then attaches the provided ValueEventListener to listen for changes.
+     * Any updates to the data at this reference will trigger the listener's methods.
+     *
+     * @param valueEventListener The listener to be added for value events.
+     * @param key                The key for the user data to listen to.
+     */
+    public void addValueEventListenerToFirestore(ValueEventListener valueEventListener, String key) {
+        //TODO implement this method (might be different)
     }
 
     /**
      * Removes a previously attached ValueEventListener from the Firebase Realtime Database reference.
      *
      * <p>This method is used to detach a listener that was previously registered with
-     * {@link #addValueEventListener(ValueEventListener, String)}. It is important to call this
+     * {@link #addValueEventListenerToRealTime(ValueEventListener, String)}. It is important to call this
      * method when the listener is no longer needed to avoid memory leaks and
      * unintended behavior, especially in lifecycle-aware components such as Activities or Fragments.</p>
      *
@@ -300,8 +373,24 @@ public class DatabaseManager {
      *                           It must be the same instance that was previously added.
      *                           If the listener was not added, this method has no effect.
      */
-    public void removeEventListener(ValueEventListener valueEventListener) {
-        database.getReference().removeEventListener(valueEventListener);
+    public void removeEventListenerFromRealTime(ValueEventListener valueEventListener) {
+        realTimeDatabase.getReference().removeEventListener(valueEventListener);
+    }
+
+    /**
+     * Removes a previously attached ValueEventListener from the Firestore Database reference.
+     *
+     * <p>This method is used to detach a listener that was previously registered with
+     * {@link #addValueEventListenerToFirestore(ValueEventListener, String)}. It is important to call this
+     * method when the listener is no longer needed to avoid memory leaks and
+     * unintended behavior, especially in lifecycle-aware components such as Activities or Fragments.</p>
+     *
+     * @param valueEventListener The ValueEventListener to be removed.
+     *                           It must be the same instance that was previously added.
+     *                           If the listener was not added, this method has no effect.
+     */
+    public void removeEventListenerFromFirestore(ValueEventListener valueEventListener) {
+        // TODO: implement this method
     }
 
     /**
@@ -331,8 +420,8 @@ public class DatabaseManager {
      * @param matchingValue The value to be matched for the specified key.
      * @param callback      A callback to be invoked with the list of matching user IDs.
      */
-    public void getUserIdByMatchingData(String key, String matchingValue, DataCallback callback) {
-        DatabaseReference ref = database.getReference("users");
+    public void getUserIdByMatchingDataFromRealTime(String key, String matchingValue, DataCallback callback) {
+        DatabaseReference ref = realTimeDatabase.getReference("users");
         List<String> userIds = new ArrayList<>();
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -382,6 +471,22 @@ public class DatabaseManager {
     }
 
     /**
+     * Retrieves user IDs that match a specified key-value pair from firestore.
+     * <p>
+     * This method queries the user data in the database and checks for entries where the specified
+     * key matches the given value. It collects the user IDs of all matching entries and invokes the
+     * provided callback with the list of these user IDs. If the query is cancelled or encounters an
+     * error, it returns an empty list via the callback.
+     *
+     * @param key           The key to match against in the user data.
+     * @param matchingValue The value to be matched for the specified key.
+     * @param callback      A callback to be invoked with the list of matching user IDs.
+     */
+    public void getUserIdByMatchingDataFromFirestore(String key, String matchingValue, DataCallback callback) {
+        //TODO: implement this method
+    }
+
+    /**
      * Stores a value in the database under the specified user ID and type.
      * <p>
      * This method writes the provided value to the database at the specified path,
@@ -393,10 +498,27 @@ public class DatabaseManager {
      * @param value    The value to be stored in the database; can be null.
      * @param listener A listener to be notified when the store operation is complete.
      */
-    public void storeUserValue(String userId, String type, @Nullable Object value, @Nullable OnCompleteListener<Void> listener) {
-        DatabaseReference ref = database.getReference().child("users").child(userId).child(type);
+    public void storeUserValueToRealTime(String userId, String type, @Nullable Object value, @Nullable OnCompleteListener<Void> listener) {
+        DatabaseReference ref = realTimeDatabase.getReference().child("users").child(userId).child(type);
         Task<Void> task = ref.setValue(value);
         if (listener != null) task.addOnCompleteListener(listener);
+    }
+
+    /**
+     * Stores a value in the firestore database under the specified user ID and type.
+     * <p>
+     * This method writes the provided value to the database at the specified path,
+     * which is constructed using the user ID and type. Upon completion of the write
+     * operation, it invokes the provided listener to notify about the result.
+     *
+     * @param userId   The ID of the user for whom the value is being stored.
+     * @param type     The type/category under which the value is stored.
+     * @param value    The value to be stored in the database; can be null.
+     * @param listener A listener to be notified when the store operation is complete.
+     */
+    public void storeUserValueToFirestore(String userId, String type, @Nullable Object value, @Nullable OnCompleteListener<Void> listener) {
+        //TODO: implement this method
+        //FIXME should be hierarchical if possible aka /users/<type>/<userId> instead of /users/<userId>/<type>
     }
 
     /**
@@ -410,7 +532,23 @@ public class DatabaseManager {
      * @param value    The value to be stored in the database; can be null.
      * @param listener A listener to be notified when the store operation is complete.
      */
-    public void storeUserValue(String type, @Nullable Object value, OnCompleteListener<Void> listener) {
-        storeUserValue(UserSession.getInstance().getUserId(), type, value, listener);
+    public void storeUserValueToRealTime(String type, @Nullable Object value, OnCompleteListener<Void> listener) {
+        storeUserValueToRealTime(UserSession.getInstance().getUserId(), type, value, listener);
+    }
+
+    /**
+     * Stores a value for the currently authenticated user under the specified type.
+     * <p>
+     * This method calls another version of `storeValue` with the current user's ID, the provided
+     * type, and the value to be stored. It serves as a convenience method for storing user data
+     * without needing to specify the user ID explicitly.
+     *
+     * @param type     The type/category under which the value is stored.
+     * @param value    The value to be stored in the database; can be null.
+     * @param listener A listener to be notified when the store operation is complete.
+     */
+    public void storeUserValueToFirestore(String type, @Nullable Object value, OnCompleteListener<Void> listener) {
+        //FIXME make sure this works
+        storeUserValueToFirestore(UserSession.getInstance().getUserId(), type, value, listener);
     }
 }

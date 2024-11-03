@@ -63,7 +63,7 @@ public class AccountManagementFragment extends Fragment {
      */
     private void displayUserRegistrationStatus() {
         Log.d("AccountManagementFragment", "In the displayUserRegistrationStatus method");
-        DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_REGISTRATION_STATE, userState -> {
+        DatabaseManager.getDatabaseManager().getUserDataFromRealTime(DatabaseManager.USER_REGISTRATION_STATE, userState -> {
             Log.d("AccountManagementFragment", "In the onCallback of displayUserRegistrationStatus: " + userState);
             if (userState != null) {
                 int intUserState = (int) (long) ((Long) userState);
@@ -109,7 +109,7 @@ public class AccountManagementFragment extends Fragment {
      */
     private void displayUserEmail() {
         Log.d("AccountManagementFragment", "In the displayUserEmail method");
-        DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_EMAIL, userEmail -> {
+        DatabaseManager.getDatabaseManager().getUserDataFromRealTime(DatabaseManager.USER_EMAIL, userEmail -> {
             if (userEmail != null) {
                 // Create a User representation based on the user type
                 if (UserSession.getInstance().getUserRepresentation() != null) {
@@ -134,7 +134,7 @@ public class AccountManagementFragment extends Fragment {
      */
     private void displayUserType() {
         Log.d("AccountManagementFragment", "In the displayUserType method");
-        DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_TYPE, userType -> {
+        DatabaseManager.getDatabaseManager().getUserDataFromRealTime(DatabaseManager.USER_TYPE, userType -> {
             Log.d("AccountManagementFragment", "In the onCallback of displayUserType: " + userType);
             if (userType != null) {
                 // Create a User representation based on the user type

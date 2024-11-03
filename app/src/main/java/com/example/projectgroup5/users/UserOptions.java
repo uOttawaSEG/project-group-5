@@ -37,11 +37,11 @@ public class UserOptions {
     public static void getUsersWithRegistrationStatus(UsersCallback callback, int userRegistrationState) {
         List<User> pendingUsers = new ArrayList<>();
         DatabaseManager databaseManager = DatabaseManager.getDatabaseManager();
-        databaseManager.getUserIdByMatchingData(DatabaseManager.USER_REGISTRATION_STATE, String.valueOf(userRegistrationState), userIds -> {
+        databaseManager.getUserIdByMatchingDataFromRealTime(DatabaseManager.USER_REGISTRATION_STATE, String.valueOf(userRegistrationState), userIds -> {
             // Create a counter to track completed user data retrieval
             AtomicInteger remainingCalls = new AtomicInteger(userIds.size());
             for (String userId : userIds) {
-                DatabaseManager.getDatabaseManager().getUserData(userId, DatabaseManager.USER_TYPE, userType -> {
+                DatabaseManager.getDatabaseManager().getUserDataFromRealTime(userId, DatabaseManager.USER_TYPE, userType -> {
                     User user = User.newUser(userId, (int) (long) ((Long) userType));
                     pendingUsers.add(user);
                     // Decrement the counter and check if all callbacks are complete

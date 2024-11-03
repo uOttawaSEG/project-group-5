@@ -1,6 +1,5 @@
 package com.example.projectgroup5.users;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
@@ -21,7 +20,6 @@ public class UserSession {
     private String userId;
 
     private static User userRepresentation;
-    @SuppressLint("StaticFieldLeak")
     private static NavController navController;
 
     /**
@@ -63,7 +61,7 @@ public class UserSession {
         }
         userId = user.getUid();
         // update all the data from the database
-        DatabaseManager.getDatabaseManager().getUserData(userId, DatabaseManager.USER_TYPE, userType -> {
+        DatabaseManager.getDatabaseManager().getUserDataFromRealTime(userId, DatabaseManager.USER_TYPE, userType -> {
             if (userType != null) {
                 // Create a User representation based on the user type
                 if (userRepresentation != null) {
@@ -115,7 +113,7 @@ public class UserSession {
      */
     private void instantiateEmailForUser(FirebaseUser user) {
         //  set the user email
-        DatabaseManager.getDatabaseManager().storeUserValue(DatabaseManager.USER_EMAIL, user.getEmail(), (task) -> {
+        DatabaseManager.getDatabaseManager().storeUserValueToRealTime(DatabaseManager.USER_EMAIL, user.getEmail(), (task) -> {
             if (task.isSuccessful()) {
                 Log.d("UserSession", "Success instantiateEmailForUser: success");
             } else {
@@ -198,7 +196,7 @@ public class UserSession {
      * @param password The password for the new user.
      */
     public void createUser(String email, String password) {
-        DatabaseManager.getDatabaseManager().createUserWithEmailAndPassword(email, password, context, task -> DatabaseManager.getDatabaseManager().getUserData(DatabaseManager.USER_TYPE, userType -> {
+        DatabaseManager.getDatabaseManager().createUserWithEmailAndPassword(email, password, context, task -> DatabaseManager.getDatabaseManager().getUserDataFromRealTime(DatabaseManager.USER_TYPE, userType -> {
             if (userType != null) {
                 // Create a User representation based on the user type
                 userRepresentation = User.newUser(userId, (int) (long) ((Long) userType));

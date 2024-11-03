@@ -26,7 +26,7 @@ public class DatabaseListener {
     public static void clearListeners() {
         for (ValueEventListener listener : listeners) {
             Log.e("DatabaseListener", "clearing listener " + listener.toString());
-            DatabaseManager.getDatabaseManager().removeEventListener(listener);
+            DatabaseManager.getDatabaseManager().removeEventListenerFromRealTime(listener);
         }
         listeners.clear();
     }
@@ -103,7 +103,7 @@ public class DatabaseListener {
 
                 Log.e("DatabaseListener", "adding second listener " + secondListener.toString());
                 listeners.add(secondListener);
-                DatabaseManager.getDatabaseManager().addValueEventListener(secondListener, USER_REGISTRATION_STATE);
+                DatabaseManager.getDatabaseManager().addValueEventListenerToRealTime(secondListener, USER_REGISTRATION_STATE);
             }
 
             @Override
@@ -114,7 +114,7 @@ public class DatabaseListener {
 
         Log.e("DatabaseListener", "adding first listener " + firstListener.toString());
         listeners.add(firstListener);
-        DatabaseManager.getDatabaseManager().addValueEventListener(firstListener, USER_REGISTRATION_STATE);
+        DatabaseManager.getDatabaseManager().addValueEventListenerToRealTime(firstListener, USER_REGISTRATION_STATE);
     }
 
 }
