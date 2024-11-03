@@ -170,7 +170,7 @@ public abstract class User {
         View customView = LayoutInflater.from(context).inflate(R.layout.account_entry, layout, false);
         customView.setId(userId.hashCode());
         // set get the data from firebase if possible
-        DatabaseManager.getDatabaseManager().getAllUserDataFromRealTime(userId, value -> {
+        DatabaseManager.getDatabaseManager().getAllUserDataFromFirestore(userId, value -> {
             if (value != null) {
                 if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
                     setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
@@ -243,13 +243,13 @@ public abstract class User {
         rejectButton.setOnClickListener(v -> {
             removeUserFromLayout(layout);
             // Handle reject button click
-            DatabaseManager.getDatabaseManager().storeUserValueToRealTime(userId, DatabaseManager.USER_REGISTRATION_STATE, REJECTED, null);
+            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(userId, DatabaseManager.USER_REGISTRATION_STATE, REJECTED, null);
         });
         Button acceptButton = customView.findViewById(R.id.acceptUserButton);
         acceptButton.setOnClickListener(v -> {
             removeUserFromLayout(layout);
             // Handle accept button click
-            DatabaseManager.getDatabaseManager().storeUserValueToRealTime(userId, DatabaseManager.USER_REGISTRATION_STATE, ACCEPTED, null);
+            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(userId, DatabaseManager.USER_REGISTRATION_STATE, ACCEPTED, null);
         });
 
 

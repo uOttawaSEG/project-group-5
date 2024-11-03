@@ -18,7 +18,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.annotations.Nullable;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 
 import java.util.ArrayList;
@@ -39,6 +45,32 @@ public class DatabaseManager {
     private final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final FirebaseDatabase realTimeDatabase = FirebaseDatabase.getInstance();
     private final FirebaseFirestore firestoreDatabase = FirebaseFirestore.getInstance();
+
+    // test function to make sure stuff saves to the firestore database
+    public void test() {
+        Log.d("DatabaseManager", "test() called");
+        firestoreDatabase.collection("users").document("test").set(Collections.singletonMap("test", "test"));
+        Log.d("DatabaseManager", "test() finished");
+        // get the data from the database
+        firestoreDatabase.collection("users").document("test").get().addOnCompleteListener(task ->
+                Log.d("DatabaseManager", "test() finished: " + task.getResult().getData()));
+        Log.d("DatabaseManager", "test() waiting for result");
+
+        // Display all the users in the firestore
+        CollectionReference usersRef = firestoreDatabase.collection("users");
+        usersRef.limit(10).get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Log.d("DatabaseManager", "User: " + document.getId() + " => " + document.getData());
+                        }
+                    } else {
+                        Log.d("DatabaseManager", "Error getting documents: ", task.getException());
+                    }
+                });
+        Log.d("DatabaseManager", "test() finished");
+    }
+
+
 
     /**
      * Retrieves the singleton instance of the DatabaseManager.
@@ -223,7 +255,34 @@ public class DatabaseManager {
      * TODO definitions
      */
     public void getUserDataFromFirestore(String userId, String key, final UserSession.FirebaseCallback<Object> callback) {
-        //TODO: Implement this method
+        if (userId == null) {
+            Log.e("UserSession", "User ID is null");
+            callback.onCallback(null);
+            return;
+        }
+
+        // Reference to Firestore
+        DocumentReference docRef = firestoreDatabase.collection("users").document(userId);
+
+        Log.d("UserSession", "Fetching user data for key: " + key); // Debug log
+
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Object data = document.get(key); // Get the value associated with the key
+                    Log.d("UserSession", "Data retrieved: " + data); // Debug log
+                    callback.onCallback(data);
+                } else {
+                    Log.e("UserSession", "Document does not exist for user ID: " + userId); // Debug log
+                    callback.onCallback(null);
+                }
+            } else {
+                Log.e("DatabaseManager", "getUserDataFromFirestore failed"); // Log the error
+                Log.e("FirebaseError", "Error getting document: " + task.getException().getMessage()); // Log the error
+                callback.onCallback(null);
+            }
+        });
     }
 
     /**
@@ -257,7 +316,7 @@ public class DatabaseManager {
      * TODO: add documentation
      */
     public void getUserDataFromFirestore(String key, final UserSession.FirebaseCallback<Object> callback) {
-        //TODO: Implement this method
+        getUserDataFromFirestore(UserSession.getInstance().getUserId(), key, callback);
     }
 
     /**
@@ -323,7 +382,34 @@ public class DatabaseManager {
      *                 </ul>
      */
     public void getAllUserDataFromFirestore(String userId, final UserSession.FirebaseCallback<Map<String, Object>> callback) {
-        //TODO: Implement this method
+        if (userId == null) {
+            Log.e("UserSession", "User ID is null");
+            callback.onCallback(null);
+            return;
+        }
+
+        // Reference to Firestore
+        DocumentReference docRef = firestoreDatabase.collection("users").document(userId);
+
+        Log.d("UserSession", "Fetching all user data for user ID: " + userId); // Debug log
+
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Map<String, Object> data = document.getData(); // Get all user data as a Map
+                    Log.d("UserSession", "Data retrieved: " + data); // Debug log
+                    callback.onCallback(data);
+                } else {
+                    Log.e("UserSession", "Document does not exist for user ID: " + userId); // Debug log
+                    callback.onCallback(null);
+                }
+            } else {
+                Log.e("DatabaseManager", "getAllUserDataFromFirestore failed"); // Log the error
+                Log.e("FirebaseError", "Error getting document: " + task.getException().getMessage()); // Log the error
+                callback.onCallback(null);
+            }
+        });
     }
 
 
@@ -354,11 +440,42 @@ public class DatabaseManager {
      * and the specified key, then attaches the provided ValueEventListener to listen for changes.
      * Any updates to the data at this reference will trigger the listener's methods.
      *
-     * @param valueEventListener The listener to be added for value events.
+     * @param eventListener The listener to be added for value events.
      * @param key                The key for the user data to listen to.
      */
-    public void addValueEventListenerToFirestore(ValueEventListener valueEventListener, String key) {
-        //TODO implement this method (might be different)
+    public ListenerRegistration addValueEventListenerToFirestore(EventListener<DocumentSnapshot> eventListener, String key) {
+        String userId = UserSession.getInstance().getUserId();
+
+        if (userId == null) {
+            Log.e("UserSession", "User ID is null");
+            return null;
+        }
+
+        // Reference to Firestore
+        DocumentReference docRef = firestoreDatabase.collection("users").document(userId);
+
+        Log.d("UserSession", "Adding listener for key: " + key); // Debug log
+
+        // Use the event listener to listen for document changes
+        ListenerRegistration listenerRegistration = docRef.addSnapshotListener((snapshot, error) -> {
+            if (error != null) {
+                Log.e("FirebaseError", "Listen failed: " + error.getMessage());
+                return;
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+                Map<String, Object> data = snapshot.getData();
+                if (data != null && data.containsKey(key)) {
+                    Log.d("UserSession", "Data updated for key " + key + ": " + data.get(key)); // Debug log
+                    eventListener.onEvent(snapshot, null); // Call the provided eventListener
+                } else {
+                    Log.e("UserSession", "Key does not exist in document: " + key);
+                }
+            } else {
+                Log.e("UserSession", "Document does not exist for user ID: " + userId);
+            }
+        });
+        return listenerRegistration;
     }
 
     /**
@@ -378,19 +495,25 @@ public class DatabaseManager {
     }
 
     /**
-     * Removes a previously attached ValueEventListener from the Firestore Database reference.
+     * Removes a previously attached EventListener from the Firestore Database reference.
      *
      * <p>This method is used to detach a listener that was previously registered with
-     * {@link #addValueEventListenerToFirestore(ValueEventListener, String)}. It is important to call this
+     * {@link #addValueEventListenerToFirestore(EventListener, String)}. It is important to call this
      * method when the listener is no longer needed to avoid memory leaks and
      * unintended behavior, especially in lifecycle-aware components such as Activities or Fragments.</p>
      *
-     * @param valueEventListener The ValueEventListener to be removed.
+     * @param listenerRegistration The EventListener to be removed.
      *                           It must be the same instance that was previously added.
      *                           If the listener was not added, this method has no effect.
      */
-    public void removeEventListenerFromFirestore(ValueEventListener valueEventListener) {
-        // TODO: implement this method
+    public void removeEventListenerFromFirestore(ListenerRegistration listenerRegistration) {
+        if (listenerRegistration != null) {
+            listenerRegistration.remove(); // Detach the listener
+            listenerRegistration = null; // Clear the reference in case we try to use it again
+            Log.d("UserSession", "Listener removed from Firestore");
+        } else {
+            Log.e("UserSession", "No listener to remove from Firestore");
+        }
     }
 
     /**
@@ -483,7 +606,31 @@ public class DatabaseManager {
      * @param callback      A callback to be invoked with the list of matching user IDs.
      */
     public void getUserIdByMatchingDataFromFirestore(String key, String matchingValue, DataCallback callback) {
-        //TODO: implement this method
+        CollectionReference usersCollection = firestoreDatabase.collection("users");
+
+        // Create a query that filters documents based on the key and matching value
+        usersCollection.whereEqualTo(key, matchingValue).get()
+                .addOnCompleteListener(task -> {
+                    List<String> userIds = new ArrayList<>();
+
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            userIds.add(document.getId()); // Get the user ID (document ID)
+                        }
+                        Log.d("DatabaseManager", "Done retrieving data from Firestore"); // Log completion
+                    } else {
+                        Log.e("DatabaseManager", "getUserIdByMatchingDataFromFirestore failed"); // Log the error
+                        Log.e("FirestoreError", "Error getting documents: ", task.getException());
+                    }
+
+                    // Trigger the callback with the retrieved user IDs
+                    callback.onDataReceived(userIds);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FirestoreError", "Query failed: " + e.getMessage());
+                    // Return an empty list on failure
+                    callback.onDataReceived(Collections.emptyList());
+                });
     }
 
     /**
@@ -517,8 +664,22 @@ public class DatabaseManager {
      * @param listener A listener to be notified when the store operation is complete.
      */
     public void storeUserValueToFirestore(String userId, String type, @Nullable Object value, @Nullable OnCompleteListener<Void> listener) {
-        //TODO: implement this method
-        //FIXME should be hierarchical if possible aka /users/<type>/<userId> instead of /users/<userId>/<type>
+        DocumentReference docRef = firestoreDatabase.collection("users").document(type).collection("userData").document(userId);
+
+        // Use set() to store the value
+        docRef.set(value)
+                .addOnCompleteListener(task1 -> {
+                    if (listener != null) {
+                        listener.onComplete(task1); // Notify listener on completion
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FirestoreError", "Failed to store value: " + e.getMessage());
+                    if (listener != null) {
+                        Task<Void> failedTask = Tasks.forException(e);
+                        listener.onComplete(failedTask); // Notify listener with failure
+                    }
+                });
     }
 
     /**
@@ -548,7 +709,6 @@ public class DatabaseManager {
      * @param listener A listener to be notified when the store operation is complete.
      */
     public void storeUserValueToFirestore(String type, @Nullable Object value, OnCompleteListener<Void> listener) {
-        //FIXME make sure this works
         storeUserValueToFirestore(UserSession.getInstance().getUserId(), type, value, listener);
     }
 }

@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.example.projectgroup5.database.DatabaseManager;
 import com.example.projectgroup5.database.Notification;
 import com.example.projectgroup5.users.UserSession;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
         createNotificationChannel();
         UserSession.initialize(this, navController, this);
+        DatabaseManager.getDatabaseManager().test();
     }
 
     /**
