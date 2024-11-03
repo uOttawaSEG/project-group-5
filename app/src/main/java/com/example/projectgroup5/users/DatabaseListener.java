@@ -25,8 +25,10 @@ public class DatabaseListener {
 
     public static void clearListeners() {
         for (ValueEventListener listener : listeners) {
+            Log.e("DatabaseListener", "clearing listener " + listener.toString());
             DatabaseManager.getDatabaseManager().removeEventListener(listener);
         }
+        listeners.clear();
     }
 
     /**
@@ -55,6 +57,7 @@ public class DatabaseListener {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             // Check if the value exists and equals 1 (this means it has been updated to 1)
+                            Log.e("DatabaseListener", "secondListener onDataChange from 0");
                             if (!dataSnapshot.exists()) return;
                             Integer value = dataSnapshot.getValue(Integer.class);
                             if (value != null && value == 1)
@@ -75,13 +78,17 @@ public class DatabaseListener {
                     secondListener = new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Log.e("DatabaseListener", "secondListener onDataChange from 2");
                             // Check if the value exists and equals 1 (this means it has been updated to 1)
                             if (!dataSnapshot.exists()) return;
                             Integer value = dataSnapshot.getValue(Integer.class);
-                            if (value != null && value == 1)
-                                Notification.sendAcceptedNotification(context);
                             // DO NOT TOUCH THIS!!!!!!!!!!!!!!!!!
-                            navController.navigate(R.id.account);
+                            if (value != null && value == 1) {
+                                Notification.sendAcceptedNotification(context);
+                                navController.navigate(R.id.account);
+                            } else if (value != null && value == 0) {
+                                navController.navigate(R.id.account);
+                            }
                         }
 
                         @Override
@@ -94,7 +101,7 @@ public class DatabaseListener {
                     return;
                 }
 
-//                if (value != null && value == 2) return;
+                Log.e("DatabaseListener", "adding second listener " + secondListener.toString());
                 listeners.add(secondListener);
                 DatabaseManager.getDatabaseManager().addValueEventListener(secondListener, USER_REGISTRATION_STATE);
             }
@@ -104,9 +111,10 @@ public class DatabaseListener {
                 Log.e("FirebaseError", databaseError.getMessage());
             }
         };
+
+        Log.e("DatabaseListener", "adding first listener " + firstListener.toString());
         listeners.add(firstListener);
         DatabaseManager.getDatabaseManager().addValueEventListener(firstListener, USER_REGISTRATION_STATE);
     }
-
 
 }

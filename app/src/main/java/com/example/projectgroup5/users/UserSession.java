@@ -64,14 +64,15 @@ public class UserSession {
         DatabaseManager.getDatabaseManager().getUserData(userId, DatabaseManager.USER_TYPE, userType -> {
             if (userType != null) {
                 // Create a User representation based on the user type
-                userRepresentation = User.newUser(userId, (int) (long) ((Long) userType));
-                if (userRepresentation == null) {
-                    Log.e("UserSession", "User representation is null 1");
-//                            return;
+                if (userRepresentation != null) {
+                    Log.e("UserSession", "User representation is not initially null");
+                            return;
                 }
+                userRepresentation = User.newUser(userId, (int) (long) ((Long) userType));
                 instantiateEmailForUser(user);
                 // Notification for prelogged in user
                 DatabaseListener.clearListeners();
+                Log.d("DatabaseListener", "User type: " + userType);
                 DatabaseListener.addValueAccountCreationEventListener(context, navController);
                 //This was not working for some reason after 2 accounts logged in sequentially
 //                navController.navigate(R.id.account_management);
@@ -98,7 +99,7 @@ public class UserSession {
     public void login(String email, String password, OnCompleteListener<AuthResult> listener) {
         DatabaseManager.getDatabaseManager().login(email, password, context, listener);
         DatabaseListener.clearListeners();
-        DatabaseListener.addValueAccountCreationEventListener(context, navController);
+//        DatabaseListener.addValueAccountCreationEventListener(context, navController);
     }
 
     /**

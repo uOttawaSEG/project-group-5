@@ -13,7 +13,7 @@ import androidx.navigation.Navigation;
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.databinding.FragmentAdminListsOptionSelectorBinding;
 
-public class AdminListsOptionSelector extends Fragment {
+public class AdminOptionSelector extends Fragment {
 
     private FragmentAdminListsOptionSelectorBinding binding;
 
