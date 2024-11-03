@@ -7,6 +7,7 @@ import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -128,19 +129,19 @@ public class DatabaseManager {
      * @param password The password of the user attempting to log in.
      * @param listener A listener that will be notified when the login operation is complete.
      */
-    public void login(String email, String password, MainActivity context, OnCompleteListener<AuthResult> listener) {
+    public void login(String email, String password, MainActivity context, OnCompleteListener<AuthResult> listener, OnSuccessListener<AuthResult> listener2) {
         logout();
         if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
-            Log.e("UserSession", "Email or password is empty");
+            Log.e("DatabaseManager", "Email or password is empty");
             // make a call back to the listener with a no success
             listener.onComplete(Tasks.forException(new Exception("Email or password is empty")));
             return;
         }
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnSuccessListener(task -> {
-                    UserSession.getInstance().setUserId(firebaseAuth.getCurrentUser().getUid());
-                    if (UserSession.getInstance().getUserRepresentation() == null)
-                        UserSession.getInstance().instantiateUserRepresentation(context, listener);
-                });
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnSuccessListener(listener2);
+    }
+
+    public String getAuthID() {
+        return firebaseAuth.getCurrentUser().getUid();
     }
 
     /**
@@ -184,10 +185,12 @@ public class DatabaseManager {
         if (firebaseAuth.getCurrentUser() != null)
             firebaseAuth.signOut();
         if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
-            Log.e("UserSession", "Email or password is empty");
+            Log.e("DatabaseManager", "Email or password is empty");
             listener.onComplete(Tasks.forException(new Exception("Email or password is empty")));
             return;
         }
+
+        Log.d("DatabaseManager", "Creating a new user with email: " + email + " and password: " + password);
         // we want to give a confirmation to the listener that the user has been created
         firebaseAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(listener);
@@ -213,7 +216,7 @@ public class DatabaseManager {
      */
     public void getUserDataFromFirestore(String userId, String key, final UserSession.FirebaseCallback<Object> callback) {
         if (userId == null) {
-            Log.e("UserSession", "User ID is null");
+            Log.e("DatabaseManager", "User ID is null");
             callback.onCallback(null);
             return;
         }
@@ -221,17 +224,17 @@ public class DatabaseManager {
         // Reference to Firestore
         DocumentReference docRef = firestoreDatabase.collection("users").document(userId);
 
-        Log.d("UserSession", "Fetching user data for key: " + key); // Debug log
+        Log.d("DatabaseManager", "Fetching user data for key: " + key); // Debug log
 
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
                     Object data = document.get(key); // Get the value associated with the key
-                    Log.d("UserSession", "Data retrieved: " + data); // Debug log
+                    Log.d("DatabaseManager", "Data retrieved: " + data); // Debug log
                     callback.onCallback(data);
                 } else {
-                    Log.e("UserSession", "Document does not exist for user ID: " + userId); // Debug log
+                    Log.e("DatabaseManager", "Document does not exist for user ID: " + userId); // Debug log
                     callback.onCallback(null);
                 }
             } else {
@@ -273,7 +276,7 @@ public class DatabaseManager {
      */
     public void getAllUserDataFromFirestore(String userId, final UserSession.FirebaseCallback<Map<String, Object>> callback) {
         if (userId == null) {
-            Log.e("UserSession", "User ID is null");
+            Log.e("DatabaseManager", "User ID is null");
             callback.onCallback(null);
             return;
         }
@@ -281,17 +284,17 @@ public class DatabaseManager {
         // Reference to Firestore
         DocumentReference docRef = firestoreDatabase.collection("users").document(userId);
 
-        Log.d("UserSession", "Fetching all user data for user ID: " + userId); // Debug log
+        Log.d("DatabaseManager", "Fetching all user data for user ID: " + userId); // Debug log
 
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
                     Map<String, Object> data = document.getData(); // Get all user data as a Map
-                    Log.d("UserSession", "Data retrieved: " + data); // Debug log
+                    Log.d("DatabaseManager", "Data retrieved: " + data); // Debug log
                     callback.onCallback(data);
                 } else {
-                    Log.e("UserSession", "Document does not exist for user ID: " + userId); // Debug log
+                    Log.e("DatabaseManager", "Document does not exist for user ID: " + userId); // Debug log
                     callback.onCallback(null);
                 }
             } else {
@@ -312,18 +315,17 @@ public class DatabaseManager {
      * @param eventListener The listener to be added for value events.
      * @param key                The key for the user data to listen to.
      */
-    public ListenerRegistration addValueEventListenerToFirestore(EventListener<DocumentSnapshot> eventListener, String key) {
-        String userId = UserSession.getInstance().getUserId();
+    public ListenerRegistration addValueEventListenerToFirestore(String userId, EventListener<DocumentSnapshot> eventListener, String key) {
 
         if (userId == null) {
-            Log.e("UserSession", "User ID is null");
+            Log.e("DatabaseManager", "User ID is null");
             return null;
         }
 
         // Reference to Firestore
         DocumentReference docRef = firestoreDatabase.collection("users").document(userId);
 
-        Log.d("UserSession", "Adding listener for key: " + key); // Debug log
+        Log.d("DatabaseManager", "Adding listener for key: " + key); // Debug log
 
         // Use the event listener to listen for document changes
         // Debug log
@@ -337,15 +339,19 @@ public class DatabaseManager {
             if (snapshot != null && snapshot.exists()) {
                 Map<String, Object> data = snapshot.getData();
                 if (data != null && data.containsKey(key)) {
-                    Log.d("UserSession", "Data updated for key " + key + ": " + data.get(key)); // Debug log
+                    Log.d("DatabaseManager", "Data updated for key " + key + ": " + data.get(key)); // Debug log
                     eventListener.onEvent(snapshot, null); // Call the provided eventListener
                 } else {
-                    Log.e("UserSession", "Key does not exist in document: " + key);
+                    Log.e("DatabaseManager", "Key does not exist in document: " + key);
                 }
             } else {
-                Log.e("UserSession", "Document does not exist for user ID: " + userId);
+                Log.e("DatabaseManager", "Document does not exist for user ID: " + userId);
             }
         });
+    }
+
+    public ListenerRegistration addValueEventListenerToFirestore(EventListener<DocumentSnapshot> eventListener, String key) {
+        return addValueEventListenerToFirestore(UserSession.getInstance().getUserId(), eventListener, key);
     }
 
     /**
@@ -363,9 +369,9 @@ public class DatabaseManager {
     public void removeEventListenerFromFirestore(ListenerRegistration listenerRegistration) {
         if (listenerRegistration != null) {
             listenerRegistration.remove(); // Detach the listener
-            Log.d("UserSession", "Listener removed from Firestore");
+            Log.d("DatabaseManager", "Listener removed from Firestore");
         } else {
-            Log.e("UserSession", "No listener to remove from Firestore");
+            Log.e("DatabaseManager", "No listener to remove from Firestore");
         }
     }
 
@@ -392,7 +398,7 @@ public class DatabaseManager {
      * provided callback with the list of these user IDs. If the query is cancelled or encounters an
      * error, it returns an empty list via the callback.
      *
-     * @param key           The key to match against in the user data.
+     * @param field           The key to match against in the user data.
      * @param matchingValue The value to be matched for the specified key.
      * @param callback      A callback to be invoked with the list of matching user IDs.
      */

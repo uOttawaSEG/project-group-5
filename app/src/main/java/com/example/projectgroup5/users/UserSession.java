@@ -90,7 +90,11 @@ public class UserSession {
      *                 containing the result of the authentication attempt.
      */
     public void login(String email, String password, MainActivity context, OnCompleteListener<AuthResult> listener) {
-        DatabaseManager.getDatabaseManager().login(email, password, context, listener);
+        DatabaseManager.getDatabaseManager().login(email, password, context, listener, task -> {
+            UserSession.getInstance().setUserId(DatabaseManager.getDatabaseManager().getAuthID());
+            if (UserSession.getInstance().getUserRepresentation() == null)
+                UserSession.getInstance().instantiateUserRepresentation(context, listener);
+        });
     }
 
 //    /**

@@ -173,6 +173,7 @@ public class AccountManagementFragment extends Fragment {
      */
     private void displayUserType() {
         Log.d("AccountManagementFragment", "In the displayUserType method");
+        cachedDisplayUserType();
         DatabaseManager.getDatabaseManager().getUserDataFromFirestore(DatabaseManager.USER_TYPE, userType -> {
             Log.d("AccountManagementFragment", "In the onCallback of displayUserType: " + userType);
             if (userType != null) {

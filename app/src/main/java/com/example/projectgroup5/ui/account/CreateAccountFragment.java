@@ -124,13 +124,16 @@ public class CreateAccountFragment extends Fragment {
                 if (!task.isSuccessful()) {
                     binding.editTextTextEmailAddressUserCreate.setError("Invalid email or password");
                     binding.editTextTextPasswordUserCreate.setError("Invalid email or password");
+                    Log.e("CreateAccountFragment", "User creation failed: " + task.getException());
                     return;
+                } else {
+                    Log.d("CreateAccountFragment", "User creation successful");
                 }
                 // now we have created the user, lets store the user data
                 // we must first make sure that the UserSession userid is set
                 UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
                 // Initialize a counter for the number of tasks
-                int totalTasks = binding.OrganizerVSUserSwitch.isChecked()? 7 : 6; // Number of Firestore tasks
+                int totalTasks = binding.OrganizerVSUserSwitch.isChecked()? 8 : 7; // Number of Firestore tasks
                 AtomicInteger tasksCompleted = new AtomicInteger(0); // Use AtomicInteger for thread safety
 
                 DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
@@ -146,8 +149,14 @@ public class CreateAccountFragment extends Fragment {
                 );
 
                 DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+                        DatabaseManager.USER_EMAIL,
+                        binding.editTextTextEmailAddressUserCreate.getText().toString(),
+                        (task0) -> handleTaskCompletion(task0, "storeUserEmailError", tasksCompleted, totalTasks)
+                );
+
+                DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
                         DatabaseManager.USER_PHONE,
-                        phoneNumber,
+                        Long.parseLong(phoneNumber),
                         (task0) -> handleTaskCompletion(task0, "storeUserPhoneError", tasksCompleted, totalTasks)
                 );
 
