@@ -28,7 +28,8 @@ public class LoginFragment extends Fragment {
         root.findViewById(R.id.confirmCredentialAndLoginButton).setOnClickListener(v -> UserSession.getInstance().login(binding.emailInput.getText().toString(), binding.passwordInput.getText().toString(), (task) -> {
             if (task.isSuccessful()) {
                 Log.e("LoginFragment", "login was successful");
-                UserSession.getInstance().instantiateUserRepresentation(getContext());
+                if (UserSession.getInstance().getUserRepresentation() == null)
+                    UserSession.getInstance().instantiateUserRepresentation(getContext());
                 UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
             } else {
                 // show an error message

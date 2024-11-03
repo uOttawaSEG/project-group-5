@@ -80,7 +80,10 @@ public class DatabaseManager {
         }
         Log.d("UserSession", "Login: " + email + " " + password);
         firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(listener).addOnSuccessListener(task -> UserSession.getInstance().instantiateUserRepresentation(context));
+                .addOnCompleteListener(listener).addOnSuccessListener(task -> {
+                    if (UserSession.getInstance().getUserRepresentation() == null)
+                        UserSession.getInstance().instantiateUserRepresentation(context);
+                });
     }
 
     /**
@@ -122,7 +125,10 @@ public class DatabaseManager {
         if (firebaseAuth.getCurrentUser() != null) {
             firebaseAuth.signOut();
             firebaseAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(listener).addOnSuccessListener(task -> UserSession.getInstance().instantiateUserRepresentation(context));
+                    .addOnCompleteListener(listener).addOnCompleteListener(listener).addOnSuccessListener(task -> {
+                        if (UserSession.getInstance().getUserRepresentation() == null)
+                            UserSession.getInstance().instantiateUserRepresentation(context);
+                    });
         }
     }
 
