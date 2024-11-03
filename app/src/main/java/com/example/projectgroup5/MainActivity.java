@@ -5,7 +5,7 @@ import android.app.NotificationManager;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.example.projectgroup5.users.Notification;
+import com.example.projectgroup5.database.Notification;
 import com.example.projectgroup5.users.UserSession;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 

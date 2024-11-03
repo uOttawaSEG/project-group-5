@@ -8,6 +8,8 @@ import androidx.navigation.NavController;
 
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.R;
+import com.example.projectgroup5.database.DatabaseListener;
+import com.example.projectgroup5.database.DatabaseManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;

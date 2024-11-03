@@ -1,10 +1,11 @@
-package com.example.projectgroup5.users;
+package com.example.projectgroup5.database;
 
 import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.projectgroup5.users.UserSession;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;

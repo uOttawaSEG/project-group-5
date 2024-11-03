@@ -1,5 +1,7 @@
 package com.example.projectgroup5.users;
 
+import com.example.projectgroup5.database.DatabaseManager;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;

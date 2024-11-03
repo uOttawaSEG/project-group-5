@@ -1,6 +1,6 @@
 package com.example.projectgroup5.users;
 
-import static com.example.projectgroup5.users.DatabaseManager.USER_ORGANIZATION_NAME;
+import static com.example.projectgroup5.database.DatabaseManager.USER_ORGANIZATION_NAME;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.projectgroup5.R;
+import com.example.projectgroup5.database.DatabaseManager;
 
 public abstract class User {
     public final static int USER_TYPE_ORGANIZER = 1;

@@ -1,6 +1,6 @@
-package com.example.projectgroup5.users;
+package com.example.projectgroup5.database;
 
-import static com.example.projectgroup5.users.DatabaseManager.USER_REGISTRATION_STATE;
+import static com.example.projectgroup5.database.DatabaseManager.USER_REGISTRATION_STATE;
 
 import android.content.Context;
 import android.util.Log;

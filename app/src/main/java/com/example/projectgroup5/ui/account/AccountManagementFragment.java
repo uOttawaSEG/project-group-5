@@ -14,7 +14,7 @@ import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.databinding.FragmentAccountManagementBinding;
-import com.example.projectgroup5.users.DatabaseManager;
+import com.example.projectgroup5.database.DatabaseManager;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
 
