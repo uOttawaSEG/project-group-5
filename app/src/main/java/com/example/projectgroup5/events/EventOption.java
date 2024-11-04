@@ -2,6 +2,7 @@ package com.example.projectgroup5.events;
 
 import com.example.projectgroup5.users.User;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
 
 import java.util.List;
 
@@ -36,13 +37,13 @@ public class EventOption {
      *  <li><code>END_TIME_EMPTY_ERROR</code></li>
      * </ul>
      */
-    public static EventOption oldEvent(String title, String description, String address, Timestamp startTime, Timestamp endTime, Timestamp date, List<User> participants) {
+    public static EventOption oldEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept,  List<DocumentReference> participants, DocumentReference organizer) {
         EventOption option = new EventOption();
 
-        if (checkEmpty(option, title, description, address, startTime, endTime)) {
+        if (checkEmpty(option, title, description, address, startTime, endTime, organizer)) {
             return option;
         }
-        Event event = new Event(title, address, startTime, endTime, participants);
+        Event event = new Event(title, address, startTime, endTime, autoAccept, participants, organizer);
         option.setEvent(event);
         return option;
     }
@@ -66,10 +67,10 @@ public class EventOption {
      * </ul>
      */
     // TODO auto accept and address
-    public static EventOption newEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime,  List<User> participants) {
+    public static EventOption newEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept,  List<DocumentReference> participants, DocumentReference organizer) {
         EventOption option = new EventOption();
 
-        if (checkEmpty(option, title,description, address, startTime, endTime)) {
+        if (checkEmpty(option, title,description, address, startTime, endTime, organizer)) {
             return option;
         }
 
@@ -77,7 +78,7 @@ public class EventOption {
             return option;
         }
 
-        Event event = new Event(title, address, startTime, endTime, participants);
+        Event event = new Event(title, address, startTime, endTime, autoAccept, participants, organizer);
         option.setEvent(event);
         return option;
     }
@@ -93,7 +94,7 @@ public class EventOption {
         return null;
     }
 
-    private static boolean checkEmpty(EventOption option, String title,String description, String address,  Timestamp startTime, Timestamp endTime) {
+    private static boolean checkEmpty(EventOption option, String title,String description, String address,  Timestamp startTime, Timestamp endTime, DocumentReference organizer) {
         if (title == null || title.isEmpty()) {
             option.setError(EventError.TITLE_EMPTY_ERROR);
             return true;
@@ -112,6 +113,10 @@ public class EventOption {
         }
         if (description == null || description.isEmpty()) {
             option.setError(EventError.DESCRIPTION_EMPTY_ERROR);
+            return true;
+        }
+        if (organizer == null) {
+            option.setError(EventError.ORGANIZER_EMPTY_ERROR);
             return true;
         }
         return false; // No errors found

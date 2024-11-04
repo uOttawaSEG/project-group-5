@@ -3,6 +3,7 @@ package com.example.projectgroup5.database;
 import android.util.Log;
 
 
+import com.example.projectgroup5.Address.Address;
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
@@ -41,6 +42,8 @@ public class DatabaseManager {
     private static final DatabaseManager databaseManager = new DatabaseManager();
     private final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore firestoreDatabase = FirebaseFirestore.getInstance();
+
+    //---------------------------------------------USER-------------------------------------------------------------------
 
     // test function to make sure stuff saves to the firestore database
     public void test() {
@@ -485,4 +488,47 @@ public class DatabaseManager {
     public void storeUserValueToFirestore(String type, @Nullable Object value, OnCompleteListener<Void> listener) {
         storeUserValueToFirestore(UserSession.getInstance().getUserId(), type, value, listener);
     }
+
+
+
+    //---------------------------------------ADDRESS----------------------------------------------
+
+    //FIXME UNTESTED
+
+    private void storeAddress(Address address, OnCompleteListener<String> listener) {
+        // Create a unique ID for each address
+        String addressId = firestoreDatabase.collection("addresses").document().getId();
+
+        // Store the address in Firestore
+        firestoreDatabase.collection("addresses").document(addressId)
+                .set(address)
+                .addOnSuccessListener(aVoid -> {
+                    // Address was successfully written
+                    Log.d("Firestore", "Address stored successfully!");
+                    listener.onComplete(Tasks.forResult(addressId));
+                })
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    Log.w("Firestore", "Error storing address", e);
+                });
+    }
+
+    private void getAddress(String addressId, OnCompleteListener<Address> listener) {
+        firestoreDatabase.collection("addresses").document(addressId)
+                .get()
+                .addOnSuccessListener(documentSnapshot ->{
+                    if (!documentSnapshot.exists()) {
+                        listener.onComplete(Tasks.forException(new Exception("Address not found")));
+                        return;
+                    }
+                    Address address = documentSnapshot.toObject(Address.class);
+                    listener.onComplete(Tasks.forResult(address));
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Firestore", "Error getting address", e);
+                });
+    }
+
+    //---------------------------------------EVENT------------------------------------------------
+    // TODO event calls
 }

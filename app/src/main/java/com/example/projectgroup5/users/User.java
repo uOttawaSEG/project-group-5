@@ -25,7 +25,6 @@ public abstract class User {
     private String userEmail;
     private long userPhoneNumber;
     private String userAddress;
-    private String userOrganizationName;
     private int userRegistrationState;
     private int userType;
 
@@ -84,7 +83,8 @@ public abstract class User {
                     user.setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
                 }
                 if (value.containsKey(USER_ORGANIZATION_NAME)) {
-                    user.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
+                    if (user instanceof Organizer organizer)
+                    organizer.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
                 }
                 if (value.containsKey(DatabaseManager.USER_REGISTRATION_STATE)) {
                     user.setUserRegistrationState((int) (long) value.get(DatabaseManager.USER_REGISTRATION_STATE));
@@ -134,17 +134,6 @@ public abstract class User {
      */
     public void setUserPhoneNumber(long userPhoneNumber) {
         this.userPhoneNumber = userPhoneNumber;
-    }
-
-    /**
-     * Sets the organization name of the user.
-     * <p>
-     * This method updates the user's organization name in the current user representation.
-     *
-     * @param userOrganizationName The organization name to be set for the user.
-     */
-    public void setUserOrganizationName(String userOrganizationName) {
-        this.userOrganizationName = userOrganizationName;
     }
 
     /**
@@ -217,10 +206,12 @@ public abstract class User {
                     userAddressTextView.setText(userAddress);
                 }
                 if (value.containsKey(USER_ORGANIZATION_NAME)) {
-                    setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
-                    TextView userOrganizationNameTextView = customView.findViewById(R.id.organizationNameEntry);
-                    userOrganizationNameTextView.setVisibility(View.VISIBLE);
-                    userOrganizationNameTextView.setText(userOrganizationName);
+                    if (this instanceof Organizer organizer) {
+                        organizer.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
+                        TextView userOrganizationNameTextView = customView.findViewById(R.id.organizationNameEntry);
+                        userOrganizationNameTextView.setVisibility(View.VISIBLE);
+                        userOrganizationNameTextView.setText(organizer.getUserOrganizationName());
+                    }
                 }
                 if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
                     setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());

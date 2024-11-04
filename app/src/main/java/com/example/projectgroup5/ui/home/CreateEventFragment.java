@@ -61,7 +61,7 @@ public class CreateEventFragment extends Fragment {
         // TODO display currently selected times and dates
 
         binding.getRoot().findViewById(R.id.createEventCreateButton).setOnClickListener (v ->{
-            EventOption option = EventOption.newEvent(binding.eventTitleInput.getText().toString(), binding.eventDescriptionInput.getText().toString(), "address",  startTime[0], endTime[0], null);
+            EventOption option = EventOption.newEvent(binding.eventTitleInput.getText().toString(), binding.eventDescriptionInput.getText().toString(), "address",  startTime[0], endTime[0], false, null, null);
             if (option.holdsAnEvent()) {
                 navController.popBackStack();
             } else {
