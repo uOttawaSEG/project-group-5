@@ -40,6 +40,7 @@ public class CreateEventFragment extends Fragment {
         final Timestamp[] startTime = new Timestamp[1];
         final Timestamp[] endTime = new Timestamp[1];
 
+        // TODO auto accept and address
         setTimeStamp(startTime, calendar0, minDate, binding.getRoot().findViewById(R.id.pickStartTime));
         binding.getRoot().findViewById(R.id.pickEndTime).setOnClickListener(v -> {
             if (startTime[0] == null) {

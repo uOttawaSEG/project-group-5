@@ -65,7 +65,8 @@ public class EventOption {
      *  <li><code>END_TIME_EMPTY_ERROR</code></li>
      * </ul>
      */
-    public static EventOption newEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, List<User> participants) {
+    // TODO auto accept and address
+    public static EventOption newEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime,  List<User> participants) {
         EventOption option = new EventOption();
 
         if (checkEmpty(option, title,description, address, startTime, endTime)) {
