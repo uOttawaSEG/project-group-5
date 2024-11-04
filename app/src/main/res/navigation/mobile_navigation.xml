@@ -139,12 +139,22 @@
         android:id="@+id/organizer_option_selector"
         android:name="com.example.projectgroup5.ui.home.OrganizerOptionSelector"
         android:label="Home"
-        tools:layout="@layout/fragment_organizer_option_selector" />
+        tools:layout="@layout/fragment_organizer_option_selector" >
+        <action
+            android:id="@+id/action_organizer_option_selector_to_create_event"
+            app:destination="@id/create_event" />
+    </fragment>
     <fragment
         android:id="@+id/attendee_option_selector"
         android:name="com.example.projectgroup5.ui.home.AttendeeOptionSelector"
         android:label="Home"
         tools:layout="@layout/fragment_attendee_option_selector" />
+    <fragment
+        android:id="@+id/create_event"
+        android:name="com.example.projectgroup5.ui.home.CreateEventFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_create_event" />
+
 
 
 </navigation>

@@ -16,6 +16,7 @@ public class Event {
     private Timestamp startTime;
     private Timestamp endTime;
     private Timestamp date;
+    private boolean autoAccept;
     private List<User> participants;
 
     /**
