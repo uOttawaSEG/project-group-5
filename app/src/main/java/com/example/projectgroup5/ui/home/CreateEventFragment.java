@@ -51,11 +51,14 @@ public class CreateEventFragment extends Fragment {
             timePicker(endTime, calendar0.get(Calendar.YEAR), calendar0.get(Calendar.MONTH), calendar0.get(Calendar.DAY_OF_MONTH));
                 });
 
+        // TODO pick location (currently used for debug)
         binding.getRoot().findViewById(R.id.pickLocation).setOnClickListener(v -> {
             // log both dates
             Log.d("CreateEventFragment", "Start time: " + startTime[0]);
             Log.d("CreateEventFragment", "End time: " + endTime[0]);
         });
+
+        // TODO display currently selected times and dates
 
         binding.getRoot().findViewById(R.id.createEventCreateButton).setOnClickListener (v ->{
             EventOption option = EventOption.newEvent(binding.eventTitleInput.getText().toString(), binding.eventDescriptionInput.getText().toString(), "address",  startTime[0], endTime[0], null);
