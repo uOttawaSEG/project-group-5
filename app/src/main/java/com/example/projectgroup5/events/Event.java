@@ -12,10 +12,10 @@ public class Event {
     // However we can instantiate old events with a time that has already passed.
 
     private String title;
+    private String description;
     private String address;
     private Timestamp startTime;
     private Timestamp endTime;
-    private Timestamp date;
     private boolean autoAccept;
     private List<User> participants;
 
@@ -28,15 +28,13 @@ public class Event {
      * @param address
      * @param startTime
      * @param endTime
-     * @param date
      * @param participants
      */
-    protected Event(String title, String address, Timestamp startTime, Timestamp endTime, Timestamp date, List<User> participants) {
+    protected Event(String title, String address, Timestamp startTime, Timestamp endTime, List<User> participants) {
         this.title = title;
         this.address = address;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.date = date;
         this.participants = participants;
     }
 

@@ -10,6 +10,7 @@ public enum EventError {
     DATE_EMPTY_ERROR,
     START_TIME_EMPTY_ERROR,
     END_TIME_EMPTY_ERROR,
+    DESCRIPTION_EMPTY_ERROR,
 }
 
 

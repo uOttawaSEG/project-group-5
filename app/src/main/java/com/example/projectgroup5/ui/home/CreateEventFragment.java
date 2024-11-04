@@ -57,7 +57,12 @@ public class CreateEventFragment extends Fragment {
         });
 
         binding.getRoot().findViewById(R.id.createEventCreateButton).setOnClickListener (v ->{
-
+            EventOption option = EventOption.newEvent(binding.eventTitleInput.getText().toString(), binding.eventDescriptionInput.getText().toString(), "address",  startTime[0], endTime[0], null);
+            if (option.holdsAnEvent()) {
+                navController.popBackStack();
+            } else {
+                Toast.makeText(getContext(), option.getError().toString(), Toast.LENGTH_SHORT).show();
+            }
         });
 
 //
@@ -93,8 +98,9 @@ public class CreateEventFragment extends Fragment {
         TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                // Handle the time selected by the user
-                // You can now use the selected date and time
+                // Round the time to the nearest 30 minutes
+                minute = (minute / 30) * 30;
+                // Create a Calendar object and set the selected time
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(year, month, dayOfMonth, hourOfDay, minute, 0);
                 // Create a Firebase Timestamp from the Calendar's time

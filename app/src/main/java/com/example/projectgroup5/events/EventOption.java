@@ -36,13 +36,13 @@ public class EventOption {
      *  <li><code>END_TIME_EMPTY_ERROR</code></li>
      * </ul>
      */
-    public static EventOption oldEvent(String title, String address, Timestamp startTime, Timestamp endTime, Timestamp date, List<User> participants) {
+    public static EventOption oldEvent(String title, String description, String address, Timestamp startTime, Timestamp endTime, Timestamp date, List<User> participants) {
         EventOption option = new EventOption();
 
-        if (checkEmpty(option, title, address, startTime, endTime, date)) {
+        if (checkEmpty(option, title, description, address, startTime, endTime)) {
             return option;
         }
-        Event event = new Event(title, address, startTime, endTime, date, participants);
+        Event event = new Event(title, address, startTime, endTime, participants);
         option.setEvent(event);
         return option;
     }
@@ -65,10 +65,10 @@ public class EventOption {
      *  <li><code>END_TIME_EMPTY_ERROR</code></li>
      * </ul>
      */
-    public static EventOption newEvent(String title, String address, Timestamp startTime, Timestamp endTime, Timestamp date, List<User> participants) {
+    public static EventOption newEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, List<User> participants) {
         EventOption option = new EventOption();
 
-        if (checkEmpty(option, title, address, startTime, endTime, date)) {
+        if (checkEmpty(option, title,description, address, startTime, endTime)) {
             return option;
         }
 
@@ -76,12 +76,23 @@ public class EventOption {
             return option;
         }
 
-        Event event = new Event(title, address, startTime, endTime, date, participants);
+        Event event = new Event(title, address, startTime, endTime, participants);
         option.setEvent(event);
         return option;
     }
 
-    private static boolean checkEmpty(EventOption option, String title, String address, Timestamp startTime, Timestamp endTime, Timestamp date) {
+    public boolean holdsAnEvent() {
+        return holdsAnEvent;
+    }
+
+    public EventError getError() {
+        if (!holdsAnEvent) {
+            return error;
+        }
+        return null;
+    }
+
+    private static boolean checkEmpty(EventOption option, String title,String description, String address,  Timestamp startTime, Timestamp endTime) {
         if (title == null || title.isEmpty()) {
             option.setError(EventError.TITLE_EMPTY_ERROR);
             return true;
@@ -98,8 +109,8 @@ public class EventOption {
             option.setError(EventError.END_TIME_EMPTY_ERROR);
             return true;
         }
-        if (date == null) {
-            option.setError(EventError.DATE_EMPTY_ERROR);
+        if (description == null || description.isEmpty()) {
+            option.setError(EventError.DESCRIPTION_EMPTY_ERROR);
             return true;
         }
         return false; // No errors found
