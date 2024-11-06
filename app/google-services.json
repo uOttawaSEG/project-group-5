@@ -1,8 +1,9 @@
 {
   "project_info": {
     "project_number": "498800404663",
+    "firebase_url": "https://eams-4ceab-default-rtdb.firebaseio.com",
     "project_id": "eams-4ceab",
-    "storage_bucket": "eams-4ceab.appspot.com"
+    "storage_bucket": "eams-4ceab.firebasestorage.app"
   },
   "client": [
     {

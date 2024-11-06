@@ -114,7 +114,7 @@ public class CreateEventFragment extends Fragment {
                 Toast.makeText(getContext(), "Set start time first!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            timePicker(endTime, calendar0.get(Calendar.YEAR), calendar0.get(Calendar.MONTH), calendar0.get(Calendar.DAY_OF_MONTH), binding.getRoot().findViewById(R.id.pickEndTime));
+            timePicker(endTime, calendar0.get(Calendar.YEAR), calendar0.get(Calendar.MONTH), calendar0.get(Calendar.DAY_OF_MONTH), binding.getRoot().findViewById(R.id.pickEndTime), calendar0);
             // set the text of the button to the time selected
                 });
 
@@ -139,7 +139,10 @@ public class CreateEventFragment extends Fragment {
     private void setTimeStamp(Timestamp[] timeChosen, Calendar calendar0, long minDate, Button button) {
         button.setOnClickListener (v ->{
             DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
-                timePicker(timeChosen, year, month, dayOfMonth, button);
+                calendar0.set(Calendar.YEAR, year);
+                calendar0.set(Calendar.MONTH, month);
+                calendar0.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                timePicker(timeChosen, year, month, dayOfMonth, button, calendar0);
             }, calendar0.get(Calendar.YEAR), calendar0.get(Calendar.MONTH), calendar0.get(Calendar.DAY_OF_MONTH));
 
             // Set the minimum date
@@ -150,7 +153,7 @@ public class CreateEventFragment extends Fragment {
         });
     }
 
-    private void timePicker(Timestamp[] timeChosen, int year, int month, int dayOfMonth, Button button) {
+    private void timePicker(Timestamp[] timeChosen, int year, int month, int dayOfMonth, Button button, Calendar calendar) {
         Calendar calendar1 = Calendar.getInstance();
         int hour = calendar1.get(Calendar.HOUR_OF_DAY);
         int minute = calendar1.get(Calendar.MINUTE);
@@ -160,8 +163,8 @@ public class CreateEventFragment extends Fragment {
             // Round the time to the nearest 30 minutes rounded up or down
             minute1 = (minute1 + 15) / 30 * 30;
             // Create a Calendar object and set the selected time
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(year, month, dayOfMonth, hourOfDay, minute1, 0);
+            Calendar calendar2 = Calendar.getInstance();
+            calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), hourOfDay, minute1, 0);
             // Create a Firebase Timestamp from the Calendar's time
             Timestamp timestamp = new Timestamp(calendar.getTime());
             timeChosen[0] = timestamp;
