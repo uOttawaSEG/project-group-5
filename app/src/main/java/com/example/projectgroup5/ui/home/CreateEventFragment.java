@@ -120,11 +120,6 @@ public class CreateEventFragment extends Fragment {
         binding.getRoot().findViewById(R.id.pickEndTime).setOnClickListener(v -> {
             // clear the error of the edit text
             binding.pickEndTime.setError(null);
-            if (startTime == null) {
-                // pop up error message as start time is not set
-                Toast.makeText(getContext(), "Set start time first!", Toast.LENGTH_SHORT).show();
-                return;
-            }
             // set the text of the button to the time selected
             DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> timePicker(endTime, binding.pickEndTime, stopCalendar), stopCalendar.get(Calendar.YEAR), stopCalendar.get(Calendar.MONTH), stopCalendar.get(Calendar.DAY_OF_MONTH));
 
