@@ -1,7 +1,7 @@
 package com.example.projectgroup5.events;
 
-import com.example.projectgroup5.users.User;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
 
 import java.util.List;
 
@@ -36,13 +36,13 @@ public class EventOption {
      *  <li><code>END_TIME_EMPTY_ERROR</code></li>
      * </ul>
      */
-    public static EventOption oldEvent(String title, String address, Timestamp startTime, Timestamp endTime, Timestamp date, List<User> participants) {
+    public static EventOption oldEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept,  List<DocumentReference> participants, DocumentReference organizer) {
         EventOption option = new EventOption();
 
-        if (checkEmpty(option, title, address, startTime, endTime, date)) {
+        if (checkFields(option, title, description, address, startTime, endTime, organizer)) {
             return option;
         }
-        Event event = new Event(title, address, startTime, endTime, date, participants);
+        Event event = new Event(title, address, startTime, endTime, autoAccept, participants, organizer);
         option.setEvent(event);
         return option;
     }
@@ -65,10 +65,11 @@ public class EventOption {
      *  <li><code>END_TIME_EMPTY_ERROR</code></li>
      * </ul>
      */
-    public static EventOption newEvent(String title, String address, Timestamp startTime, Timestamp endTime, Timestamp date, List<User> participants) {
+    // TODO auto accept and address
+    public static EventOption newEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept,  List<DocumentReference> participants, DocumentReference organizer) {
         EventOption option = new EventOption();
 
-        if (checkEmpty(option, title, address, startTime, endTime, date)) {
+        if (checkFields(option, title,description, address, startTime, endTime, organizer)) {
             return option;
         }
 
@@ -76,30 +77,49 @@ public class EventOption {
             return option;
         }
 
-        Event event = new Event(title, address, startTime, endTime, date, participants);
+        Event event = new Event(title, address, startTime, endTime, autoAccept, participants, organizer);
         option.setEvent(event);
         return option;
     }
 
-    private static boolean checkEmpty(EventOption option, String title, String address, Timestamp startTime, Timestamp endTime, Timestamp date) {
+    public boolean holdsAnEvent() {
+        return holdsAnEvent;
+    }
+
+    public EventError getError() {
+        if (!holdsAnEvent) {
+            return error;
+        }
+        return null;
+    }
+
+    private static boolean checkFields(EventOption option, String title, String description, String address, Timestamp startTime, Timestamp endTime, DocumentReference organizer) {
         if (title == null || title.isEmpty()) {
-            option.setError(EventError.TITLE_EMPTY_ERROR);
+            option.setError(EventError.TITLE_EMPTY);
+            return true;
+        }
+        if (!title.matches("[a-zA-Z]+")) {
+            option.setError(EventError.TITLE_BADLY_FORMATTED);
+            return true;
+        }
+        if (description == null || description.isEmpty()) {
+            option.setError(EventError.DESCRIPTION_EMPTY);
             return true;
         }
         if (address == null || address.isEmpty()) {
-            option.setError(EventError.ADDRESS_EMPTY_ERROR);
+            option.setError(EventError.ADDRESS_EMPTY);
             return true;
         }
         if (startTime == null) {
-            option.setError(EventError.START_TIME_EMPTY_ERROR);
+            option.setError(EventError.START_TIME_EMPTY);
             return true;
         }
         if (endTime == null) {
-            option.setError(EventError.END_TIME_EMPTY_ERROR);
+            option.setError(EventError.END_TIME_EMPTY);
             return true;
         }
-        if (date == null) {
-            option.setError(EventError.DATE_EMPTY_ERROR);
+        if (organizer == null) {
+            option.setError(EventError.ORGANIZER_EMPTY);
             return true;
         }
         return false; // No errors found
@@ -107,15 +127,15 @@ public class EventOption {
 
     private static boolean checkTimes(EventOption option, Timestamp startTime, Timestamp endTime) {
         if (startTime.compareTo(Timestamp.now()) < 0) {
-            option.setError(EventError.START_TIME_PAST_ERROR);
+            option.setError(EventError.START_TIME_PAST);
             return true;
         }
         if (endTime.compareTo(Timestamp.now()) < 0) {
-            option.setError(EventError.END_TIME_PAST_ERROR);
+            option.setError(EventError.END_TIME_PAST);
             return true;
         }
         if (endTime.compareTo(startTime) < 0) {
-            option.setError(EventError.END_TIME_BEFORE_START_TIME_ERROR);
+            option.setError(EventError.END_TIME_BEFORE_START_TIME);
             return true;
         }
         return false; // No errors found

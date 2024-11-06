@@ -23,7 +23,7 @@ public class OrganizerOptionSelector extends Fragment {
         NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
 
         // set the buttons on click listeners for the accepted list button
-//        binding.getRoot().findViewById(R.id.Placeholder1).setOnClickListener(v -> navController.navigate(R.id.SOMEWHERE_TO_GO_TO));
+        binding.getRoot().findViewById(R.id.EventCreateButton).setOnClickListener(v -> navController.navigate(R.id.action_organizer_option_selector_to_create_event));
 //
 //        // same for the rejected list button
 //        binding.getRoot().findViewById(R.id.Placeholder2).setOnClickListener(v -> navController.navigate(R.id.SOMEWHERE_TO_GO_TO));

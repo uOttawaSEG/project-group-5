@@ -1,6 +1,8 @@
 [versions]
-agp = "8.6.0"
+agp = "8.7.0"
 #firebaseBom = "33.4.0"
+coreKtx = "1.15.0"
+firebaseBom = "33.5.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -15,10 +17,15 @@ firebaseAuth = "23.0.0"
 firebaseDatabase = "21.0.0"
 firebaseMessaging = "24.0.2"
 firebaseFirestore = "25.1.1"
+places = "4.0.0"
+secretsGradlePlugin = "2.0.1"
 
 [libraries]
 #firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 #firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -33,6 +40,8 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+places = { module = "com.google.android.libraries.places:places", version.ref = "places" }
+secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

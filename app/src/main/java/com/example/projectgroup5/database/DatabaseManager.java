@@ -2,7 +2,6 @@ package com.example.projectgroup5.database;
 
 import android.util.Log;
 
-
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
@@ -41,6 +40,8 @@ public class DatabaseManager {
     private static final DatabaseManager databaseManager = new DatabaseManager();
     private final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore firestoreDatabase = FirebaseFirestore.getInstance();
+
+    //---------------------------------------------USER-------------------------------------------------------------------
 
     // test function to make sure stuff saves to the firestore database
     public void test() {
@@ -485,4 +486,12 @@ public class DatabaseManager {
     public void storeUserValueToFirestore(String type, @Nullable Object value, OnCompleteListener<Void> listener) {
         storeUserValueToFirestore(UserSession.getInstance().getUserId(), type, value, listener);
     }
+
+    public DocumentReference getCurrentUserReference() {
+        return firestoreDatabase.collection("users").document(UserSession.getInstance().getUserId());
+    }
+
+
+    //---------------------------------------EVENT------------------------------------------------
+    // TODO event calls
 }

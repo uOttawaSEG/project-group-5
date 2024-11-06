@@ -1,7 +1,7 @@
 package com.example.projectgroup5.events;
 
-import com.example.projectgroup5.users.User;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
 
 import java.util.List;
 
@@ -12,31 +12,36 @@ public class Event {
     // However we can instantiate old events with a time that has already passed.
 
     private String title;
+    private String description;
     private String address;
     private Timestamp startTime;
     private Timestamp endTime;
-    private Timestamp date;
-    private List<User> participants;
+    private boolean autoAccept;
+    private List<DocumentReference> participants; // this is a list of reference to the list of users, format is: /users/{uid}
+    private DocumentReference organizer; // This is a reference to the organizer, format is /users/{uid}
 
     /**
      * This constructor is used to create a new event.
      * It should not be called directly.
-     * Instead use the {@link EventOption#newEvent(String, String, Timestamp, Timestamp, Timestamp, List)}
-     * <p> or {@link EventOption#oldEvent(String, String, Timestamp, Timestamp, Timestamp, List)}</p>
+     * Instead use the {@link EventOption#newEvent(String, String, String, Timestamp, Timestamp, boolean, List, DocumentReference)}
+     * <p>or:          {@link EventOption#oldEvent(String, String, String, Timestamp, Timestamp, boolean, List, DocumentReference)}</p>
      * @param title
      * @param address
      * @param startTime
      * @param endTime
-     * @param date
+     * @param autoAccept
      * @param participants
+     * @param organizer
+     * @
      */
-    protected Event(String title, String address, Timestamp startTime, Timestamp endTime, Timestamp date, List<User> participants) {
+    protected Event(String title, String address, Timestamp startTime, Timestamp endTime, boolean autoAccept, List<DocumentReference> participants, DocumentReference organizer) {
         this.title = title;
         this.address = address;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.date = date;
+        this.autoAccept = autoAccept;
         this.participants = participants;
+        this.organizer = organizer;
     }
 
 

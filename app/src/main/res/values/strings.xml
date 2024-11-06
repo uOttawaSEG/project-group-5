@@ -22,4 +22,6 @@
     <string name="rejected_list">Rejected List</string>
     <string name="accepted_list">Accepted List</string>
     <string name="you_are_not_registered">You are not registered</string>
+    <string name="pick_end_time">Pick end time</string>
+    <string name="pick_start_time">Pick start time</string>
 </resources>
