@@ -1,6 +1,5 @@
 package com.example.projectgroup5.events;
 
-import com.example.projectgroup5.users.User;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -40,7 +39,7 @@ public class EventOption {
     public static EventOption oldEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept,  List<DocumentReference> participants, DocumentReference organizer) {
         EventOption option = new EventOption();
 
-        if (checkEmpty(option, title, description, address, startTime, endTime, organizer)) {
+        if (checkFields(option, title, description, address, startTime, endTime, organizer)) {
             return option;
         }
         Event event = new Event(title, address, startTime, endTime, autoAccept, participants, organizer);
@@ -70,7 +69,7 @@ public class EventOption {
     public static EventOption newEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept,  List<DocumentReference> participants, DocumentReference organizer) {
         EventOption option = new EventOption();
 
-        if (checkEmpty(option, title,description, address, startTime, endTime, organizer)) {
+        if (checkFields(option, title,description, address, startTime, endTime, organizer)) {
             return option;
         }
 
@@ -94,9 +93,13 @@ public class EventOption {
         return null;
     }
 
-    private static boolean checkEmpty(EventOption option, String title,String description, String address,  Timestamp startTime, Timestamp endTime, DocumentReference organizer) {
+    private static boolean checkFields(EventOption option, String title, String description, String address, Timestamp startTime, Timestamp endTime, DocumentReference organizer) {
         if (title == null || title.isEmpty()) {
             option.setError(EventError.TITLE_EMPTY_ERROR);
+            return true;
+        }
+        if (!title.matches("[a-zA-Z]+")) {
+            option.setError(EventError.TITLE_BADLY_FORMATTED_ERROR);
             return true;
         }
         if (description == null || description.isEmpty()) {

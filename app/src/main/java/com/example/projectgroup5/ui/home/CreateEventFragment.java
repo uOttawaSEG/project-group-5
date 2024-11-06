@@ -149,6 +149,9 @@ public class CreateEventFragment extends Fragment {
                     case TITLE_EMPTY_ERROR:
                         binding.eventTitleInput.setError("Please enter a title");
                         break;
+                        case TITLE_BADLY_FORMATTED_ERROR:
+                            binding.eventTitleInput.setError("Please enter a valid title");
+                        break;
                     case DESCRIPTION_EMPTY_ERROR:
                         binding.eventDescriptionInput.setError("Please enter a description");
                         break;
