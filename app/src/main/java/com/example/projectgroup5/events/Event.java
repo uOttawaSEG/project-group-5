@@ -1,6 +1,5 @@
 package com.example.projectgroup5.events;
 
-import com.example.projectgroup5.users.User;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -24,13 +23,15 @@ public class Event {
     /**
      * This constructor is used to create a new event.
      * It should not be called directly.
-     * Instead use the {@link EventOption#newEvent(String, String, Timestamp, Timestamp, Timestamp, boolean, List, DocumentReference)}
-     * <p>or:          {@link EventOption#oldEvent(String, String, Timestamp, Timestamp, Timestamp, boolean, List, DocumentReference)}</p>
+     * Instead use the {@link EventOption#newEvent(String, String, String, Timestamp, Timestamp, boolean, List, DocumentReference)}
+     * <p>or:          {@link EventOption#oldEvent(String, String, String, Timestamp, Timestamp, boolean, List, DocumentReference)}</p>
      * @param title
      * @param address
      * @param startTime
      * @param endTime
+     * @param autoAccept
      * @param participants
+     * @param organizer
      * @
      */
     protected Event(String title, String address, Timestamp startTime, Timestamp endTime, boolean autoAccept, List<DocumentReference> participants, DocumentReference organizer) {

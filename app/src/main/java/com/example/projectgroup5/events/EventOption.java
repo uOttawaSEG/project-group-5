@@ -95,31 +95,31 @@ public class EventOption {
 
     private static boolean checkFields(EventOption option, String title, String description, String address, Timestamp startTime, Timestamp endTime, DocumentReference organizer) {
         if (title == null || title.isEmpty()) {
-            option.setError(EventError.TITLE_EMPTY_ERROR);
+            option.setError(EventError.TITLE_EMPTY);
             return true;
         }
         if (!title.matches("[a-zA-Z]+")) {
-            option.setError(EventError.TITLE_BADLY_FORMATTED_ERROR);
+            option.setError(EventError.TITLE_BADLY_FORMATTED);
             return true;
         }
         if (description == null || description.isEmpty()) {
-            option.setError(EventError.DESCRIPTION_EMPTY_ERROR);
+            option.setError(EventError.DESCRIPTION_EMPTY);
             return true;
         }
         if (address == null || address.isEmpty()) {
-            option.setError(EventError.ADDRESS_EMPTY_ERROR);
+            option.setError(EventError.ADDRESS_EMPTY);
             return true;
         }
         if (startTime == null) {
-            option.setError(EventError.START_TIME_EMPTY_ERROR);
+            option.setError(EventError.START_TIME_EMPTY);
             return true;
         }
         if (endTime == null) {
-            option.setError(EventError.END_TIME_EMPTY_ERROR);
+            option.setError(EventError.END_TIME_EMPTY);
             return true;
         }
         if (organizer == null) {
-            option.setError(EventError.ORGANIZER_EMPTY_ERROR);
+            option.setError(EventError.ORGANIZER_EMPTY);
             return true;
         }
         return false; // No errors found
@@ -127,15 +127,15 @@ public class EventOption {
 
     private static boolean checkTimes(EventOption option, Timestamp startTime, Timestamp endTime) {
         if (startTime.compareTo(Timestamp.now()) < 0) {
-            option.setError(EventError.START_TIME_PAST_ERROR);
+            option.setError(EventError.START_TIME_PAST);
             return true;
         }
         if (endTime.compareTo(Timestamp.now()) < 0) {
-            option.setError(EventError.END_TIME_PAST_ERROR);
+            option.setError(EventError.END_TIME_PAST);
             return true;
         }
         if (endTime.compareTo(startTime) < 0) {
-            option.setError(EventError.END_TIME_BEFORE_START_TIME_ERROR);
+            option.setError(EventError.END_TIME_BEFORE_START_TIME);
             return true;
         }
         return false; // No errors found

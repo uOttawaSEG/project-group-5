@@ -58,7 +58,7 @@ public class CreateEventFragment extends Fragment {
         String apiKey = BuildConfig.PLACES_API_KEY;
 
         // Log an error if apiKey is not set.
-        if (TextUtils.isEmpty(apiKey) || apiKey.equals("DEFAULT_API_KEY")) {
+        if (TextUtils.isEmpty(apiKey)) {
             Log.e("Places test", "No api key");
             Toast.makeText(getContext(), "No api key", Toast.LENGTH_SHORT).show();
             navController.popBackStack();
@@ -126,9 +126,7 @@ public class CreateEventFragment extends Fragment {
                 return;
             }
             // set the text of the button to the time selected
-            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
-                timePicker(endTime, binding.pickEndTime, stopCalendar);
-            }, stopCalendar.get(Calendar.YEAR), stopCalendar.get(Calendar.MONTH), stopCalendar.get(Calendar.DAY_OF_MONTH));
+            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> timePicker(endTime, binding.pickEndTime, stopCalendar), stopCalendar.get(Calendar.YEAR), stopCalendar.get(Calendar.MONTH), stopCalendar.get(Calendar.DAY_OF_MONTH));
 
             // Set the minimum date
             datePickerDialog.getDatePicker().setMinDate(startCalendar.getTimeInMillis());
@@ -146,34 +144,34 @@ public class CreateEventFragment extends Fragment {
             } else {
                 // based on the error add a warning to the corresponding field
                 switch (option.getError()) {
-                    case TITLE_EMPTY_ERROR:
+                    case TITLE_EMPTY:
                         binding.eventTitleInput.setError("Please enter a title");
                         break;
-                        case TITLE_BADLY_FORMATTED_ERROR:
+                        case TITLE_BADLY_FORMATTED:
                             binding.eventTitleInput.setError("Please enter a valid title");
                         break;
-                    case DESCRIPTION_EMPTY_ERROR:
+                    case DESCRIPTION_EMPTY:
                         binding.eventDescriptionInput.setError("Please enter a description");
                         break;
-                    case ADDRESS_EMPTY_ERROR:
+                    case ADDRESS_EMPTY:
                         editTextLocation.setError("Please enter an address");
                         break;
-                    case START_TIME_EMPTY_ERROR:
+                    case START_TIME_EMPTY:
                         binding.pickStartTime.setError("Please select a start time");
                         break;
-                    case END_TIME_EMPTY_ERROR:
+                    case END_TIME_EMPTY:
                         binding.pickEndTime.setError("Please select an end time");
                         break;
-                    case START_TIME_PAST_ERROR:
+                    case START_TIME_PAST:
                         binding.pickStartTime.setError("Start time cannot be in the past");
                         break;
-                    case END_TIME_PAST_ERROR:
+                    case END_TIME_PAST:
                         binding.pickEndTime.setError("End time cannot be in the past");
                         break;
-                    case END_TIME_BEFORE_START_TIME_ERROR:
+                    case END_TIME_BEFORE_START_TIME:
                         binding.pickEndTime.setError("End time cannot be before start time");
                         break;
-                    case ORGANIZER_EMPTY_ERROR:
+                    case ORGANIZER_EMPTY:
                         Toast.makeText(getContext(), "You are not logged in as an organizer", Toast.LENGTH_SHORT).show();
                         navController.popBackStack();
                         break;
@@ -184,9 +182,7 @@ public class CreateEventFragment extends Fragment {
             }
         });
 
-        binding.getRoot().findViewById(R.id.cancelEventCreateButton).setOnClickListener(v -> {
-            navController.popBackStack();
-        });
+        binding.getRoot().findViewById(R.id.cancelEventCreateButton).setOnClickListener(v -> navController.popBackStack());
 
         return binding.getRoot();
     }
