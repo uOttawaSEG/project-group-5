@@ -99,6 +99,10 @@ public class EventOption {
             option.setError(EventError.TITLE_EMPTY_ERROR);
             return true;
         }
+        if (description == null || description.isEmpty()) {
+            option.setError(EventError.DESCRIPTION_EMPTY_ERROR);
+            return true;
+        }
         if (address == null || address.isEmpty()) {
             option.setError(EventError.ADDRESS_EMPTY_ERROR);
             return true;
@@ -109,10 +113,6 @@ public class EventOption {
         }
         if (endTime == null) {
             option.setError(EventError.END_TIME_EMPTY_ERROR);
-            return true;
-        }
-        if (description == null || description.isEmpty()) {
-            option.setError(EventError.DESCRIPTION_EMPTY_ERROR);
             return true;
         }
         if (organizer == null) {
