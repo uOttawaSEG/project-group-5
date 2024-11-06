@@ -15,15 +15,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        android:layout_marginBottom="100dp"
+        android:orientation="horizontal">
 
-        <!-- Cancel Button -->
-
-        <!-- Login Button -->
         <Space
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,65 +40,76 @@
                 android:background="@drawable/rectangular_input"
                 android:gravity="center"
                 android:hint="Title"
-                android:textColorHint="@color/material_dynamic_neutral30"
-                android:textColor="@color/black"
-                android:inputType="textWebEmailAddress"
-                android:minHeight="48dp"
                 android:importantForAutofill=""
+                android:inputType="text"
+                android:minHeight="48dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/material_dynamic_neutral30"
                 android:textSize="@dimen/form_text_size" />
 
             <EditText
                 android:id="@+id/eventDescriptionInput"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="200dp"
                 android:layout_marginTop="10sp"
+                android:autofillHints="description"
                 android:background="@drawable/rectangular_input"
                 android:gravity="center"
                 android:hint="Description"
-                android:textColorHint="@color/material_dynamic_neutral30"
+                android:inputType="textMultiLine"
                 android:textColor="@color/black"
-                android:inputType="textPassword"
-                android:autofillHints="password"
-                android:minHeight="48dp"
+                android:textColorHint="@color/material_dynamic_neutral30"
                 android:textSize="@dimen/form_text_size" />
 
 
+            <EditText
+                android:id="@+id/eventAddressInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10sp"
+                android:autofillHints="postalAddress"
+                android:background="@drawable/rectangular_input"
+                android:focusable="false"
+                android:gravity="center"
+                android:hint="Address"
+                android:inputType="textPostalAddress"
+                android:minHeight="48dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/material_dynamic_neutral30"
+                android:textSize="@dimen/form_text_size" />
+
             <Switch
-                android:id="@+id/AutoAcceptToEvent"
+                android:id="@+id/autoAcceptSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="48sp"
                 android:gravity="center"
-                android:textColor="@color/black"
                 android:text="Auto Accept"
+                android:textColor="@color/black"
                 android:textSize="@dimen/form_text_size"
                 tools:ignore="UseSwitchCompatOrMaterialXml" />
-
-            <Button
-                android:id="@+id/pickLocation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Pick location" />
 
             <Button
                 android:id="@+id/pickStartTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Pick start time" />
+                android:text="@string/pick_start_time" />
 
             <Button
                 android:id="@+id/pickEndTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Pick end time" />
+                android:text="@string/pick_end_time" />
 
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20sp"
                 android:orientation="horizontal">
 
-                <Button style="?android:attr/borderlessButtonStyle"
+                <Button
                     android:id="@+id/cancelEventCreateButton"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="4dp"
@@ -114,8 +119,9 @@
                     android:textColor="@color/white"
                     android:textSize="@dimen/form_text_size" />
 
-                <Button style="?android:attr/borderlessButtonStyle"
+                <Button
                     android:id="@+id/createEventCreateButton"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="4dp"

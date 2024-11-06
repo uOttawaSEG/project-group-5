@@ -84,7 +84,7 @@ public abstract class User {
                 }
                 if (value.containsKey(USER_ORGANIZATION_NAME)) {
                     if (user instanceof Organizer organizer)
-                    organizer.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
+                        organizer.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
                 }
                 if (value.containsKey(DatabaseManager.USER_REGISTRATION_STATE)) {
                     user.setUserRegistrationState((int) (long) value.get(DatabaseManager.USER_REGISTRATION_STATE));
