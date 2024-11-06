@@ -97,13 +97,13 @@
                     android:id="@+id/pickStartTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Pick start time" />
+                    android:text="@string/pick_start_time" />
 
                 <Button
                     android:id="@+id/pickEndTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Pick end time" />
+                    android:text="@string/pick_end_time" />
 
 
                 <LinearLayout

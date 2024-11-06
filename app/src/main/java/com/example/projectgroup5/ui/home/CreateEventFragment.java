@@ -107,16 +107,46 @@ public class CreateEventFragment extends Fragment {
 
 
 
-        setTimeStamp(startTime, calendar0, minDate, binding.getRoot().findViewById(R.id.pickStartTime));
+
+        binding.getRoot().findViewById(R.id.pickStartTime).setOnClickListener (v ->{
+            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
+                calendar0.set(Calendar.YEAR, year);
+                calendar0.set(Calendar.MONTH, month);
+                calendar0.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                timePicker(startTime, year, month, dayOfMonth, binding.pickStartTime, calendar0);
+                // clear the Pick END time
+                endTime[0] = null;
+                binding.pickEndTime.setText(R.string.pick_end_time);
+            }, calendar0.get(Calendar.YEAR), calendar0.get(Calendar.MONTH), calendar0.get(Calendar.DAY_OF_MONTH));
+
+            // Set the minimum date
+            datePickerDialog.getDatePicker().setMinDate(minDate);
+
+            // Show the DatePickerDialog
+            datePickerDialog.show();
+        });
+
+
         binding.getRoot().findViewById(R.id.pickEndTime).setOnClickListener(v -> {
             if (startTime[0] == null) {
                 // pop up error message as start time is not set
                 Toast.makeText(getContext(), "Set start time first!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            timePicker(endTime, calendar0.get(Calendar.YEAR), calendar0.get(Calendar.MONTH), calendar0.get(Calendar.DAY_OF_MONTH), binding.getRoot().findViewById(R.id.pickEndTime), calendar0);
+//            timePicker(endTime, calendar0.get(Calendar.YEAR), calendar0.get(Calendar.MONTH), calendar0.get(Calendar.DAY_OF_MONTH), binding.getRoot().findViewById(R.id.pickEndTime), calendar0);
             // set the text of the button to the time selected
-                });
+            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
+                timePicker(endTime, year, month, dayOfMonth, binding.pickEndTime, calendar0);
+            }, calendar0.get(Calendar.YEAR), calendar0.get(Calendar.MONTH), calendar0.get(Calendar.DAY_OF_MONTH));
+
+            // Set the minimum date
+            datePickerDialog.getDatePicker().setMinDate(calendar0.getTimeInMillis());
+
+            // Show the DatePickerDialog
+            datePickerDialog.show();
+        });
+
+
 
         binding.getRoot().findViewById(R.id.createEventCreateButton).setOnClickListener (v ->{
             EventOption option = EventOption.newEvent(binding.eventTitleInput.getText().toString(), binding.eventDescriptionInput.getText().toString(), placeAddress,  startTime[0], endTime[0], binding.autoAcceptSwitch.isChecked(), null, DatabaseManager.getDatabaseManager().getCurrentUserReference());
@@ -137,20 +167,7 @@ public class CreateEventFragment extends Fragment {
     }
 
     private void setTimeStamp(Timestamp[] timeChosen, Calendar calendar0, long minDate, Button button) {
-        button.setOnClickListener (v ->{
-            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
-                calendar0.set(Calendar.YEAR, year);
-                calendar0.set(Calendar.MONTH, month);
-                calendar0.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                timePicker(timeChosen, year, month, dayOfMonth, button, calendar0);
-            }, calendar0.get(Calendar.YEAR), calendar0.get(Calendar.MONTH), calendar0.get(Calendar.DAY_OF_MONTH));
 
-            // Set the minimum date
-            datePickerDialog.getDatePicker().setMinDate(minDate);
-
-            // Show the DatePickerDialog
-            datePickerDialog.show();
-        });
     }
 
     private void timePicker(Timestamp[] timeChosen, int year, int month, int dayOfMonth, Button button, Calendar calendar) {
