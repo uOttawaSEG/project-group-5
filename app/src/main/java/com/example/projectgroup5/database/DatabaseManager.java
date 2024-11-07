@@ -496,7 +496,7 @@ public class DatabaseManager {
 
     //TODO documentation, this method should only be called to create a brand new user or to update an existing user from the ground up
     public void createNewUser(User user, String password, OnCompleteListener<Void> listener) {
-        DatabaseManager.getDatabaseManager().createUserWithEmailAndPassword(user.getUserEmail(), password, task -> {
+        databaseManager.createUserWithEmailAndPassword(user.getUserEmail(), password, task -> {
             // now we have tried to create the user, lets check if it was successful
             if (!task.isSuccessful()) {
                 listener.onComplete(Tasks.forException(task.getException()));
@@ -512,51 +512,51 @@ public class DatabaseManager {
             int totalTasks = user instanceof Organizer ? 8 : 7; // Number of Firestore tasks
             AtomicInteger tasksCompleted = new AtomicInteger(0); // Use AtomicInteger for thread safety
 
-            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+            databaseManager.storeUserValueToFirestore(
                     DatabaseManager.USER_TYPE,
                     user instanceof Organizer ? User.USER_TYPE_ORGANIZER : User.USER_TYPE_ATTENDEE,
                     (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) //, "storeUserTypeError")
             );
 
-            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+            databaseManager.storeUserValueToFirestore(
                     DatabaseManager.USER_ADDRESS,
                     user.getUserAddress(),
                     (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserAddressError")
             );
 
-            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+            databaseManager.storeUserValueToFirestore(
                     DatabaseManager.USER_EMAIL,
                     user.getUserEmail(),
                     (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) //  , "storeUserEmailError")
             );
 
-            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+            databaseManager.storeUserValueToFirestore(
                     DatabaseManager.USER_PHONE,
                     user.getPhoneNumber(),
                     (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserPhoneError")
             );
 
-            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+            databaseManager.storeUserValueToFirestore(
                     DatabaseManager.USER_FIRST_NAME,
                     user.getFirstName(),
                     (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserFirstNameError")
             );
 
-            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+            databaseManager.storeUserValueToFirestore(
                     DatabaseManager.USER_LAST_NAME,
                     user.getLastName(),
                     (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserLastNameError")
             );
 
-            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+            databaseManager.storeUserValueToFirestore(
                     DatabaseManager.USER_REGISTRATION_STATE,
                     User.WAITLISTED,
                     (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserUserRegistrationState")
             );
 
             if (user instanceof Organizer organizer) {
-                DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
-                        DatabaseManager.USER_ORGANIZATION_NAME,
+                databaseManager.storeUserValueToFirestore(
+                        USER_ORGANIZATION_NAME,
                         organizer.getUserOrganizationName(),
                         (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserOrganisationError")
                 );
