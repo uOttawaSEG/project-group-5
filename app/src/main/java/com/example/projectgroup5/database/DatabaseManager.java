@@ -494,15 +494,16 @@ public class DatabaseManager {
         return firestoreDatabase.collection("users").document(UserSession.getInstance().getUserId());
     }
 
+    //TODO documentation, this method should only be called to create a brand new user or to update an existing user from the ground up
     public void createNewUser(User user, String password, OnCompleteListener<Void> listener) {
         DatabaseManager.getDatabaseManager().createUserWithEmailAndPassword(user.getUserEmail(), password, task -> {
             // now we have tried to create the user, lets check if it was successful
             if (!task.isSuccessful()) {
                 listener.onComplete(Tasks.forException(task.getException()));
-                Log.e("CreateAccountFragment", "User creation failed: " + task.getException());
+                Log.e("DatabaseManager", "User creation failed: " + task.getException());
                 return;
             } else {
-                Log.d("CreateAccountFragment", "User creation successful");
+                Log.d("DatabaseManager", "User creation successful");
             }
             // now we have created the user, lets store the user data
             // we must first make sure that the UserSession userid is set
@@ -514,75 +515,76 @@ public class DatabaseManager {
             DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
                     DatabaseManager.USER_TYPE,
                     user instanceof Organizer ? User.USER_TYPE_ORGANIZER : User.USER_TYPE_ATTENDEE,
-                    (task0) -> handleTaskCompletion(task0, "storeUserTypeError", tasksCompleted, totalTasks, listener)
+                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) //, "storeUserTypeError")
             );
 
             DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
                     DatabaseManager.USER_ADDRESS,
                     user.getUserAddress(),
-                    (task0) -> handleTaskCompletion(task0, "storeUserAddressError", tasksCompleted, totalTasks, listener)
+                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserAddressError")
             );
 
             DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
                     DatabaseManager.USER_EMAIL,
                     user.getUserEmail(),
-                    (task0) -> handleTaskCompletion(task0, "storeUserEmailError", tasksCompleted, totalTasks, listener)
+                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) //  , "storeUserEmailError")
             );
 
             DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
                     DatabaseManager.USER_PHONE,
                     user.getPhoneNumber(),
-                    (task0) -> handleTaskCompletion(task0, "storeUserPhoneError", tasksCompleted, totalTasks, listener)
+                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserPhoneError")
             );
 
             DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
                     DatabaseManager.USER_FIRST_NAME,
                     user.getFirstName(),
-                    (task0) -> handleTaskCompletion(task0, "storeUserFirstNameError", tasksCompleted, totalTasks, listener)
+                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserFirstNameError")
             );
 
             DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
                     DatabaseManager.USER_LAST_NAME,
                     user.getLastName(),
-                    (task0) -> handleTaskCompletion(task0, "storeUserLastNameError", tasksCompleted, totalTasks, listener)
+                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserLastNameError")
             );
 
             DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
                     DatabaseManager.USER_REGISTRATION_STATE,
                     User.WAITLISTED,
-                    (task0) -> handleTaskCompletion(task0, "storeUserUserRegistrationState", tasksCompleted, totalTasks, listener)
+                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserUserRegistrationState")
             );
 
             if (user instanceof Organizer organizer) {
                 DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
                         DatabaseManager.USER_ORGANIZATION_NAME,
                         organizer.getUserOrganizationName(),
-                        (task0) -> handleTaskCompletion(task0, "storeUserOrganisationError", tasksCompleted, totalTasks, listener)
+                        (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserOrganisationError")
                 );
             }
         });
     }
 
-    private void handleTaskCompletion(Task<Void> task, String errorMessage, AtomicInteger tasksCompleted, int totalTasks, OnCompleteListener<Void> listener) {
-        if (task.isSuccessful()) {
-            Log.d("CreateAccountFragment", "Success: " + task.getResult());
-        } else {
-            Log.d("CreateAccountFragment", errorMessage + ": " + task.getException());
-            listener.onComplete(Tasks.forException(task.getException()));
-        }
 
-        // Increment the completed tasks count
-        int completed = tasksCompleted.incrementAndGet();
-
-        // Check if all tasks are completed
-        if (completed == totalTasks) {
-            Log.d("CreateAccountFragment", "All tasks completed successfully!");
-            // We now have all the account data saved we update the listner
-            listener.onComplete(task);
-        }
-    }
 
 
     //---------------------------------------EVENT------------------------------------------------
     // TODO event calls
+
+
+    //---------------------------------------MultiTaskHandler------------------------------------------------
+    private void handleTaskCompletion(Task<Void> task, AtomicInteger tasksCompleted, int totalTasks, OnCompleteListener<Void> listener) { //, String errorMessage, ) {
+        if (task.isSuccessful()) {
+            Log.d("DatabaseManager", "Success: " + task.getResult());
+        } else {
+//            Log.e("DatabaseManager", errorMessage + ": " + task.getException());
+            Log.e("DatabaseManager", "Error in handleTaskCompletion: " + task.getException());
+            listener.onComplete(Tasks.forException(task.getException()));
+        }
+        // Increment the completed tasks count
+        int completed = tasksCompleted.incrementAndGet();
+        if (completed == totalTasks) {
+            Log.d("DatabaseManager", "All tasks completed successfully!");
+            listener.onComplete(task);
+        }
+    }
 }

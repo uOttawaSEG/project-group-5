@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("UserSession initialization failed");
             }
         });
-        DatabaseManager.getDatabaseManager().test();
+//        DatabaseManager.getDatabaseManager().test();
     }
 
     /**
