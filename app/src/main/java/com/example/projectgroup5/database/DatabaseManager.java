@@ -3,7 +3,6 @@ package com.example.projectgroup5.database;
 import android.util.Log;
 
 import com.example.projectgroup5.MainActivity;
-import com.example.projectgroup5.R;
 import com.example.projectgroup5.users.Organizer;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;

@@ -97,32 +97,6 @@ public class UserSession {
         });
     }
 
-//    /**
-//     * Instantiates and stores the email for the specified user in the user representation and database.
-//     * <p>
-//     * This method retrieves the email of the provided {@link FirebaseUser} and stores it in the database.
-//     * It also updates the email in the user representation if it exists.
-//     *
-//     * @param user The {@link FirebaseUser} whose email is to be instantiated.
-//     *             Must not be null.
-//     */
-//    private void instantiateEmailForUser(FirebaseUser user) {
-//        //  set the user email
-//        DatabaseManager.getDatabaseManager().storeUserValueToFirestore(DatabaseManager.USER_EMAIL, user.getEmail(), (task) -> {
-//            if (task.isSuccessful()) {
-//                Log.d("UserSession", "Success instantiateEmailForUser: success");
-//            } else {
-//                Log.d("UserSession", "storeUserEmailError: " + task.getException());
-//            }
-//        });
-//        if (userRepresentation != null) {
-//            Log.d("UserSession", "Set the user email in the user representation to: " + user.getEmail());
-//            userRepresentation.setUserEmail(user.getEmail());
-//        } else {
-//            Log.e("UserSession", "User representation is null");
-//        }
-//    }
-
     /**
      * Retrieves the user representation associated with the current user session.
      *

@@ -19,10 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AcceptedList extends Fragment {
-    private FragmentAcceptedListBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentAcceptedListBinding.inflate(inflater, container, false);
+        com.example.projectgroup5.databinding.FragmentAcceptedListBinding binding = FragmentAcceptedListBinding.inflate(inflater, container, false);
         // Initialize the ListView
         ListView listView = binding.acceptedListLayout;
 

@@ -53,21 +53,20 @@ public abstract class User {
      */
     public static User newUserFromDatabase(String userId, String userType) {
         final User user;
-        if (userType.equals(USER_TYPE_ORGANIZER)) {
-            user = new Organizer(userId);
-        } else if (userType.equals(USER_TYPE_ATTENDEE)) {
-            user = new Attendee(userId);
-        } else if (userType.equals(USER_TYPE_ADMIN)) {
-            user = new Administrator(userId);
-        } else {
-            return null;
+        switch (userType) {
+            case USER_TYPE_ORGANIZER -> user = new Organizer(userId);
+            case USER_TYPE_ATTENDEE -> user = new Attendee(userId);
+            case USER_TYPE_ADMIN -> user = new Administrator(userId);
+            default -> {
+                return null;
+            }
         }
 
         Log.d("User", "User data at database fetch: " + userId);
         DatabaseManager.getDatabaseManager().getAllUserDataFromFirestore(userId, value -> {
             Log.d("User", "User successful data at database fetch: " + value);
             if (value != null) {
-                Log.d("User", "User data done at database fetch: " + value.toString());
+                Log.d("User", "User data done at database fetch: " + value);
                 if (value.containsKey(DatabaseManager.USER_FIRST_NAME)) {
                     user.setUserFirstName(value.get(DatabaseManager.USER_FIRST_NAME).toString());
                 }
@@ -101,15 +100,16 @@ public abstract class User {
     //TODO: add documentation
     public static User newUser(String userType, String firstName, String lastName, String email, long phoneNumber, String address, String organisation) {
         final User user;
-        if (userType.equals(USER_TYPE_ORGANIZER)) {
-            user = new Organizer(null);
-            ((Organizer) user).setUserOrganizationName(organisation);
-        } else if (userType.equals(USER_TYPE_ATTENDEE)) {
-            user = new Attendee(null);
-        } else if (userType.equals(USER_TYPE_ADMIN)) {
-            user = new Administrator(null);
-        } else {
-            return null;
+        switch (userType) {
+            case USER_TYPE_ORGANIZER -> {
+                user = new Organizer(null);
+                ((Organizer) user).setUserOrganizationName(organisation);
+            }
+            case USER_TYPE_ATTENDEE -> user = new Attendee(null);
+            case USER_TYPE_ADMIN -> user = new Administrator(null);
+            default -> {
+                return null;
+            }
         }
         user.setUserFirstName(firstName);
         user.setUserLastName(lastName);

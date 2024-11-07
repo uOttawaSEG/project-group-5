@@ -25,13 +25,11 @@ import java.util.List;
 public class UserAdapterForAdminView extends ArrayAdapter<User> {
 
     private Context context;
-    private List<User> users;
 
     // Constructor for the adapter
     public UserAdapterForAdminView(@NonNull Context context, List<User> users) {
         super(context, 0, users);
         this.context = context;
-        this.users = users;
     }
 
     @NonNull

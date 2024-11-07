@@ -19,9 +19,6 @@ import com.example.projectgroup5.database.DatabaseManager;
 import com.example.projectgroup5.databinding.FragmentCreateAccountBinding;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
-import com.google.android.gms.tasks.Task;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class CreateAccountFragment extends Fragment {
     private FragmentCreateAccountBinding binding;

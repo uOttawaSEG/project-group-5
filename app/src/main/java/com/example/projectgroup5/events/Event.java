@@ -25,13 +25,13 @@ public class Event {
      * It should not be called directly.
      * Instead use the {@link EventOption#newEvent(String, String, String, Timestamp, Timestamp, boolean, List, DocumentReference)}
      * <p>or:          {@link EventOption#oldEvent(String, String, String, Timestamp, Timestamp, boolean, List, DocumentReference)}</p>
-     * @param title
-     * @param address
-     * @param startTime
-     * @param endTime
-     * @param autoAccept
-     * @param registrations
-     * @param organizer
+     * @param title The title of the event
+     * @param address The address of the event
+     * @param startTime The start time of the event
+     * @param endTime The end time of the event
+     * @param autoAccept Whether the registrations to the event should be automatically accepted
+     * @param registrations The registrations to the event
+     * @param organizer The organizer of the event
      * @
      */
     protected Event(String title, String address, Timestamp startTime, Timestamp endTime, boolean autoAccept, List<DocumentReference> registrations, DocumentReference organizer) {

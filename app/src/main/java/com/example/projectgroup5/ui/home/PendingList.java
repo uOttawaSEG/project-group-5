@@ -20,10 +20,9 @@ import java.util.List;
 
 
 public class PendingList extends Fragment {
-    private FragmentPendingListBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentPendingListBinding.inflate(inflater, container, false);
+        com.example.projectgroup5.databinding.FragmentPendingListBinding binding = FragmentPendingListBinding.inflate(inflater, container, false);
         // Initialize the ListView
         ListView listView = binding.pendingListLayout;
 
