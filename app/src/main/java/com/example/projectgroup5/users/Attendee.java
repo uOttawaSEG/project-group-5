@@ -2,11 +2,12 @@ package com.example.projectgroup5.users;
 
 import com.google.firebase.firestore.DocumentReference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Attendee extends User {
 
-    private List<DocumentReference> attendeeEvents;
+    private List<DocumentReference> attendeeRegistrations = new ArrayList<>();
 
     public Attendee(String userId) {
         super(userId);
@@ -14,12 +15,12 @@ public class Attendee extends User {
 
     // ------------------------Getters and setters---------------------
 
-    public List<DocumentReference> getAttendeeEvents() {
-        return attendeeEvents;
+    public List<DocumentReference> getAttendeeRegistrations() {
+        return attendeeRegistrations;
     }
 
-    public void setAttendeeEvents(List<DocumentReference> attendeeEvents) {
-        this.attendeeEvents = attendeeEvents;
+    public void setAttendeeRegistrations(List<DocumentReference> attendeeEvents) {
+        this.attendeeRegistrations = attendeeEvents;
     }
 
 }

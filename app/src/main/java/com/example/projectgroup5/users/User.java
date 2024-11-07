@@ -8,6 +8,9 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.example.projectgroup5.database.DatabaseManager;
+import com.google.firebase.firestore.DocumentReference;
+
+import java.util.List;
 
 public abstract class User {
     public final static String USER_TYPE_ORGANIZER = "Organizer";
@@ -86,12 +89,30 @@ public abstract class User {
                     if (user instanceof Organizer organizer)
                         organizer.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
                 }
+                if (value.containsKey(DatabaseManager.USER_ORGANIZER_EVENTS)) {
+                    if (user instanceof Organizer organizer) {
+                        // try the cast to list of document references
+                        List<DocumentReference> events = (List<DocumentReference>) value.get(DatabaseManager.USER_ORGANIZER_EVENTS);
+                        if (events == null)
+                            organizer.setOrganizerEvents(events);
+
+                    }
+                }
                 if (value.containsKey(USER_REGISTRATION_STATE)) {
                     Log.d("User", "User registration state at database fetch: " + value.get(USER_REGISTRATION_STATE).toString());
                     user.setUserRegistrationState(value.get(USER_REGISTRATION_STATE).toString());
                     Log.d("User", "User registration state after fetch: " + user.getUserRegistrationState());
                 }
+                if (value.containsKey(DatabaseManager.USER_ATTENDEE_REGISTRATIONS)) {
+                    if (user instanceof Attendee attendee) {
+                        // try the cast to list of document references
+                        List<DocumentReference> registrations = (List<DocumentReference>) value.get(DatabaseManager.USER_ATTENDEE_REGISTRATIONS);
+                        if (registrations == null)
+                            attendee.setAttendeeRegistrations(registrations);
+                    }
+                }
                 user.setUserType(userType);
+
             }
         });
         return user;

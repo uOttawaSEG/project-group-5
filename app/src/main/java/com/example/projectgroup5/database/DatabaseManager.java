@@ -3,6 +3,7 @@ package com.example.projectgroup5.database;
 import android.util.Log;
 
 import com.example.projectgroup5.MainActivity;
+import com.example.projectgroup5.users.Attendee;
 import com.example.projectgroup5.users.Organizer;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
@@ -40,6 +41,8 @@ public class DatabaseManager {
     public static final String USER_LAST_NAME = "UserLastName";
     public static final String USER_REGISTRATION_STATE = "UserRegistrationState";
     public static final String USER_ORGANIZATION_NAME = "UserOrganizationName";
+    public static final String USER_ATTENDEE_REGISTRATIONS = "UserAttendeeRegistrations";
+    public static final String USER_ORGANIZER_EVENTS = "UserOrganizerEvents";
     private static final DatabaseManager databaseManager = new DatabaseManager();
     private final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore firestoreDatabase = FirebaseFirestore.getInstance();
@@ -508,7 +511,7 @@ public class DatabaseManager {
             // we must first make sure that the UserSession userid is set
             UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
             // Initialize a counter for the number of tasks
-            int totalTasks = user instanceof Organizer ? 8 : 7; // Number of Firestore tasks
+            int totalTasks = user instanceof Organizer ? 9 : 8; // Number of Firestore tasks
             AtomicInteger tasksCompleted = new AtomicInteger(0); // Use AtomicInteger for thread safety
 
             databaseManager.storeUserValueToFirestore(
@@ -559,6 +562,19 @@ public class DatabaseManager {
                         organizer.getUserOrganizationName(),
                         (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserOrganisationError")
                 );
+
+                databaseManager.storeUserValueToFirestore(
+                        USER_ORGANIZER_EVENTS,
+                        organizer.getOrganizerEvents(),
+                        (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserOrganizerEventsError")
+                );
+            }
+
+            if (user instanceof Attendee attendee) {
+                databaseManager.storeUserValueToFirestore(
+                        USER_ATTENDEE_REGISTRATIONS,
+                        attendee.getAttendeeRegistrations(),
+                        (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener));
             }
         });
     }
