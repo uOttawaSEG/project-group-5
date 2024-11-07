@@ -8,6 +8,8 @@ import androidx.annotation.Nullable;
 
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.R;
+import com.example.projectgroup5.users.User;
+import com.example.projectgroup5.users.UserSession;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -66,12 +68,18 @@ public class DatabaseListener {
                     // Send notifications if needed
                     if (currentValue == 1 && lastKnownValue.get() == 0) {
                         Notification.sendAcceptedNotification(context);
+                        // set the user representation to accepted
+                        UserSession.getInstance().getUserRepresentation().setUserRegistrationState(User.ACCEPTED);
                         context.getNavController().navigate(R.id.account);
                     } else if (currentValue == 2 && lastKnownValue.get() == 0) {
                         Notification.sendRejectedNotification(context);
+                        // set the user representation to rejected
+                        UserSession.getInstance().getUserRepresentation().setUserRegistrationState(User.REJECTED);
                         context.getNavController().navigate(R.id.account);
                     } else if (currentValue == 1 && lastKnownValue.get() == 2) {
                         Notification.sendAcceptedNotification(context);
+                        // set the user representation to accepted
+                        UserSession.getInstance().getUserRepresentation().setUserRegistrationState(User.ACCEPTED);
                         context.getNavController().navigate(R.id.account);
                     } else {
                         Log.e("DatabaseListener", "Invalid value: " + currentValue + " LastKnown: " + lastKnownValue.get());

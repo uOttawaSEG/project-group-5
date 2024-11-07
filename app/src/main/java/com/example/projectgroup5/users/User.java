@@ -2,14 +2,9 @@ package com.example.projectgroup5.users;
 
 import static com.example.projectgroup5.database.DatabaseManager.USER_ORGANIZATION_NAME;
 
-import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import com.example.projectgroup5.R;
 import com.example.projectgroup5.database.DatabaseManager;
 
 public abstract class User {
@@ -54,7 +49,7 @@ public abstract class User {
      *                 </ul>
      * @return A new User instance of the specified type, or null if the user type is invalid.
      */
-    public static User newUser(String userId, int userType) {
+    public static User newUserFromDatabase(String userId, int userType) {
         final User user;
         if (userType == USER_TYPE_ORGANIZER) {
             user = new Organizer(userId);
@@ -65,7 +60,7 @@ public abstract class User {
         } else {
             return null;
         }
-        DatabaseManager.getDatabaseManager().getAllUserDataFromFirestore(userId, value ->{
+        DatabaseManager.getDatabaseManager().getAllUserDataFromFirestore(userId, value -> {
             if (value != null) {
                 if (value.containsKey(DatabaseManager.USER_FIRST_NAME)) {
                     user.setUserFirstName(value.get(DatabaseManager.USER_FIRST_NAME).toString());
@@ -95,7 +90,28 @@ public abstract class User {
         return user;
     }
 
-    private void setUserRegistrationState(int userRegistrationState) {
+    //TODO: add documentation
+    public static User newUser(int userType, String firstName, String lastName, String email, long phoneNumber, String address, String organisation) {
+        final User user;
+        if (userType == USER_TYPE_ORGANIZER) {
+            user = new Organizer(null);
+            ((Organizer) user).setUserOrganizationName(organisation);
+        } else if (userType == USER_TYPE_ATTENDEE) {
+            user = new Attendee(null);
+        } else if (userType == USER_TYPE_ADMIN) {
+            user = new Administrator(null);
+        } else {
+            return null;
+        }
+        user.setUserFirstName(firstName);
+        user.setUserLastName(lastName);
+        user.setUserEmail(email);
+        user.setUserPhoneNumber(phoneNumber);
+        user.setUserAddress(address);
+        return user;
+    }
+
+    public void setUserRegistrationState(int userRegistrationState) {
         this.userRegistrationState = userRegistrationState;
     }
 
@@ -181,111 +197,6 @@ public abstract class User {
     public String getUserEmail() {
         return userEmail;
     }
-
-    /*
-     * Adds a user entry to the specified layout, populating it with user data from the database.
-     * <p>
-     * This method inflates a custom view for a user entry and retrieves user data from the
-     * Firebase database. It sets the values for various TextViews and manages the visibility
-     * of buttons based on the user's registration state. Additionally, it sets up click listeners
-     * for the accept and reject buttons.
-     *
-     * @param layout  The LinearLayout to which the user entry will be added.
-     * @param context The context used to inflate the view and access resources.
-     */
-//    public void addUserToLayout(LinearLayout layout, Context context) {
-//
-//        View customView = LayoutInflater.from(context).inflate(R.layout.account_entry, layout, false);
-//        customView.setId(userId.hashCode());
-//        // set get the data from firebase if possible
-//        DatabaseManager.getDatabaseManager().getAllUserDataFromFirestore(userId, value -> {
-//            if (value != null) {
-//                if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
-//                    setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
-//                    TextView userAddressTextView = customView.findViewById(R.id.homeAddressEntry);
-//                    userAddressTextView.setText(userAddress);
-//                }
-//                if (value.containsKey(USER_ORGANIZATION_NAME)) {
-//                    if (this instanceof Organizer organizer) {
-//                        organizer.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
-//                        TextView userOrganizationNameTextView = customView.findViewById(R.id.organizationNameEntry);
-//                        userOrganizationNameTextView.setVisibility(View.VISIBLE);
-//                        userOrganizationNameTextView.setText(organizer.getUserOrganizationName());
-//                    }
-//                }
-//                if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
-//                    setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
-//                    TextView userAddressTextView = customView.findViewById(R.id.homeAddressEntry);
-//                    userAddressTextView.setText(userAddress);
-//                }
-//                if (value.containsKey(DatabaseManager.USER_FIRST_NAME)) {
-//                    setUserFirstName(value.get(DatabaseManager.USER_FIRST_NAME).toString());
-//                    TextView userFirstNameTextView = customView.findViewById(R.id.firstNameEntry);
-//                    userFirstNameTextView.setText(userFirstName);
-//                }
-//                if (value.containsKey(DatabaseManager.USER_LAST_NAME)) {
-//                    setUserLastName(value.get(DatabaseManager.USER_LAST_NAME).toString());
-//                    TextView userLastNameTextView = customView.findViewById(R.id.lastNameEntry);
-//                    userLastNameTextView.setText(userLastName);
-//                }
-//                if (value.containsKey(DatabaseManager.USER_EMAIL)) {
-//                    setUserEmail(value.get(DatabaseManager.USER_EMAIL).toString());
-//                    TextView userEmailTextView = customView.findViewById(R.id.emailAddressEntry);
-//                    userEmailTextView.setText(userEmail);
-//                }
-//                if (value.containsKey(DatabaseManager.USER_PHONE)) {
-//                    setUserPhoneNumber(Long.valueOf(value.get(DatabaseManager.USER_PHONE).toString().replace("\"", "")));
-//                    TextView userPhoneNumberTextView = customView.findViewById(R.id.phoneNumberEntry);
-//                    userPhoneNumberTextView.setText(userPhoneNumber + "");
-//                }
-//                if (value.containsKey(DatabaseManager.USER_REGISTRATION_STATE)) {
-//                    int userRegistrationState = (int) (long) value.get(DatabaseManager.USER_REGISTRATION_STATE);
-//                    switch (userRegistrationState) {
-//                        case REJECTED: {
-//                            Button rejectButton = customView.findViewById(R.id.rejectUserButton);
-//                            rejectButton.setVisibility(View.GONE);
-//                            Button acceptButton = customView.findViewById(R.id.acceptUserButton);
-//                            acceptButton.setVisibility(View.VISIBLE);
-//                            break;
-//                        }
-//                        case ACCEPTED: {
-//                            Button rejectButton = customView.findViewById(R.id.rejectUserButton);
-//                            rejectButton.setVisibility(View.GONE);
-//                            Button acceptButton = customView.findViewById(R.id.acceptUserButton);
-//                            acceptButton.setVisibility(View.GONE);
-//                            break;
-//                        }
-//                        case WAITLISTED: {
-//                            Button rejectButton = customView.findViewById(R.id.rejectUserButton);
-//                            rejectButton.setVisibility(View.VISIBLE);
-//                            Button acceptButton = customView.findViewById(R.id.acceptUserButton);
-//                            acceptButton.setVisibility(View.VISIBLE);
-//                            break;
-//                        }
-//                    }
-//                }
-//
-//
-//            }
-//        });
-//
-//        Button rejectButton = customView.findViewById(R.id.rejectUserButton);
-//        rejectButton.setOnClickListener(v -> {
-//            removeUserFromLayout(layout);
-//            // Handle reject button click
-//            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(userId, DatabaseManager.USER_REGISTRATION_STATE, REJECTED, null);
-//        });
-//        Button acceptButton = customView.findViewById(R.id.acceptUserButton);
-//        acceptButton.setOnClickListener(v -> {
-//            removeUserFromLayout(layout);
-//            // Handle accept button click
-//            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(userId, DatabaseManager.USER_REGISTRATION_STATE, ACCEPTED, null);
-//        });
-//
-//
-//        layout.addView(customView);
-//
-//    }
 
     /**
      * Removes a user entry view from the specified layout.

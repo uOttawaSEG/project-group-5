@@ -42,7 +42,7 @@ public class UserOptions {
             AtomicInteger remainingCalls = new AtomicInteger(userIds.size());
             for (String userId : userIds) {
                 DatabaseManager.getDatabaseManager().getUserDataFromFirestore(userId, DatabaseManager.USER_TYPE, userType -> {
-                    User user = User.newUser(userId, (int) (long) ((Long) userType));
+                    User user = User.newUserFromDatabase(userId, (int) (long) ((Long) userType));
                     pendingUsers.add(user);
                     // Decrement the counter and check if all callbacks are complete
                     if (remainingCalls.decrementAndGet() == 0) {

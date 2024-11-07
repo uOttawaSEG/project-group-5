@@ -3,10 +3,13 @@ package com.example.projectgroup5.database;
 import android.util.Log;
 
 import com.example.projectgroup5.MainActivity;
+import com.example.projectgroup5.R;
+import com.example.projectgroup5.users.Organizer;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class DatabaseManager {
     public static final String USER_TYPE = "UserType";
@@ -56,14 +60,14 @@ public class DatabaseManager {
         // Display all the users in the firestore
         CollectionReference usersRef = firestoreDatabase.collection("users");
         usersRef.limit(10).get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Log.d("DatabaseManager", "User: " + document.getId() + " => " + document.getData());
-                        }
-                    } else {
-                        Log.d("DatabaseManager", "Error getting documents: ", task.getException());
-                    }
-                });
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    Log.d("DatabaseManager", "User: " + document.getId() + " => " + document.getData());
+                }
+            } else {
+                Log.d("DatabaseManager", "Error getting documents: ", task.getException());
+            }
+        });
         Log.d("DatabaseManager", "test() finished");
         test2();
     }
@@ -78,12 +82,12 @@ public class DatabaseManager {
         // test of the getUserDataFromFirestore method
         Log.d("DatabaseManager", "test2() called");
         getUserDataFromFirestore("userIdvaluetest", "testkey", (Object data) -> {
-                    if (data != null) {
-                        Log.d("DatabaseManager", "test2() finished: " + data);
-                    } else {
-                        Log.d("DatabaseManager", "test2() finished: null");
-                    }
-                });
+            if (data != null) {
+                Log.d("DatabaseManager", "test2() finished: " + data);
+            } else {
+                Log.d("DatabaseManager", "test2() finished: null");
+            }
+        });
         getUserDataFromFirestore("userIdvaluetest", "nokey", (Object data) -> {
             if (data != null) {
                 Log.d("DatabaseManager", "test2() finished: " + data);
@@ -93,7 +97,6 @@ public class DatabaseManager {
         });
         Log.d("DatabaseManager", "test2() finished");
     }
-
 
 
     /**
@@ -194,7 +197,7 @@ public class DatabaseManager {
         Log.d("DatabaseManager", "Creating a new user with email: " + email + " and password: " + password);
         // we want to give a confirmation to the listener that the user has been created
         firebaseAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(listener);
+                .addOnCompleteListener(listener);
 
     }
 
@@ -314,7 +317,7 @@ public class DatabaseManager {
      * Any updates to the data at this reference will trigger the listener's methods.
      *
      * @param eventListener The listener to be added for value events.
-     * @param key                The key for the user data to listen to.
+     * @param key           The key for the user data to listen to.
      */
     public ListenerRegistration addValueEventListenerToFirestore(String userId, EventListener<DocumentSnapshot> eventListener, String key) {
 
@@ -364,8 +367,8 @@ public class DatabaseManager {
      * unintended behavior, especially in lifecycle-aware components such as Activities or Fragments.</p>
      *
      * @param listenerRegistration The EventListener to be removed.
-     *                           It must be the same instance that was previously added.
-     *                           If the listener was not added, this method has no effect.
+     *                             It must be the same instance that was previously added.
+     *                             If the listener was not added, this method has no effect.
      */
     public void removeEventListenerFromFirestore(ListenerRegistration listenerRegistration) {
         if (listenerRegistration != null) {
@@ -399,7 +402,7 @@ public class DatabaseManager {
      * provided callback with the list of these user IDs. If the query is cancelled or encounters an
      * error, it returns an empty list via the callback.
      *
-     * @param field           The key to match against in the user data.
+     * @param field         The key to match against in the user data.
      * @param matchingValue The value to be matched for the specified key.
      * @param callback      A callback to be invoked with the list of matching user IDs.
      */
@@ -489,6 +492,94 @@ public class DatabaseManager {
 
     public DocumentReference getCurrentUserReference() {
         return firestoreDatabase.collection("users").document(UserSession.getInstance().getUserId());
+    }
+
+    public void createNewUser(User user, String password, OnCompleteListener<Void> listener) {
+        DatabaseManager.getDatabaseManager().createUserWithEmailAndPassword(user.getUserEmail(), password, task -> {
+            // now we have tried to create the user, lets check if it was successful
+            if (!task.isSuccessful()) {
+                listener.onComplete(Tasks.forException(task.getException()));
+                Log.e("CreateAccountFragment", "User creation failed: " + task.getException());
+                return;
+            } else {
+                Log.d("CreateAccountFragment", "User creation successful");
+            }
+            // now we have created the user, lets store the user data
+            // we must first make sure that the UserSession userid is set
+            UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
+            // Initialize a counter for the number of tasks
+            int totalTasks = user instanceof Organizer ? 8 : 7; // Number of Firestore tasks
+            AtomicInteger tasksCompleted = new AtomicInteger(0); // Use AtomicInteger for thread safety
+
+            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+                    DatabaseManager.USER_TYPE,
+                    user instanceof Organizer ? User.USER_TYPE_ORGANIZER : User.USER_TYPE_ATTENDEE,
+                    (task0) -> handleTaskCompletion(task0, "storeUserTypeError", tasksCompleted, totalTasks, listener)
+            );
+
+            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+                    DatabaseManager.USER_ADDRESS,
+                    user.getUserAddress(),
+                    (task0) -> handleTaskCompletion(task0, "storeUserAddressError", tasksCompleted, totalTasks, listener)
+            );
+
+            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+                    DatabaseManager.USER_EMAIL,
+                    user.getUserEmail(),
+                    (task0) -> handleTaskCompletion(task0, "storeUserEmailError", tasksCompleted, totalTasks, listener)
+            );
+
+            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+                    DatabaseManager.USER_PHONE,
+                    user.getPhoneNumber(),
+                    (task0) -> handleTaskCompletion(task0, "storeUserPhoneError", tasksCompleted, totalTasks, listener)
+            );
+
+            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+                    DatabaseManager.USER_FIRST_NAME,
+                    user.getFirstName(),
+                    (task0) -> handleTaskCompletion(task0, "storeUserFirstNameError", tasksCompleted, totalTasks, listener)
+            );
+
+            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+                    DatabaseManager.USER_LAST_NAME,
+                    user.getLastName(),
+                    (task0) -> handleTaskCompletion(task0, "storeUserLastNameError", tasksCompleted, totalTasks, listener)
+            );
+
+            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+                    DatabaseManager.USER_REGISTRATION_STATE,
+                    User.WAITLISTED,
+                    (task0) -> handleTaskCompletion(task0, "storeUserUserRegistrationState", tasksCompleted, totalTasks, listener)
+            );
+
+            if (user instanceof Organizer organizer) {
+                DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
+                        DatabaseManager.USER_ORGANIZATION_NAME,
+                        organizer.getUserOrganizationName(),
+                        (task0) -> handleTaskCompletion(task0, "storeUserOrganisationError", tasksCompleted, totalTasks, listener)
+                );
+            }
+        });
+    }
+
+    private void handleTaskCompletion(Task<Void> task, String errorMessage, AtomicInteger tasksCompleted, int totalTasks, OnCompleteListener<Void> listener) {
+        if (task.isSuccessful()) {
+            Log.d("CreateAccountFragment", "Success: " + task.getResult());
+        } else {
+            Log.d("CreateAccountFragment", errorMessage + ": " + task.getException());
+            listener.onComplete(Tasks.forException(task.getException()));
+        }
+
+        // Increment the completed tasks count
+        int completed = tasksCompleted.incrementAndGet();
+
+        // Check if all tasks are completed
+        if (completed == totalTasks) {
+            Log.d("CreateAccountFragment", "All tasks completed successfully!");
+            // We now have all the account data saved we update the listner
+            listener.onComplete(task);
+        }
     }
 
 

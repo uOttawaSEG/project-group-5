@@ -39,7 +39,7 @@ public class UserSession {
      * <p>
      * This method retrieves the current user from the database and updates the user ID.
      * It fetches the user's type from the database and creates a corresponding user representation
-     * using the {@link User#newUser(String, int)} method. If the user type is not found,
+     * using the {@link User#newUserFromDatabase(String, int)} method. If the user type is not found,
      * an error is logged. Additionally, it navigates to the account management screen
      * after successfully instantiating the user representation.
      * <p>
@@ -60,7 +60,7 @@ public class UserSession {
                     Log.e("UserSession", "User representation is not initially null");
                             return;
                 }
-                userRepresentation = User.newUser(userId, (int) (long) ((Long) userType));
+                userRepresentation = User.newUserFromDatabase(userId, (int) (long) ((Long) userType));
                 // Notification for prelogged in user
                 DatabaseListener.clearListeners();
                 Log.d("DatabaseListener", "User type: " + userType);
@@ -196,7 +196,7 @@ public class UserSession {
 //            if (userType != null) {
 //                Log.d("UserSession", "User type: " + userType);
 //                // Create a User representation based on the user type
-//                userRepresentation = User.newUser(userId, (int) (long) ((Long) userType));
+//                userRepresentation = User.newUserFromDatabase(userId, (int) (long) ((Long) userType));
 //                if (userRepresentation == null) {
 //                    Log.e("UserSession", "User representation is null 1");
 ////                            return;
