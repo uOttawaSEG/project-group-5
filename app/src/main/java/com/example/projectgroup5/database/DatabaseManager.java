@@ -295,7 +295,7 @@ public class DatabaseManager {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
                     Map<String, Object> data = document.getData(); // Get all user data as a Map
-                    Log.d("DatabaseManager", "Data retrieved: " + data); // Debug log
+                    Log.d("DatabaseManager", "All the Data retrieved: " + data); // Debug log
                     callback.onCallback(data);
                 } else {
                     Log.e("DatabaseManager", "Document does not exist for user ID: " + userId); // Debug log

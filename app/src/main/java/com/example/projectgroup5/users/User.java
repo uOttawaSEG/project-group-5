@@ -1,7 +1,9 @@
 package com.example.projectgroup5.users;
 
 import static com.example.projectgroup5.database.DatabaseManager.USER_ORGANIZATION_NAME;
+import static com.example.projectgroup5.database.DatabaseManager.USER_REGISTRATION_STATE;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -60,8 +62,12 @@ public abstract class User {
         } else {
             return null;
         }
+
+        Log.d("User", "User data at database fetch: " + userId);
         DatabaseManager.getDatabaseManager().getAllUserDataFromFirestore(userId, value -> {
+            Log.d("User", "User successful data at database fetch: " + value);
             if (value != null) {
+                Log.d("User", "User data done at database fetch: " + value.toString());
                 if (value.containsKey(DatabaseManager.USER_FIRST_NAME)) {
                     user.setUserFirstName(value.get(DatabaseManager.USER_FIRST_NAME).toString());
                 }
@@ -81,8 +87,10 @@ public abstract class User {
                     if (user instanceof Organizer organizer)
                         organizer.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
                 }
-                if (value.containsKey(DatabaseManager.USER_REGISTRATION_STATE)) {
-                    user.setUserRegistrationState(value.get(DatabaseManager.USER_REGISTRATION_STATE).toString());
+                if (value.containsKey(USER_REGISTRATION_STATE)) {
+                    Log.d("User", "User registration state at database fetch: " + value.get(USER_REGISTRATION_STATE).toString());
+                    user.setUserRegistrationState(value.get(USER_REGISTRATION_STATE).toString());
+                    Log.d("User", "User registration state after fetch: " + user.getUserRegistrationState());
                 }
                 user.setUserType(userType);
             }

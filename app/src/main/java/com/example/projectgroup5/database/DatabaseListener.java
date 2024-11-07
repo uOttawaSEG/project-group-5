@@ -60,23 +60,23 @@ public class DatabaseListener {
                 // Ensure the document exists
                 if (dataSnapshot == null || !dataSnapshot.exists()) return;
                 // Get the current value of USER_REGISTRATION_STATE
-                Integer currentValue = dataSnapshot.getLong(USER_REGISTRATION_STATE).intValue();
+                String currentValue = dataSnapshot.getString(USER_REGISTRATION_STATE);
                 if (currentValue == null) return;
 
                 // If the value has changed, proceed
-                if (lastKnownValue.get() != currentValue) {
+                if (mapAtomicIntToRegistration(lastKnownValue).equals(currentValue)) {
                     // Send notifications if needed
-                    if (currentValue == 1 && lastKnownValue.get() == 0) {
+                    if ((currentValue.equals(User.ACCEPTED)) && mapAtomicIntToRegistration(lastKnownValue).equals(User.WAITLISTED)) {
                         Notification.sendAcceptedNotification(context);
                         // set the user representation to accepted
                         UserSession.getInstance().getUserRepresentation().setUserRegistrationState(User.ACCEPTED);
                         context.getNavController().navigate(R.id.account);
-                    } else if (currentValue == 2 && lastKnownValue.get() == 0) {
+                    } else if ((currentValue.equals(User.REJECTED)) && mapAtomicIntToRegistration(lastKnownValue).equals(User.WAITLISTED)) {
                         Notification.sendRejectedNotification(context);
                         // set the user representation to rejected
                         UserSession.getInstance().getUserRepresentation().setUserRegistrationState(User.REJECTED);
                         context.getNavController().navigate(R.id.account);
-                    } else if (currentValue == 1 && lastKnownValue.get() == 2) {
+                    } else if ((currentValue.equals(User.ACCEPTED)) && mapAtomicIntToRegistration(lastKnownValue).equals(User.REJECTED)) {
                         Notification.sendAcceptedNotification(context);
                         // set the user representation to accepted
                         UserSession.getInstance().getUserRepresentation().setUserRegistrationState(User.ACCEPTED);
@@ -86,11 +86,38 @@ public class DatabaseListener {
                     }
                     Log.d("DatabaseListener", "Values: " + currentValue + " LastKnown: " + lastKnownValue.get());
                     // Update the last known value
-                    lastKnownValue.set(currentValue);
+                    setRegistrationState(currentValue, lastKnownValue);
                 }
             }
         };
         // Add the listener to the specific field
         firestoreListeners.add(DatabaseManager.getDatabaseManager().addValueEventListenerToFirestore(registrationStateListener, USER_REGISTRATION_STATE));
+    }
+
+    // map the atomicInt to a registration state
+    private static String mapAtomicIntToRegistration(AtomicInteger atomicInt) {
+        return switch (atomicInt.get()) {
+            case 0 -> User.WAITLISTED;
+            case 1 -> User.ACCEPTED;
+            case 2 -> User.REJECTED;
+            default -> "Unknown";
+        };
+    }
+
+    private static void setRegistrationState(String registrationState, AtomicInteger lastKnownValue) {
+        switch (registrationState) {
+            case User.WAITLISTED:
+                lastKnownValue.set(0);
+                break;
+            case User.ACCEPTED:
+                lastKnownValue.set(1);
+                break;
+            case User.REJECTED:
+                lastKnownValue.set(2);
+                break;
+            default:
+                Log.e("DatabaseListener", "Invalid registration state: " + registrationState);
+                break;
+        }
     }
 }

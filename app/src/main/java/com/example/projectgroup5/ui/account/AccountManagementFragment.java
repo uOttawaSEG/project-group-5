@@ -102,6 +102,7 @@ public class AccountManagementFragment extends Fragment {
     private void cachedDisplayRegistrationStatus() {
         if (UserSession.getInstance().getUserRepresentation() != null) {
             String newText;
+            if (UserSession.getInstance().getUserRepresentation().getUserRegistrationState() == null) return;
             switch (UserSession.getInstance().getUserRepresentation().getUserRegistrationState()) {
                 case User.WAITLISTED:
                     binding.userCurrentState.setVisibility(View.VISIBLE);
@@ -220,6 +221,7 @@ public class AccountManagementFragment extends Fragment {
     private void cachedDisplayUserType() {
         if (UserSession.getInstance().getUserRepresentation() == null) return;
         String newText;
+        if (UserSession.getInstance().getUserRepresentation().getUserType() == null) return;
         switch (UserSession.getInstance().getUserRepresentation().getUserType()) {
             case User.USER_TYPE_ORGANIZER:
                 Log.d("AccountManagementFragment", "usertype: organizer");
