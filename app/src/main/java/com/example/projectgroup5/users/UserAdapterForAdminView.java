@@ -91,7 +91,7 @@ public class UserAdapterForAdminView extends ArrayAdapter<User> {
                     userPhoneNumberTextView.setText(user.getPhoneNumber() + "");
                 }
                 if (value.containsKey(DatabaseManager.USER_REGISTRATION_STATE)) {
-                    int userRegistrationState = (int) (long) value.get(DatabaseManager.USER_REGISTRATION_STATE);
+                    String userRegistrationState = value.get(DatabaseManager.USER_REGISTRATION_STATE).toString();
                     switch (userRegistrationState) {
                         case REJECTED: {
                             Button rejectButton = finalCustomView.findViewById(R.id.rejectUserButton);

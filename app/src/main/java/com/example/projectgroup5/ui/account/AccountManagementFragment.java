@@ -67,9 +67,8 @@ public class AccountManagementFragment extends Fragment {
         DatabaseManager.getDatabaseManager().getUserDataFromFirestore(DatabaseManager.USER_REGISTRATION_STATE, userState -> {
             Log.d("AccountManagementFragment", "In the onCallback of displayUserRegistrationStatus: " + userState);
             if (userState != null) {
-                int intUserState = (int) (long) ((Long) userState);
                 String newText;
-                switch (intUserState) {
+                switch (userState.toString()) {
                     case User.WAITLISTED:
                         binding.userCurrentState.setVisibility(View.VISIBLE);
                         Log.d("AccountManagementFragment", "userState: waitlisted");
@@ -183,11 +182,10 @@ public class AccountManagementFragment extends Fragment {
             if (userType != null) {
                 // Create a User representation based on the user type
                 Log.d("UserSession", "User type UPDATED: " + userType);
-                UserSession.getInstance().getUserRepresentation().setUserType((int) (long) ((Long) userType));
-                int intUserType = (int) (long) ((Long) userType);
+                UserSession.getInstance().getUserRepresentation().setUserType(userType.toString());
                 Log.d("firebase", "Retrieved user type: " + userType);
                 String newText;
-                switch (intUserType) {
+                switch (userType.toString()) {
                     case User.USER_TYPE_ORGANIZER:
                         Log.d("AccountManagementFragment", "usertype: organizer");
                         binding.userAccountType.setVisibility(View.VISIBLE);

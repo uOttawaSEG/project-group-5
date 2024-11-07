@@ -17,7 +17,7 @@ public class Event {
     private Timestamp startTime;
     private Timestamp endTime;
     private boolean autoAccept;
-    private List<DocumentReference> participants; // this is a list of reference to the list of users, format is: /users/{uid}
+    private List<DocumentReference> registrations; // this is a list of registrations, they can be found in /registrations/{registrationID}
     private DocumentReference organizer; // This is a reference to the organizer, format is /users/{uid}
 
     /**
@@ -30,17 +30,17 @@ public class Event {
      * @param startTime
      * @param endTime
      * @param autoAccept
-     * @param participants
+     * @param registrations
      * @param organizer
      * @
      */
-    protected Event(String title, String address, Timestamp startTime, Timestamp endTime, boolean autoAccept, List<DocumentReference> participants, DocumentReference organizer) {
+    protected Event(String title, String address, Timestamp startTime, Timestamp endTime, boolean autoAccept, List<DocumentReference> registrations, DocumentReference organizer) {
         this.title = title;
         this.address = address;
         this.startTime = startTime;
         this.endTime = endTime;
         this.autoAccept = autoAccept;
-        this.participants = participants;
+        this.registrations = registrations;
         this.organizer = organizer;
     }
 

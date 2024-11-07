@@ -36,13 +36,13 @@ public class EventOption {
      *  <li><code>END_TIME_EMPTY_ERROR</code></li>
      * </ul>
      */
-    public static EventOption oldEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept,  List<DocumentReference> participants, DocumentReference organizer) {
+    public static EventOption oldEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept,  List<DocumentReference> registrations, DocumentReference organizer) {
         EventOption option = new EventOption();
 
         if (checkFields(option, title, description, address, startTime, endTime, organizer)) {
             return option;
         }
-        Event event = new Event(title, address, startTime, endTime, autoAccept, participants, organizer);
+        Event event = new Event(title, address, startTime, endTime, autoAccept, registrations, organizer);
         option.setEvent(event);
         return option;
     }
@@ -66,7 +66,7 @@ public class EventOption {
      * </ul>
      */
     // TODO auto accept and address
-    public static EventOption newEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept,  List<DocumentReference> participants, DocumentReference organizer) {
+    public static EventOption newEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept,  List<DocumentReference> registrations, DocumentReference organizer) {
         EventOption option = new EventOption();
 
         if (checkFields(option, title,description, address, startTime, endTime, organizer)) {
@@ -77,7 +77,7 @@ public class EventOption {
             return option;
         }
 
-        Event event = new Event(title, address, startTime, endTime, autoAccept, participants, organizer);
+        Event event = new Event(title, address, startTime, endTime, autoAccept, registrations, organizer);
         option.setEvent(event);
         return option;
     }

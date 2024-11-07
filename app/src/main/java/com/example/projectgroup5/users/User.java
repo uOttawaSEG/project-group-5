@@ -8,20 +8,20 @@ import android.widget.LinearLayout;
 import com.example.projectgroup5.database.DatabaseManager;
 
 public abstract class User {
-    public final static int USER_TYPE_ORGANIZER = 1;
-    public final static int USER_TYPE_ATTENDEE = 2;
-    public final static int USER_TYPE_ADMIN = 0;
-    public static final int REJECTED = 2;
-    public static final int ACCEPTED = 1;
-    public static final int WAITLISTED = 0;
+    public final static String USER_TYPE_ORGANIZER = "Organizer";
+    public final static String USER_TYPE_ATTENDEE = "Attendee";
+    public final static String USER_TYPE_ADMIN = "Admin";
+    public static final String REJECTED = "Rejected";
+    public static final String ACCEPTED = "Accepted";
+    public static final String WAITLISTED = "Waitlisted";
     private final String userId;
     private String userFirstName;
     private String userLastName;
     private String userEmail;
     private long userPhoneNumber;
     private String userAddress;
-    private int userRegistrationState;
-    private int userType;
+    private String userRegistrationState;
+    private String userType;
 
     /**
      * Creates a new User instance with the specified user ID.
@@ -49,13 +49,13 @@ public abstract class User {
      *                 </ul>
      * @return A new User instance of the specified type, or null if the user type is invalid.
      */
-    public static User newUserFromDatabase(String userId, int userType) {
+    public static User newUserFromDatabase(String userId, String userType) {
         final User user;
-        if (userType == USER_TYPE_ORGANIZER) {
+        if (userType.equals(USER_TYPE_ORGANIZER)) {
             user = new Organizer(userId);
-        } else if (userType == USER_TYPE_ATTENDEE) {
+        } else if (userType.equals(USER_TYPE_ATTENDEE)) {
             user = new Attendee(userId);
-        } else if (userType == USER_TYPE_ADMIN) {
+        } else if (userType.equals(USER_TYPE_ADMIN)) {
             user = new Administrator(userId);
         } else {
             return null;
@@ -82,7 +82,7 @@ public abstract class User {
                         organizer.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
                 }
                 if (value.containsKey(DatabaseManager.USER_REGISTRATION_STATE)) {
-                    user.setUserRegistrationState((int) (long) value.get(DatabaseManager.USER_REGISTRATION_STATE));
+                    user.setUserRegistrationState(value.get(DatabaseManager.USER_REGISTRATION_STATE).toString());
                 }
                 user.setUserType(userType);
             }
@@ -91,14 +91,14 @@ public abstract class User {
     }
 
     //TODO: add documentation
-    public static User newUser(int userType, String firstName, String lastName, String email, long phoneNumber, String address, String organisation) {
+    public static User newUser(String userType, String firstName, String lastName, String email, long phoneNumber, String address, String organisation) {
         final User user;
-        if (userType == USER_TYPE_ORGANIZER) {
+        if (userType.equals(USER_TYPE_ORGANIZER)) {
             user = new Organizer(null);
             ((Organizer) user).setUserOrganizationName(organisation);
-        } else if (userType == USER_TYPE_ATTENDEE) {
+        } else if (userType.equals(USER_TYPE_ATTENDEE)) {
             user = new Attendee(null);
-        } else if (userType == USER_TYPE_ADMIN) {
+        } else if (userType.equals(USER_TYPE_ADMIN)) {
             user = new Administrator(null);
         } else {
             return null;
@@ -111,11 +111,11 @@ public abstract class User {
         return user;
     }
 
-    public void setUserRegistrationState(int userRegistrationState) {
+    public void setUserRegistrationState(String userRegistrationState) {
         this.userRegistrationState = userRegistrationState;
     }
 
-    public int getUserRegistrationState() {
+    public String getUserRegistrationState() {
         return userRegistrationState;
     }
 
@@ -159,7 +159,7 @@ public abstract class User {
      *
      * @param userType The type to be set for the user, typically represented as an integer.
      */
-    public void setUserType(int userType) {
+    public void setUserType(String userType) {
         this.userType = userType;
     }
 
@@ -168,7 +168,7 @@ public abstract class User {
      *
      * @return The current user type, represented as an integer.
      */
-    public int getUserType() {
+    public String getUserType() {
         return userType;
     }
 

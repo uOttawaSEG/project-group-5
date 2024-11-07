@@ -91,8 +91,7 @@ public class UserAdapterForOrganizerView extends ArrayAdapter<User> {
                     userPhoneNumberTextView.setText(user.getPhoneNumber() + "");
                 }
                 if (value.containsKey(DatabaseManager.USER_REGISTRATION_STATE)) {
-                    int userRegistrationState = (int) (long) value.get(DatabaseManager.USER_REGISTRATION_STATE);
-                    switch (userRegistrationState) {
+                    switch (value.get(DatabaseManager.USER_REGISTRATION_STATE).toString()) {
                         case REJECTED: {
                             Button rejectButton = finalCustomView.findViewById(R.id.rejectUserButton);
                             rejectButton.setVisibility(View.GONE);

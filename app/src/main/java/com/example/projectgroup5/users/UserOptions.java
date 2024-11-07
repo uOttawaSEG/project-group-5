@@ -34,7 +34,7 @@ public class UserOptions {
      * @param userRegistrationState The registration state to filter users by. This should correspond to
      *                              the values defined in the user registration state enumeration.
      */
-    public static void getUsersWithRegistrationStatus(UsersCallback callback, int userRegistrationState) {
+    public static void getUsersWithRegistrationStatus(UsersCallback callback, String userRegistrationState) {
         List<User> pendingUsers = new ArrayList<>();
         DatabaseManager databaseManager = DatabaseManager.getDatabaseManager();
         databaseManager.getUserIdByMatchingDataFromFirestore(DatabaseManager.USER_REGISTRATION_STATE, userRegistrationState, userIds -> {
@@ -42,7 +42,7 @@ public class UserOptions {
             AtomicInteger remainingCalls = new AtomicInteger(userIds.size());
             for (String userId : userIds) {
                 DatabaseManager.getDatabaseManager().getUserDataFromFirestore(userId, DatabaseManager.USER_TYPE, userType -> {
-                    User user = User.newUserFromDatabase(userId, (int) (long) ((Long) userType));
+                    User user = User.newUserFromDatabase(userId, userType.toString());
                     pendingUsers.add(user);
                     // Decrement the counter and check if all callbacks are complete
                     if (remainingCalls.decrementAndGet() == 0) {
@@ -61,7 +61,7 @@ public class UserOptions {
     /**
      * Retrieves a list of users who have been accepted.
      * <p>
-     * This method invokes the {@link #getUsersWithRegistrationStatus(UsersCallback, int)} method
+     * This method invokes the {@link #getUsersWithRegistrationStatus(UsersCallback, String)} method
      * with the registration state set to accepted. It passes the provided callback to receive
      * the list of accepted users.
      *
@@ -74,7 +74,7 @@ public class UserOptions {
     /**
      * Retrieves a list of users who are pending approval (waitlisted).
      * <p>
-     * This method invokes the {@link #getUsersWithRegistrationStatus(UsersCallback, int)} method
+     * This method invokes the {@link #getUsersWithRegistrationStatus(UsersCallback, String)} method
      * with the registration state set to waitlisted. It passes the provided callback to receive
      * the list of pending users.
      *
@@ -87,7 +87,7 @@ public class UserOptions {
     /**
      * Retrieves a list of users who have been rejected.
      * <p>
-     * This method invokes the {@link #getUsersWithRegistrationStatus(UsersCallback, int)} method
+     * This method invokes the {@link #getUsersWithRegistrationStatus(UsersCallback, String)} method
      * with the registration state set to rejected. It passes the provided callback to receive
      * the list of rejected users.
      *
