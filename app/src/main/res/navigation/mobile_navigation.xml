@@ -76,6 +76,9 @@
         android:label="@string/userAccount"
         tools:layout="@layout/fragment_login_or_create_account" >
         <action
+            android:id="@+id/action_create_account_to_login_or_create_account"
+            app:destination="@+id/login_or_create_account"/>
+        <action
             android:id="@+id/action_login_or_create_account_to_login"
             app:destination="@+id/login"/>
         <action
