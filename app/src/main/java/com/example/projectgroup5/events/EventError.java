@@ -12,6 +12,7 @@ public enum EventError {
     END_TIME_EMPTY,
     DESCRIPTION_EMPTY,
     ORGANIZER_EMPTY,
+    EVENT_ID_EMPTY
 }
 
 

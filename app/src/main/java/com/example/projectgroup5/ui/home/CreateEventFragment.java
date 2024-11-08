@@ -27,6 +27,7 @@ import com.example.projectgroup5.R;
 import com.example.projectgroup5.database.DatabaseManager;
 import com.example.projectgroup5.databinding.FragmentCreateEventBinding;
 import com.example.projectgroup5.events.EventOption;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
@@ -136,6 +137,8 @@ public class CreateEventFragment extends Fragment {
                 navController.popBackStack();
                 Toast.makeText(getContext(), "Event created!", Toast.LENGTH_SHORT).show();
                 // TODO add event to database here
+
+                DatabaseManager.getDatabaseManager().createNewEvent(option.getEvent(), null);
             } else {
                 // based on the error add a warning to the corresponding field
                 switch (option.getError()) {

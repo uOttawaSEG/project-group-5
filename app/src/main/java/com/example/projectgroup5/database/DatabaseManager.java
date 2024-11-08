@@ -3,6 +3,7 @@ package com.example.projectgroup5.database;
 import android.util.Log;
 
 import com.example.projectgroup5.MainActivity;
+import com.example.projectgroup5.events.Event;
 import com.example.projectgroup5.users.Attendee;
 import com.example.projectgroup5.users.Organizer;
 import com.example.projectgroup5.users.User;
@@ -11,6 +12,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -46,6 +48,14 @@ public class DatabaseManager {
     private static final DatabaseManager databaseManager = new DatabaseManager();
     private final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore firestoreDatabase = FirebaseFirestore.getInstance();
+    public static final String EVENT_TITLE = "EventTitle";
+    public static final String EVENT_DESCRIPTION = "EventDescription";
+    public static final String EVENT_ADDRESS = "EventAddress";
+    public static final String EVENT_START_TIME = "EventStartTime";
+    public static final String EVENT_END_TIME = "EventEndTime";
+    public static final String EVENT_AUTO_ACCEPT= "AutoAccept";
+    public static final String EVENT_REGISTRATIONS = "EventRegistration"; // this is a list of registrations, they can be found in /registrations/{registrationID}
+    public static final String EVENT_ORGANIZER = "EventOrganizer";
 
     //---------------------------------------------USER-------------------------------------------------------------------
 
@@ -583,8 +593,98 @@ public class DatabaseManager {
 
 
     //---------------------------------------EVENT------------------------------------------------
-    // TODO event calls
+    public void storeEventValueToFirestore(String eventID, String type, @Nullable Object value, @Nullable OnCompleteListener<Void> listener) {
+        // Create a reference to the document
+        DocumentReference docRef = firestoreDatabase.collection("events").document(eventID);
 
+        // Prepare the data to store as a map
+        Map<String, Object> data = new HashMap<>();
+        data.put(type, value);
+
+        Log.d("DatabaseManager", "Storing data in storeEventValueToFirestore: " + data); // Log the data being stored
+
+        // Use set() with SetOptions.merge() to store the value without overwriting existing data
+        docRef.set(data, SetOptions.merge())
+                .addOnCompleteListener(task -> {
+                    if (listener != null) {
+                        listener.onComplete(task); // Notify listener on completion
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FirestoreError", "Failed to store value: " + e.getMessage());
+                    if (listener != null) {
+                        listener.onComplete(Tasks.forException(e)); // Notify listener with failure
+                    }
+                });
+
+        Log.d("DatabaseManager", "Done storing data"); // Log completion
+    }
+
+
+    public void createNewEvent(Event event, OnCompleteListener<Void> listener) {
+        // now we have tried to create the user, lets check if it was successful
+        // now we have created the user, lets store the user data
+        // we must first make sure that the UserSession userid is set
+        // Initialize a counter for the number of tasks
+        int totalTasks = 8; // Number of Firestore tasks
+        AtomicInteger tasksCompleted = new AtomicInteger(0); // Use AtomicInteger for thread safety
+
+        databaseManager.storeEventValueToFirestore(
+                event.getEventID(),
+                DatabaseManager.EVENT_TITLE,
+                event.getTitle(),
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) //, "storeUserTypeError")
+        );
+
+        databaseManager.storeEventValueToFirestore(
+                event.getEventID(),
+                DatabaseManager.EVENT_DESCRIPTION,
+                event.getDescription(),
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) //, "storeUserTypeError")
+        );
+
+        databaseManager.storeEventValueToFirestore(
+                event.getEventID(),
+                DatabaseManager.EVENT_ADDRESS,
+                event.getAddress(),
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) //, "storeUserTypeError")
+        );
+
+        databaseManager.storeEventValueToFirestore(
+                event.getEventID(),
+                DatabaseManager.EVENT_START_TIME,
+                event.getStartTime(),
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserAddressError")
+        );
+
+        databaseManager.storeEventValueToFirestore(
+                event.getEventID(),
+                DatabaseManager.EVENT_END_TIME,
+                event.getEndTime(),
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) //  , "storeUserEmailError")
+        );
+
+        databaseManager.storeEventValueToFirestore(
+                event.getEventID(),
+                DatabaseManager.EVENT_AUTO_ACCEPT,
+                event.isAutoAccept(),
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserPhoneError")
+        );
+
+        databaseManager.storeEventValueToFirestore(
+                event.getEventID(),
+                DatabaseManager.EVENT_REGISTRATIONS,
+                event.getRegistrations(),
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserFirstNameError")
+        );
+        databaseManager.storeEventValueToFirestore(
+                event.getEventID(),
+                DatabaseManager.EVENT_ORGANIZER,
+                event.getOrganizer(),
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserFirstNameError")
+        );
+    }
+    //---------------------------------------Joshua's part------------------------------------------------
 
     //---------------------------------------MultiTaskHandler------------------------------------------------
     private void handleTaskCompletion(Task<Void> task, AtomicInteger tasksCompleted, int totalTasks, OnCompleteListener<Void> listener) { //, String errorMessage, ) {

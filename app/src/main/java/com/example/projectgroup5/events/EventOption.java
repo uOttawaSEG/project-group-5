@@ -1,5 +1,6 @@
 package com.example.projectgroup5.events;
 
+import com.example.projectgroup5.users.Organizer;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -11,6 +12,10 @@ public class EventOption {
     Event event;
     EventError error;
     boolean holdsAnEvent;
+
+    public Event getEvent() {
+        return holdsAnEvent ? event : null;
+    }
 
     private void setEvent(Event event) {
         this.event = event;
@@ -36,13 +41,13 @@ public class EventOption {
      *  <li><code>END_TIME_EMPTY_ERROR</code></li>
      * </ul>
      */
-    public static EventOption oldEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept,  List<DocumentReference> registrations, DocumentReference organizer) {
+    public static EventOption oldEvent(String eventID, String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept,  List<DocumentReference> registrations, DocumentReference organizer) {
         EventOption option = new EventOption();
 
-        if (checkFields(option, title, description, address, startTime, endTime, organizer)) {
+        if (checkFields(option, title, description, address, startTime, endTime, organizer, eventID)) {
             return option;
         }
-        Event event = new Event(title, address, startTime, endTime, autoAccept, registrations, organizer);
+        Event event = new Event(title, address, startTime, endTime, autoAccept, registrations, organizer, eventID);
         option.setEvent(event);
         return option;
     }
@@ -77,7 +82,7 @@ public class EventOption {
             return option;
         }
 
-        Event event = new Event(title, address, startTime, endTime, autoAccept, registrations, organizer);
+        Event event = new Event(title, description, address, startTime, endTime, autoAccept, registrations, organizer);
         option.setEvent(event);
         return option;
     }
@@ -92,7 +97,18 @@ public class EventOption {
         }
         return null;
     }
+    private static boolean checkFields(EventOption option, String title, String description, String address, Timestamp startTime, Timestamp endTime, DocumentReference organizer, String eventID){
+        if (checkFields(option, title, description, address, startTime, endTime, organizer)) {
+            return true;
+        }
 
+        if (eventID == null && eventID.isEmpty()) {
+            option.setError(EventError.EVENT_ID_EMPTY);
+            return true;
+        }
+
+        return false;
+    }
     private static boolean checkFields(EventOption option, String title, String description, String address, Timestamp startTime, Timestamp endTime, DocumentReference organizer) {
         if (title == null || title.isEmpty()) {
             option.setError(EventError.TITLE_EMPTY);
