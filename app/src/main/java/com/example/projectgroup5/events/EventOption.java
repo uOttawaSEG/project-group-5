@@ -1,160 +1,88 @@
 package com.example.projectgroup5.events;
 
-import com.example.projectgroup5.users.Organizer;
-import com.google.firebase.Timestamp;
+import android.util.Log;
+
+import com.example.projectgroup5.database.DatabaseManager;
+import com.example.projectgroup5.users.UserSession;
 import com.google.firebase.firestore.DocumentReference;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class EventOption {
-    // option to define the different options that can be returned when creating an event
-    // can either be an Event or an EventError
-    Event event;
-    EventError error;
-    boolean holdsAnEvent;
-
-    public Event getEvent() {
-        return holdsAnEvent ? event : null;
-    }
-
-    private void setEvent(Event event) {
-        this.event = event;
-        this.holdsAnEvent = true;
-    }
-
-    private void setError(EventError error) {
-        this.error = error;
-        this.holdsAnEvent = false;
-    }
-
     /**
-     * This constructor is used to create a new event option. For an event that has already occurred.
-     * Returns one of the following:
-     * {@link #event} contained in EventOption if {@link #holdsAnEvent} is true
+     * Callback interface for receiving a list of events.
      * <p>
-     * or {@link #error} contained in EventOption if {@link #holdsAnEvent} is false of the type EventError
-     * <ul>
-     *  <li><code>ADDRESS_EMPTY_ERROR</code></li>
-     *  <li><code>TITLE_EMPTY_ERROR</code></li>
-     *  <li><code>DATE_EMPTY_ERROR</code></li>
-     *  <li><code>START_TIME_EMPTY_ERROR</code></li>
-     *  <li><code>END_TIME_EMPTY_ERROR</code></li>
-     * </ul>
+     * This interface defines a method to be called when a list of event objects is available,
+     * typically after querying a database or performing an asynchronous operation.
      */
-    public static EventOption oldEvent(String eventID, String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept,  List<DocumentReference> registrations, DocumentReference organizer) {
-        EventOption option = new EventOption();
-
-        if (checkFields(option, title, description, address, startTime, endTime, organizer, eventID)) {
-            return option;
-        }
-        Event event = new Event(title, address, startTime, endTime, autoAccept, registrations, organizer, eventID);
-        option.setEvent(event);
-        return option;
+    public interface EventsCallback {
+        /**
+         * Called when the data retrieval is complete and the event list is available.
+         *
+         * @param eventIds A list of event objects that were retrieved.
+         */
+        void onDataReceived(List<Event> eventIds);
     }
 
-    /**
-     * This creates a new event option. For an event that has not yet occurred. It is more strict than {@link #oldEvent}
-     * Since it makes sure that the event is not in the past.
-     * Returns one of the following:
-     * {@link #event} contained in EventOption if {@link #holdsAnEvent} is true
-     * <p>
-     * or {@link #error} contained in EventOption if {@link #holdsAnEvent} is false of the type EventError
-     * <ul>
-     *  <li><code>START_TIME_PAST_ERROR</code></li>
-     *  <li><code>END_TIME_PAST_ERROR</code></li>
-     *  <li><code>END_TIME_BEFORE_START_TIME_ERROR</code></li>
-     *  <li><code>ADDRESS_EMPTY_ERROR</code></li>
-     *  <li><code>TITLE_EMPTY_ERROR</code></li>
-     *  <li><code>DATE_EMPTY_ERROR</code></li>
-     *  <li><code>START_TIME_EMPTY_ERROR</code></li>
-     *  <li><code>END_TIME_EMPTY_ERROR</code></li>
-     * </ul>
-     */
-    // TODO auto accept and address
-    public static EventOption newEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept, DocumentReference organizer) {
-        EventOption option = new EventOption();
 
-        if (checkFields(option, title,description, address, startTime, endTime, organizer)) {
-            return option;
-        }
-
-        if (checkTimes(option, startTime, endTime)) {
-            return option;
-        }
-
-        Event event = new Event(title, description, address, startTime, endTime, autoAccept, new ArrayList<DocumentReference>(), organizer);
-        option.setEvent(event);
-        return option;
+    public static void getEventsWithTimeStatus(EventOption.EventsCallback callback, String eventTimeStatus) {
+        List<Event> events = new ArrayList<>();
+        DatabaseManager databaseManager = DatabaseManager.getDatabaseManager();
+        databaseManager.getOrganizerEvents(UserSession.getInstance().getUserId(), task -> {
+            if (task == null || !task.isSuccessful()) {
+                Log.e("EventOptions", "Failed to get organizer events");
+                callback.onDataReceived(events);
+                return;
+            } else {
+                List<DocumentReference> eventIds = task.getResult();
+                // Create a counter to track completed event data retrieval
+                AtomicInteger remainingCalls = new AtomicInteger(eventIds.size());
+                Log.d("EventOptions", "Got " + eventIds.size() + " events");
+                for (DocumentReference eventId : eventIds) {
+                    DatabaseManager.getDatabaseManager().getEvent(eventId.getId(), task2 -> {
+                        if (task2.getResult() == null || !task2.isSuccessful()) {
+                            Log.e("EventOptions", "Failed to create event from database, event ID: " + eventId);
+                            if (remainingCalls.decrementAndGet() == 0) {
+                                // Call the callback with the retrieved pending events
+                                callback.onDataReceived(events);
+                            }
+                            return;
+                        }
+                        if (task2.getResult().holdsAnEvent()) {
+                            Event event = task2.getResult().getEvent();
+                            // check if the event is in the correct time status
+                            if (event.getTimeStatus().equals(eventTimeStatus)) {
+                                events.add(event);
+                            }
+                        }
+                        // Decrement the counter and check if all callbacks are complete
+                        if (remainingCalls.decrementAndGet() == 0) {
+                            // Call the callback with the retrieved pending events
+                            callback.onDataReceived(events);
+                        }
+                    });
+                }
+                // If there are no events, callback immediately
+                if (eventIds.isEmpty()) {
+                    callback.onDataReceived(events);
+                }
+            }
+        });
     }
 
-    public boolean holdsAnEvent() {
-        return holdsAnEvent;
+
+    public static void getCurrentEvents(EventOption.EventsCallback callback) {
+        getEventsWithTimeStatus(callback, Event.CURRENT);
     }
 
-    public EventError getError() {
-        if (!holdsAnEvent) {
-            return error;
-        }
-        return null;
-    }
-    private static boolean checkFields(EventOption option, String title, String description, String address, Timestamp startTime, Timestamp endTime, DocumentReference organizer, String eventID){
-        if (checkFields(option, title, description, address, startTime, endTime, organizer)) {
-            return true;
-        }
-
-        if (eventID == null && eventID.isEmpty()) {
-            option.setError(EventError.EVENT_ID_EMPTY);
-            return true;
-        }
-
-        return false;
-    }
-    private static boolean checkFields(EventOption option, String title, String description, String address, Timestamp startTime, Timestamp endTime, DocumentReference organizer) {
-        if (title == null || title.isEmpty()) {
-            option.setError(EventError.TITLE_EMPTY);
-            return true;
-        }
-        if (!title.matches("[a-zA-Z]+")) {
-            option.setError(EventError.TITLE_BADLY_FORMATTED);
-            return true;
-        }
-        if (description == null || description.isEmpty()) {
-            option.setError(EventError.DESCRIPTION_EMPTY);
-            return true;
-        }
-        if (address == null || address.isEmpty()) {
-            option.setError(EventError.ADDRESS_EMPTY);
-            return true;
-        }
-        if (startTime == null) {
-            option.setError(EventError.START_TIME_EMPTY);
-            return true;
-        }
-        if (endTime == null) {
-            option.setError(EventError.END_TIME_EMPTY);
-            return true;
-        }
-        if (organizer == null) {
-            option.setError(EventError.ORGANIZER_EMPTY);
-            return true;
-        }
-        return false; // No errors found
+    public static void getPastEvents(EventOption.EventsCallback callback) {
+        getEventsWithTimeStatus(callback, Event.PAST);
     }
 
-    private static boolean checkTimes(EventOption option, Timestamp startTime, Timestamp endTime) {
-        if (startTime.compareTo(Timestamp.now()) < 0) {
-            option.setError(EventError.START_TIME_PAST);
-            return true;
-        }
-        if (endTime.compareTo(Timestamp.now()) < 0) {
-            option.setError(EventError.END_TIME_PAST);
-            return true;
-        }
-        if (endTime.compareTo(startTime) < 0) {
-            option.setError(EventError.END_TIME_BEFORE_START_TIME);
-            return true;
-        }
-        return false; // No errors found
+
+    public static void getFutureEvents(EventOption.EventsCallback callback) {
+        getEventsWithTimeStatus(callback, Event.FUTURE);
     }
 }

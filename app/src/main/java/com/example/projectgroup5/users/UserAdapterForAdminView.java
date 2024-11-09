@@ -37,7 +37,7 @@ public class UserAdapterForAdminView extends ArrayAdapter<User> {
     public View getView(int position, @Nullable View customView, @NonNull ViewGroup parent) {
         // Reuse existing view if possible
         if (customView == null) {
-            customView = LayoutInflater.from(context).inflate(R.layout.account_entry, parent, false);
+            customView = LayoutInflater.from(context).inflate(R.layout.admin_account_entry, parent, false);
         }
 
         Log.d("UserAdapterForAdminView", "getView called for position: " + position);

@@ -114,6 +114,11 @@
     </fragment>
 
     <fragment
+        android:id="@+id/organizer_event_list"
+        android:name="com.example.projectgroup5.ui.home.OrganizerEventList"
+        android:label="Home"
+        tools:layout="@layout/fragment_organizer_event_list"/>
+    <fragment
         android:id="@+id/accepted_list"
         android:name="com.example.projectgroup5.ui.home.AcceptedList"
         android:label="Home"
@@ -146,6 +151,9 @@
         <action
             android:id="@+id/action_organizer_option_selector_to_create_event"
             app:destination="@id/create_event" />
+        <action
+            android:id="@+id/action_organizer_option_selector_to_organizer_event_list"
+            app:destination="@id/organizer_event_list" />
     </fragment>
     <fragment
         android:id="@+id/attendee_option_selector"
@@ -157,6 +165,7 @@
         android:name="com.example.projectgroup5.ui.home.CreateEventFragment"
         android:label="Home"
         tools:layout="@layout/fragment_create_event" />
+
 
 
 

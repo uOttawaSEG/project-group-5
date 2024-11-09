@@ -26,8 +26,7 @@ import com.example.projectgroup5.BuildConfig;
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.database.DatabaseManager;
 import com.example.projectgroup5.databinding.FragmentCreateEventBinding;
-import com.example.projectgroup5.events.EventOption;
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.example.projectgroup5.events.EventOptional;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
@@ -132,7 +131,7 @@ public class CreateEventFragment extends Fragment {
 
 
         binding.getRoot().findViewById(R.id.createEventCreateButton).setOnClickListener(v -> {
-            EventOption option = EventOption.newEvent(binding.eventTitleInput.getText().toString(), binding.eventDescriptionInput.getText().toString(), placeAddress, startTime, endTime, binding.autoAcceptSwitch.isChecked(), DatabaseManager.getDatabaseManager().getCurrentUserReference());
+            EventOptional option = EventOptional.newEvent(binding.eventTitleInput.getText().toString(), binding.eventDescriptionInput.getText().toString(), placeAddress, startTime, endTime, binding.autoAcceptSwitch.isChecked(), DatabaseManager.getDatabaseManager().getCurrentUserReference());
             if (option.holdsAnEvent()) {
                 navController.popBackStack();
                 Toast.makeText(getContext(), "Event created!", Toast.LENGTH_SHORT).show();

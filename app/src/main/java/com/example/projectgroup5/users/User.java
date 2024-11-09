@@ -13,6 +13,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class User {
@@ -97,10 +98,11 @@ public abstract class User {
                     if (value.containsKey(DatabaseManager.USER_ORGANIZER_EVENTS)) {
                         if (user instanceof Organizer organizer) {
                             // try the cast to list of document references
-                            List<DocumentReference> events = (List<DocumentReference>) value.get(DatabaseManager.USER_ORGANIZER_EVENTS);
-                            if (events == null)
-                                organizer.setOrganizerEvents(events);
-
+                            Log.d("User", "User organizer events at database fetch: " + value.get(DatabaseManager.USER_ORGANIZER_EVENTS).toString());
+                            ArrayList<DocumentReference>  events =  (ArrayList<DocumentReference>) value.get(DatabaseManager.USER_ORGANIZER_EVENTS);
+                            Log.d("User", "After organizer events cast: " + events.toString());
+                            organizer.setOrganizerEvents(events);
+                            Log.d("User", "After organizer events set: " + organizer.getOrganizerEvents().toString());
                         }
                     }
                     if (value.containsKey(USER_REGISTRATION_STATE)) {
@@ -118,9 +120,9 @@ public abstract class User {
                     }
                     user.setUserType(userType.toString());
 
+                    listener.onComplete(Tasks.forResult(user));
                 }
             });
-            listener.onComplete(Tasks.forResult(user));
         });
     }
 

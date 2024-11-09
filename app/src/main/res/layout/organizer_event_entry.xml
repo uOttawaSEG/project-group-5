@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center"
+    android:background="@drawable/rectangular_input">
+
+    <TextView
+        android:id="@+id/eventTitleEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Event Title"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:padding="8dp" />
+
+    <TextView
+        android:id="@+id/eventDescriptionEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Description"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:padding="8dp" />
+
+    <TextView
+        android:id="@+id/startTimeEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Time"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:padding="8dp" />
+
+    <TextView
+        android:id="@+id/endTimeEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="End Time"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:padding="8dp" />
+
+
+
+
+    <TextView
+        android:id="@+id/eventAddressEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Address"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:padding="8dp" />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="40sp"
+        android:id="@+id/eventCategorySpinner"
+        android:gravity="center"
+        >
+    </Spinner>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/rejectUserButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reject"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/acceptUserButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Accept"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</LinearLayout>

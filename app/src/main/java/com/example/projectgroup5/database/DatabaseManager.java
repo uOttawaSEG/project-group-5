@@ -1,12 +1,10 @@
 package com.example.projectgroup5.database;
 
-import static com.example.projectgroup5.users.User.newUserFromDatabase;
-
 import android.util.Log;
 
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.events.Event;
-import com.example.projectgroup5.events.EventOption;
+import com.example.projectgroup5.events.EventOptional;
 import com.example.projectgroup5.events.Registration;
 import com.example.projectgroup5.users.Attendee;
 import com.example.projectgroup5.users.Organizer;
@@ -685,7 +683,9 @@ public class DatabaseManager {
         User.newUserFromDatabase(userId, userTask -> {
             if (userTask.isSuccessful()) {
                 User user = userTask.getResult();
+                Log.d("DatabaseManager", "User retrieved in getOrganizerEvents: " + userTask.getResult());
                 if (user instanceof Organizer organizer) {
+                    Log.d("DatabaseManager", "Organizer events retrieved in getOrganizerEvents: " + organizer.getOrganizerEvents());
                     listener.onComplete(Tasks.forResult(organizer.getOrganizerEvents()));
                 }
             }
@@ -803,7 +803,7 @@ public class DatabaseManager {
         deleteFromFirestore(eventReference, listener);
     }
 
-    public void getEvent(String eventId, OnCompleteListener<EventOption> listener) {
+    public void getEvent(String eventId, OnCompleteListener<EventOptional> listener) {
         // we want a datasnapshot of the event
         firestoreDatabase.collection("events").document(eventId).get().addOnCompleteListener(
                 task -> {
@@ -817,8 +817,8 @@ public class DatabaseManager {
                         Boolean autoAccept = snapshot.getBoolean(EVENT_AUTO_ACCEPT);
                         List<DocumentReference> registrations = (List<DocumentReference>) snapshot.get(EVENT_REGISTRATIONS);
                         DocumentReference organizer = snapshot.getDocumentReference(EVENT_ORGANIZER);
-                        EventOption eventOption = EventOption.oldEvent(eventId, title, description, address, startTime, endTime, autoAccept, registrations, organizer);
-                        listener.onComplete(Tasks.forResult(eventOption));
+                        EventOptional eventOptional = EventOptional.oldEvent(eventId, title, description, address, startTime, endTime, autoAccept, registrations, organizer);
+                        listener.onComplete(Tasks.forResult(eventOptional));
                     } else {
                         listener.onComplete(Tasks.forException(task.getException()));
                     }

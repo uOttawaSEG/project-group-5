@@ -53,8 +53,8 @@
             android:shadowColor="@color/text_shadow_button_form"
             android:layout_marginHorizontal="50sp"
             android:layout_height="wrap_content"
-            android:id="@+id/Placeholder2"
-            android:text="Placeholder 2" />
+            android:id="@+id/organizer_view_event_list"
+            android:text="My Events" />
         <Space
             android:layout_width="match_parent"
             android:layout_height="40sp" />
@@ -71,7 +71,7 @@
             android:shadowColor="@color/text_shadow_button_form"
             android:layout_marginHorizontal="50sp"
             android:layout_height="wrap_content"
-            android:id="@+id/Placeholder3"
-            android:text="Placeholder 3" />
+            android:id="@+id/organizer_event_requests"
+            android:text="My Requests" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
