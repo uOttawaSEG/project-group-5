@@ -513,7 +513,11 @@ public class DatabaseManager {
     }
 
     public DocumentReference getCurrentUserReference() {
-        return firestoreDatabase.collection("users").document(UserSession.getInstance().getUserId());
+        return getUserReference(UserSession.getInstance().getUserId());
+    }
+
+    public DocumentReference getUserReference(String userId) {
+        return firestoreDatabase.collection("users").document(userId);
     }
 
     //TODO documentation, this method should only be called to create a brand new user or to update an existing user from the ground up
@@ -602,24 +606,47 @@ public class DatabaseManager {
         });
     }
 
-    public void addEventToOrganizer(String eventId, OnCompleteListener<Void> listener) {
-        if (UserSession.getInstance().getUserRepresentation() instanceof Organizer organizer) {
-            // now we have an organizer we have to add the event to him in the database
-            getCurrentUserReference().update(USER_ORGANIZER_EVENTS, FieldValue.arrayUnion(eventId)).addOnCompleteListener(listener).addOnCompleteListener(task -> organizer.addEvent(getEventReference(eventId)));
-        }
+    public void addEventToOrganizer(DocumentReference eventRef, OnCompleteListener<Void> listener) {
+        addEventToOrganizer(getCurrentUserReference().getId(), eventRef, listener);
     }
+
+    public void addEventToOrganizer(String organizerId, DocumentReference eventRef, OnCompleteListener<Void> listener) {
+        User.newUserFromDatabase(organizerId, userTask -> {
+            if (userTask.isSuccessful()) {
+                Log.d("DatabaseManager", "User retrieved: " + userTask.getResult());
+                User user = userTask.getResult();
+                Log.d("DatabaseManager", "User type: " + user.getUserType());
+                if (user instanceof Organizer organizer) {
+                    getUserReference(organizerId).update(USER_ORGANIZER_EVENTS, FieldValue.arrayUnion(eventRef)).addOnCompleteListener(listener);
+                    Log.d("DatabaseManager", "Event added to organizer: " + eventRef);
+                    organizer.addEvent(eventRef);
+                }
+            }
+        });
+    }
+
+    public void addRegistrationToAttendee(String attendeeId, String registrationId, OnCompleteListener<Void> listener) {
+        User.newUserFromDatabase(attendeeId, userTask -> {
+            if (userTask.isSuccessful()) {
+                User user = userTask.getResult();
+                if (user instanceof Attendee attendee) {
+                    getUserReference(attendeeId).update(USER_ATTENDEE_REGISTRATIONS, FieldValue.arrayUnion(registrationId)).addOnCompleteListener(listener).addOnCompleteListener(task -> attendee.addRegistration(getRegistrationReference(registrationId)));
+                    attendee.addRegistration(getRegistrationReference(registrationId));
+                }
+            }
+        });
+    }
+
+    public void addRegistrationToAttendee(String registrationId, OnCompleteListener<Void> listener) {
+        addRegistrationToAttendee(UserSession.getInstance().getUserId(), registrationId, listener);
+    }
+
+
 
     public void removeEventFromOrganizer(String eventId, OnCompleteListener<Void> listener) {
         if (UserSession.getInstance().getUserRepresentation() instanceof Organizer organizer) {
             // now we have an organizer we have to add the event to him in the database
             getCurrentUserReference().update(USER_ORGANIZER_EVENTS, FieldValue.arrayRemove(eventId)).addOnCompleteListener(listener).addOnCompleteListener(task -> organizer.removeEvent(getEventReference(eventId)));
-        }
-    }
-
-    public void addRegistrationToAttendee(String registrationId, OnCompleteListener<Void> listener) {
-        if (UserSession.getInstance().getUserRepresentation() instanceof Attendee attendee) {
-            // now we have an organizer we have to add the event to him in the database
-            getCurrentUserReference().update(USER_ATTENDEE_REGISTRATIONS, FieldValue.arrayUnion(registrationId)).addOnCompleteListener(listener).addOnCompleteListener(task -> attendee.addRegistration(getRegistrationReference(registrationId)));
         }
     }
 
@@ -631,17 +658,19 @@ public class DatabaseManager {
     }
 
 
-    public void getUser(String userId, OnCompleteListener<User> listener) {
-        // get the data from the database for the user
-        getUserDataFromFirestore(userId, value -> {
-            DocumentSnapshot documentSnapshot = (DocumentSnapshot) value;
-            listener.onComplete(Tasks.forResult(newUserFromDatabase(userId, documentSnapshot.getString(DatabaseManager.USER_TYPE))));
-        });
-    }
+//    public void getUser(String userId, OnCompleteListener<User> listener) {
+//        // get the data from the database for the user
+//        // get the user type from the database if it exists
+//
+//        getUserDataFromFirestore(getUserReference(userId), value -> {
+//            DocumentSnapshot documentSnapshot = (DocumentSnapshot) value;
+//            listener.onComplete(Tasks.forResult(newUserFromDatabase(userId, documentSnapshot.getString(DatabaseManager.USER_TYPE))));
+//        });
+//    }
 
     public void getAttendeeRegistrations(String userId, OnCompleteListener<List<DocumentReference>> listener) {
         // get the user data from the database
-        getUser(userId, userTask -> {
+        User.newUserFromDatabase(userId, userTask -> {
             if (userTask.isSuccessful()) {
                 User user = userTask.getResult();
                 if (user instanceof Attendee attendee) {
@@ -653,7 +682,7 @@ public class DatabaseManager {
 
     public void getOrganizerEvents(String userId, OnCompleteListener<List<DocumentReference>> listener) {
         // get the user data from the database
-        getUser(userId, userTask -> {
+        User.newUserFromDatabase(userId, userTask -> {
             if (userTask.isSuccessful()) {
                 User user = userTask.getResult();
                 if (user instanceof Organizer organizer) {

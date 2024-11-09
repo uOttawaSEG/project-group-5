@@ -138,8 +138,23 @@ public class CreateEventFragment extends Fragment {
                 Toast.makeText(getContext(), "Event created!", Toast.LENGTH_SHORT).show();
                 // TODO add event to database here
 
-                DatabaseManager.getDatabaseManager().createNewEvent(option.getEvent(), (documentReference) -> {Log.d("CreateEventFragment", "Event created");
+                DatabaseManager.getDatabaseManager().createNewEvent(option.getEvent(), (task1) -> {
+                    Log.d("CreateEventFragment", "Event created");
                 // we now have an event with all the fields filled in
+                    // add the event to the organizer's list of events
+                    if (!task1.isSuccessful()) {
+                        Log.e("CreateEventFragment", "Event creation failed");
+                        Toast.makeText(getContext(), "Event creation failed", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.d("CreateEventFragment", "Event created now adding to organizer");
+                        DatabaseManager.getDatabaseManager().addEventToOrganizer(task1.getResult(), task2 -> {
+                            if (!task2.isSuccessful()) {
+                                Log.e("CreateEventFragment", "Error adding event to organizer");
+                            }
+                        });
+
+                    }
+
                 });
             } else {
                 // based on the error add a warning to the corresponding field

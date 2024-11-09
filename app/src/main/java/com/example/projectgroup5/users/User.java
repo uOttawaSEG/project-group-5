@@ -57,68 +57,75 @@ public abstract class User {
      *                 </ul>
      * @return A new User instance of the specified type, or null if the user type is invalid.
      */
-    public static User newUserFromDatabase(String userId, String userType) {
-        final User user;
-        switch (userType) {
-            case USER_TYPE_ORGANIZER -> user = new Organizer(userId);
-            case USER_TYPE_ATTENDEE -> user = new Attendee(userId);
-            case USER_TYPE_ADMIN -> user = new Administrator(userId);
-            default -> {
-                return null;
+    public static void newUserFromDatabase(String userId, OnCompleteListener<User> listener) {
+        DatabaseManager.getDatabaseManager().getUserDataFromFirestore(userId, DatabaseManager.USER_TYPE, userType -> {
+            final User user;
+            switch (userType.toString()) {
+                case USER_TYPE_ORGANIZER -> user = new Organizer(userId);
+                case USER_TYPE_ATTENDEE -> user = new Attendee(userId);
+                case USER_TYPE_ADMIN -> user = new Administrator(userId);
+                default -> {
+                    OnCompleteListener<User> errorListener = task -> {
+                        Log.e("User", "Failed to create user from database, user ID: " + userId);
+                        listener.onComplete(Tasks.forException(new Exception("Failed to create user from database, user ID: " + userId)));
+                    };
+                    return;
+
+                }
             }
-        }
 
-        Log.d("User", "User data at database fetch: " + userId);
-        DatabaseManager.getDatabaseManager().getAllUserDataFromFirestore(userId, value -> {
-            Log.d("User", "User successful data at database fetch: " + value);
-            if (value != null) {
-                Log.d("User", "User data done at database fetch: " + value);
-                if (value.containsKey(DatabaseManager.USER_FIRST_NAME)) {
-                    user.setUserFirstName(value.get(DatabaseManager.USER_FIRST_NAME).toString());
-                }
-                if (value.containsKey(DatabaseManager.USER_LAST_NAME)) {
-                    user.setUserLastName(value.get(DatabaseManager.USER_LAST_NAME).toString());
-                }
-                if (value.containsKey(DatabaseManager.USER_EMAIL)) {
-                    user.setUserEmail(value.get(DatabaseManager.USER_EMAIL).toString());
-                }
-                if (value.containsKey(DatabaseManager.USER_PHONE)) {
-                    user.setUserPhoneNumber(Long.valueOf(value.get(DatabaseManager.USER_PHONE).toString().replace("\"", "")));
-                }
-                if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
-                    user.setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
-                }
-                if (value.containsKey(USER_ORGANIZATION_NAME)) {
-                    if (user instanceof Organizer organizer)
-                        organizer.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
-                }
-                if (value.containsKey(DatabaseManager.USER_ORGANIZER_EVENTS)) {
-                    if (user instanceof Organizer organizer) {
-                        // try the cast to list of document references
-                        List<DocumentReference> events = (List<DocumentReference>) value.get(DatabaseManager.USER_ORGANIZER_EVENTS);
-                        if (events == null)
-                            organizer.setOrganizerEvents(events);
-
+            Log.d("User", "User data at database fetch: " + userId);
+            DatabaseManager.getDatabaseManager().getAllUserDataFromFirestore(userId, value -> {
+                Log.d("User", "User successful data at database fetch: " + value);
+                if (value != null) {
+                    Log.d("User", "User data done at database fetch: " + value);
+                    if (value.containsKey(DatabaseManager.USER_FIRST_NAME)) {
+                        user.setUserFirstName(value.get(DatabaseManager.USER_FIRST_NAME).toString());
                     }
-                }
-                if (value.containsKey(USER_REGISTRATION_STATE)) {
-                    Log.d("User", "User registration state at database fetch: " + value.get(USER_REGISTRATION_STATE).toString());
-                    user.setUserRegistrationState(value.get(USER_REGISTRATION_STATE).toString());
-                    Log.d("User", "User registration state after fetch: " + user.getUserRegistrationState());
-                }
-                if (value.containsKey(DatabaseManager.USER_ATTENDEE_REGISTRATIONS)) {
-                    if (user instanceof Attendee attendee) {
-                        // try the cast to list of document references
-                        List<DocumentReference> registrations = (List<DocumentReference>) value.get(DatabaseManager.USER_ATTENDEE_REGISTRATIONS);
-                        if (registrations == null)
-                            attendee.setAttendeeRegistrations(registrations);
+                    if (value.containsKey(DatabaseManager.USER_LAST_NAME)) {
+                        user.setUserLastName(value.get(DatabaseManager.USER_LAST_NAME).toString());
                     }
-                }
-                user.setUserType(userType);
+                    if (value.containsKey(DatabaseManager.USER_EMAIL)) {
+                        user.setUserEmail(value.get(DatabaseManager.USER_EMAIL).toString());
+                    }
+                    if (value.containsKey(DatabaseManager.USER_PHONE)) {
+                        user.setUserPhoneNumber(Long.valueOf(value.get(DatabaseManager.USER_PHONE).toString().replace("\"", "")));
+                    }
+                    if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
+                        user.setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
+                    }
+                    if (value.containsKey(USER_ORGANIZATION_NAME)) {
+                        if (user instanceof Organizer organizer)
+                            organizer.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
+                    }
+                    if (value.containsKey(DatabaseManager.USER_ORGANIZER_EVENTS)) {
+                        if (user instanceof Organizer organizer) {
+                            // try the cast to list of document references
+                            List<DocumentReference> events = (List<DocumentReference>) value.get(DatabaseManager.USER_ORGANIZER_EVENTS);
+                            if (events == null)
+                                organizer.setOrganizerEvents(events);
 
-            }
+                        }
+                    }
+                    if (value.containsKey(USER_REGISTRATION_STATE)) {
+                        Log.d("User", "User registration state at database fetch: " + value.get(USER_REGISTRATION_STATE).toString());
+                        user.setUserRegistrationState(value.get(USER_REGISTRATION_STATE).toString());
+                        Log.d("User", "User registration state after fetch: " + user.getUserRegistrationState());
+                    }
+                    if (value.containsKey(DatabaseManager.USER_ATTENDEE_REGISTRATIONS)) {
+                        if (user instanceof Attendee attendee) {
+                            // try the cast to list of document references
+                            List<DocumentReference> registrations = (List<DocumentReference>) value.get(DatabaseManager.USER_ATTENDEE_REGISTRATIONS);
+                            if (registrations == null)
+                                attendee.setAttendeeRegistrations(registrations);
+                        }
+                    }
+                    user.setUserType(userType.toString());
+
+                }
+            });
+            listener.onComplete(Tasks.forResult(user));
         });
-        return user;
     }
 
     //TODO: add documentation

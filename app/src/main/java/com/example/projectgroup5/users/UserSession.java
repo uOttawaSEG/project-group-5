@@ -39,7 +39,7 @@ public class UserSession {
      * <p>
      * This method retrieves the current user from the database and updates the user ID.
      * It fetches the user's type from the database and creates a corresponding user representation
-     * using the {@link User#newUserFromDatabase(String, String)} method. If the user type is not found,
+     * using the {@link User#newUserFromDatabase(String, OnCompleteListener)} method. If the user type is not found,
      * an error is logged. Additionally, it navigates to the account management screen
      * after successfully instantiating the user representation.
      * <p>
@@ -53,26 +53,22 @@ public class UserSession {
         }
         userId = user.getUid();
         // update all the data from the database
-        DatabaseManager.getDatabaseManager().getUserDataFromFirestore(userId, DatabaseManager.USER_TYPE, userType -> {
-            if (userType != null) {
-                // Create a User representation based on the user type
-                if (userRepresentation != null) {
-                    Log.e("UserSession", "User representation is not initially null");
-                            return;
-                }
-                userRepresentation = User.newUserFromDatabase(userId, userType.toString());
+        // Create a User representation based on the user type
+        if (userRepresentation != null) {
+            Log.e("UserSession", "User representation is not initially null");
+            return;
+        }
+        User.newUserFromDatabase(userId, task -> {
+            if (task.isSuccessful()) {
+                userRepresentation = task.getResult();
+                Log.d("UserSession", "User representation created");
                 // Notification for prelogged in user
                 DatabaseListener.clearListeners();
-                Log.d("DatabaseListener", "User type: " + userType);
                 DatabaseListener.addValueAccountCreationEventListener(context);
-                //This was not working for some reason after 2 accounts logged in sequentially
-                Log.d("UserSession", "User type: " + userType);
                 // success on the listener
                 listener.onComplete(Tasks.forResult(null));
             } else {
-                Log.e("UserSession", "User type not found");
-                // failure on the listener
-                listener.onComplete(Tasks.forException(new Exception("User type not found")));
+                Log.e("UserSession", "User representation not created");
             }
         });
     }

@@ -43,23 +43,23 @@ public class UserOptions {
             // Create a counter to track completed user data retrieval
             AtomicInteger remainingCalls = new AtomicInteger(userIds.size());
             for (String userId : userIds) {
-                DatabaseManager.getDatabaseManager().getUserDataFromFirestore(userId, DatabaseManager.USER_TYPE, userType -> {
-                    User user = User.newUserFromDatabase(userId, userType.toString());
-                    if (user == null) {
-                        Log.e("UserOptions", "Failed to create user from database, user ID: " + userId);
+//                DatabaseManager.getDatabaseManager().getUserDataFromFirestore(userId, DatabaseManager.USER_TYPE, userType -> {
+                    User.newUserFromDatabase(userId, task -> {
+                        if (task.isSuccessful() || task.getResult() == null) {
+                            Log.e("UserOptions", "Failed to create user from database, user ID: " + userId);
+                            if (remainingCalls.decrementAndGet() == 0) {
+                                // Call the callback with the retrieved pending users
+                                callback.onDataReceived(pendingUsers);
+                            }
+                            return;
+                        }
+                        pendingUsers.add(task.getResult());
+                        // Decrement the counter and check if all callbacks are complete
                         if (remainingCalls.decrementAndGet() == 0) {
                             // Call the callback with the retrieved pending users
                             callback.onDataReceived(pendingUsers);
                         }
-                        return;
-                    }
-                    pendingUsers.add(user);
-                    // Decrement the counter and check if all callbacks are complete
-                    if (remainingCalls.decrementAndGet() == 0) {
-                        // Call the callback with the retrieved pending users
-                        callback.onDataReceived(pendingUsers);
-                    }
-                });
+                    });
             }
             // If there are no users, callback immediately
             if (userIds.isEmpty()) {
