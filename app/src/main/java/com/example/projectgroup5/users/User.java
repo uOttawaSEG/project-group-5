@@ -47,14 +47,13 @@ public abstract class User {
      * based on the provided user ID and user type. If the user type does not match any known types,
      * it returns null.
      *
-     * @param userId   The unique identifier for the user.
-     * @param userType An integer representing the type of user to be created. This should match
-     *                 one of the predefined user types:
-     *                 <ul>
-     *                   <li><code>USER_TYPE_ORGANIZER</code></li>
-     *                   <li><code>USER_TYPE_USER</code></li>
-     *                   <li><code>USER_TYPE_ADMIN</code></li>
-     *                 </ul>
+     * @param userId The unique identifier for the user.
+     *               one of the predefined user types:
+     *               <ul>
+     *                 <li><code>USER_TYPE_ORGANIZER</code></li>
+     *                 <li><code>USER_TYPE_USER</code></li>
+     *                 <li><code>USER_TYPE_ADMIN</code></li>
+     *               </ul>
      * @return A new User instance of the specified type, or null if the user type is invalid.
      */
     public static void newUserFromDatabase(String userId, OnCompleteListener<User> listener) {
@@ -65,10 +64,7 @@ public abstract class User {
                 case USER_TYPE_ATTENDEE -> user = new Attendee(userId);
                 case USER_TYPE_ADMIN -> user = new Administrator(userId);
                 default -> {
-                    OnCompleteListener<User> errorListener = task -> {
-                        Log.e("User", "Failed to create user from database, user ID: " + userId);
-                        listener.onComplete(Tasks.forException(new Exception("Failed to create user from database, user ID: " + userId)));
-                    };
+                    listener.onComplete(Tasks.forException(new Exception("Failed to create user from database, user ID: " + userId + " user type: " + userType)));
                     return;
 
                 }

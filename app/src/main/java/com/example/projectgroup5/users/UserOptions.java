@@ -45,7 +45,7 @@ public class UserOptions {
             for (String userId : userIds) {
 //                DatabaseManager.getDatabaseManager().getUserDataFromFirestore(userId, DatabaseManager.USER_TYPE, userType -> {
                     User.newUserFromDatabase(userId, task -> {
-                        if (task.isSuccessful() || task.getResult() == null) {
+                        if (!task.isSuccessful() || task.getResult() == null) {
                             Log.e("UserOptions", "Failed to create user from database, user ID: " + userId);
                             if (remainingCalls.decrementAndGet() == 0) {
                                 // Call the callback with the retrieved pending users
