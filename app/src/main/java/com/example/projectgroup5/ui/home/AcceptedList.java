@@ -3,6 +3,7 @@ package com.example.projectgroup5.ui.home;
 import com.example.projectgroup5.databinding.FragmentAcceptedListBinding;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,10 @@ public class AcceptedList extends Fragment {
 
         // Fetch rejected users
         UserOptions.getAcceptedUsers(userIds -> {
+            // list all the user ids in the list
+            for (User userId : userIds) {
+                Log.d("AcceptedList", "User ID: " + userId.getUserId());
+            }
             acceptedUsers.addAll(userIds);
             // Create the adapter and set it to the ListView
             UserAdapterForAdminView userAdapterForAdminView = new UserAdapterForAdminView(getContext(), acceptedUsers);

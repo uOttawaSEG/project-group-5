@@ -44,6 +44,12 @@ public class UserAdapterForAdminView extends ArrayAdapter<User> {
 
         // Get the user for the current position
         User user = getItem(position);
+//        if (position <= 0 && position < getCount())
+        if (user == null) {
+            Log.e("UserAdapterForAdminView", "User is null at position : " + position + " for item : " + getItem(position) );
+            return customView;
+        }
+
 
         customView.setId(user.getUserId().hashCode());
         // set get the data from firebase if possible

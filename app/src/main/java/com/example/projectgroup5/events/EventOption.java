@@ -4,6 +4,7 @@ import com.example.projectgroup5.users.Organizer;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventOption {
@@ -71,7 +72,7 @@ public class EventOption {
      * </ul>
      */
     // TODO auto accept and address
-    public static EventOption newEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept,  List<DocumentReference> registrations, DocumentReference organizer) {
+    public static EventOption newEvent(String title, String description, String address, Timestamp startTime,  Timestamp endTime, boolean autoAccept, DocumentReference organizer) {
         EventOption option = new EventOption();
 
         if (checkFields(option, title,description, address, startTime, endTime, organizer)) {
@@ -82,7 +83,7 @@ public class EventOption {
             return option;
         }
 
-        Event event = new Event(title, description, address, startTime, endTime, autoAccept, registrations, organizer);
+        Event event = new Event(title, description, address, startTime, endTime, autoAccept, new ArrayList<DocumentReference>(), organizer);
         option.setEvent(event);
         return option;
     }

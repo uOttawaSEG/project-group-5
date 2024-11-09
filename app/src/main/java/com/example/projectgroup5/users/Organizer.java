@@ -33,5 +33,13 @@ public class Organizer extends User {
         this.organizerEvents = organizerEvents;
     }
 
+    public void addEvent(DocumentReference event) {
+        organizerEvents.add(event);
+    }
+
+    public void removeEvent(DocumentReference event) {
+        organizerEvents.remove(event);
+    }
+
 
 }

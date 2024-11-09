@@ -23,4 +23,12 @@ public class Attendee extends User {
         this.attendeeRegistrations = attendeeEvents;
     }
 
+    public void addRegistration(DocumentReference attendeeRegistration) {
+        this.attendeeRegistrations.add(attendeeRegistration);
+    }
+
+    public void removeRegistration(DocumentReference attendeeRegistration) {
+        this.attendeeRegistrations.remove(attendeeRegistration);
+    }
+
 }

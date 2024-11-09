@@ -1,9 +1,13 @@
 package com.example.projectgroup5.database;
 
+import static com.example.projectgroup5.users.User.newUserFromDatabase;
+
 import android.util.Log;
 
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.events.Event;
+import com.example.projectgroup5.events.EventOption;
+import com.example.projectgroup5.events.Registration;
 import com.example.projectgroup5.users.Attendee;
 import com.example.projectgroup5.users.Organizer;
 import com.example.projectgroup5.users.User;
@@ -20,6 +24,7 @@ import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.EventListener;
@@ -53,9 +58,11 @@ public class DatabaseManager {
     public static final String EVENT_ADDRESS = "EventAddress";
     public static final String EVENT_START_TIME = "EventStartTime";
     public static final String EVENT_END_TIME = "EventEndTime";
-    public static final String EVENT_AUTO_ACCEPT= "AutoAccept";
+    public static final String EVENT_AUTO_ACCEPT = "AutoAccept";
     public static final String EVENT_REGISTRATIONS = "EventRegistration"; // this is a list of registrations, they can be found in /registrations/{registrationID}
     public static final String EVENT_ORGANIZER = "EventOrganizer";
+    public static final String REGISTRATION_ATTENDEE = "attendee";
+    public static final String REGISTRATION_STATUS = "eventRegistrationStatus";
 
     //---------------------------------------------USER-------------------------------------------------------------------
 
@@ -224,7 +231,10 @@ public class DatabaseManager {
      * @param listener A listener that will be notified when the user deletion operation is complete.
      */
     public void deleteUserFromFirestore(OnCompleteListener<Void> listener) {
-        //TODO: Implement this method
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user != null) {
+            deleteFromFirestore(getCurrentUserReference(), listener);
+        }
     }
 
     /**
@@ -507,7 +517,7 @@ public class DatabaseManager {
     }
 
     //TODO documentation, this method should only be called to create a brand new user or to update an existing user from the ground up
-    public void createNewUser(User user, String password, OnCompleteListener<Void> listener) {
+    public void createNewUser(User user, String password, OnCompleteListener<DocumentReference> listener) {
         databaseManager.createUserWithEmailAndPassword(user.getUserEmail(), password, task -> {
             // now we have tried to create the user, lets check if it was successful
             if (!task.isSuccessful()) {
@@ -520,6 +530,9 @@ public class DatabaseManager {
             // now we have created the user, lets store the user data
             // we must first make sure that the UserSession userid is set
             UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
+
+            // Create a reference to the document
+            DocumentReference itemReference = firestoreDatabase.collection("users").document(UserSession.getInstance().getUserId());
             // Initialize a counter for the number of tasks
             int totalTasks = user instanceof Organizer ? 9 : 8; // Number of Firestore tasks
             AtomicInteger tasksCompleted = new AtomicInteger(0); // Use AtomicInteger for thread safety
@@ -527,56 +540,56 @@ public class DatabaseManager {
             databaseManager.storeUserValueToFirestore(
                     DatabaseManager.USER_TYPE,
                     user instanceof Organizer ? User.USER_TYPE_ORGANIZER : User.USER_TYPE_ATTENDEE,
-                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) //, "storeUserTypeError")
+                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, itemReference, listener) //, "storeUserTypeError")
             );
 
             databaseManager.storeUserValueToFirestore(
                     DatabaseManager.USER_ADDRESS,
                     user.getUserAddress(),
-                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserAddressError")
+                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, itemReference, listener) // , "storeUserAddressError")
             );
 
             databaseManager.storeUserValueToFirestore(
                     DatabaseManager.USER_EMAIL,
                     user.getUserEmail(),
-                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) //  , "storeUserEmailError")
+                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, itemReference, listener) //  , "storeUserEmailError")
             );
 
             databaseManager.storeUserValueToFirestore(
                     DatabaseManager.USER_PHONE,
                     user.getPhoneNumber(),
-                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserPhoneError")
+                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, itemReference, listener) // , "storeUserPhoneError")
             );
 
             databaseManager.storeUserValueToFirestore(
                     DatabaseManager.USER_FIRST_NAME,
                     user.getFirstName(),
-                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserFirstNameError")
+                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, itemReference, listener) // , "storeUserFirstNameError")
             );
 
             databaseManager.storeUserValueToFirestore(
                     DatabaseManager.USER_LAST_NAME,
                     user.getLastName(),
-                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserLastNameError")
+                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, itemReference, listener) // , "storeUserLastNameError")
             );
 
             databaseManager.storeUserValueToFirestore(
                     DatabaseManager.USER_REGISTRATION_STATE,
                     User.WAITLISTED,
-                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserUserRegistrationState")
+                    (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, itemReference, listener) // , "storeUserUserRegistrationState")
             );
 
             if (user instanceof Organizer organizer) {
                 databaseManager.storeUserValueToFirestore(
                         USER_ORGANIZATION_NAME,
                         organizer.getUserOrganizationName(),
-                        (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserOrganisationError")
+                        (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, itemReference, listener) // , "storeUserOrganisationError")
                 );
 
                 databaseManager.storeUserValueToFirestore(
                         USER_ORGANIZER_EVENTS,
                         organizer.getOrganizerEvents(),
-                        (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserOrganizerEventsError")
+                        (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, itemReference, listener) // , "storeUserOrganizerEventsError")
                 );
             }
 
@@ -584,15 +597,79 @@ public class DatabaseManager {
                 databaseManager.storeUserValueToFirestore(
                         USER_ATTENDEE_REGISTRATIONS,
                         attendee.getAttendeeRegistrations(),
-                        (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener));
+                        (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, itemReference, listener));
+            }
+        });
+    }
+
+    public void addEventToOrganizer(String eventId, OnCompleteListener<Void> listener) {
+        if (UserSession.getInstance().getUserRepresentation() instanceof Organizer organizer) {
+            // now we have an organizer we have to add the event to him in the database
+            getCurrentUserReference().update(USER_ORGANIZER_EVENTS, FieldValue.arrayUnion(eventId)).addOnCompleteListener(listener).addOnCompleteListener(task -> organizer.addEvent(getEventReference(eventId)));
+        }
+    }
+
+    public void removeEventFromOrganizer(String eventId, OnCompleteListener<Void> listener) {
+        if (UserSession.getInstance().getUserRepresentation() instanceof Organizer organizer) {
+            // now we have an organizer we have to add the event to him in the database
+            getCurrentUserReference().update(USER_ORGANIZER_EVENTS, FieldValue.arrayRemove(eventId)).addOnCompleteListener(listener).addOnCompleteListener(task -> organizer.removeEvent(getEventReference(eventId)));
+        }
+    }
+
+    public void addRegistrationToAttendee(String registrationId, OnCompleteListener<Void> listener) {
+        if (UserSession.getInstance().getUserRepresentation() instanceof Attendee attendee) {
+            // now we have an organizer we have to add the event to him in the database
+            getCurrentUserReference().update(USER_ATTENDEE_REGISTRATIONS, FieldValue.arrayUnion(registrationId)).addOnCompleteListener(listener).addOnCompleteListener(task -> attendee.addRegistration(getRegistrationReference(registrationId)));
+        }
+    }
+
+    public void removeRegistrationFromAttendee(String registrationId, OnCompleteListener<Void> listener) {
+        if (UserSession.getInstance().getUserRepresentation() instanceof Attendee attendee) {
+            // now we have an organizer we have to add the event to him in the database
+            getCurrentUserReference().update(USER_ATTENDEE_REGISTRATIONS, FieldValue.arrayRemove(registrationId)).addOnCompleteListener(listener).addOnCompleteListener(task -> attendee.removeRegistration(getRegistrationReference(registrationId)));
+        }
+    }
+
+
+    public void getUser(String userId, OnCompleteListener<User> listener) {
+        // get the data from the database for the user
+        getUserDataFromFirestore(userId, value -> {
+            DocumentSnapshot documentSnapshot = (DocumentSnapshot) value;
+            listener.onComplete(Tasks.forResult(newUserFromDatabase(userId, documentSnapshot.getString(DatabaseManager.USER_TYPE))));
+        });
+    }
+
+    public void getAttendeeRegistrations(String userId, OnCompleteListener<List<DocumentReference>> listener) {
+        // get the user data from the database
+        getUser(userId, userTask -> {
+            if (userTask.isSuccessful()) {
+                User user = userTask.getResult();
+                if (user instanceof Attendee attendee) {
+                    listener.onComplete(Tasks.forResult(attendee.getAttendeeRegistrations()));
+                }
+            }
+        });
+    }
+
+    public void getOrganizerEvents(String userId, OnCompleteListener<List<DocumentReference>> listener) {
+        // get the user data from the database
+        getUser(userId, userTask -> {
+            if (userTask.isSuccessful()) {
+                User user = userTask.getResult();
+                if (user instanceof Organizer organizer) {
+                    listener.onComplete(Tasks.forResult(organizer.getOrganizerEvents()));
+                }
             }
         });
     }
 
 
+//---------------------------------------EVENT------------------------------------------------
 
+    public DocumentReference getEventReference(String eventId) {
+        return firestoreDatabase.collection("events").document(eventId);
+    }
 
-    //---------------------------------------EVENT------------------------------------------------
     public void storeEventValueToFirestore(String eventID, String type, @Nullable Object value, @Nullable OnCompleteListener<Void> listener) {
         // Create a reference to the document
         DocumentReference docRef = firestoreDatabase.collection("events").document(eventID);
@@ -621,85 +698,208 @@ public class DatabaseManager {
     }
 
 
-    public void createNewEvent(Event event, OnCompleteListener<Void> listener) {
+    public void createNewEvent(Event event, OnCompleteListener<DocumentReference> listener) {
         // now we have tried to create the user, lets check if it was successful
         // now we have created the user, lets store the user data
         // we must first make sure that the UserSession userid is set
         // Initialize a counter for the number of tasks
-        int totalTasks = 8; // Number of Firestore tasks
+        int totalTasks = 9; // Number of Firestore tasks
         AtomicInteger tasksCompleted = new AtomicInteger(0); // Use AtomicInteger for thread safety
+
+        DocumentReference referenceToItem = firestoreDatabase.collection("events").document(event.getEventID());
 
         databaseManager.storeEventValueToFirestore(
                 event.getEventID(),
                 DatabaseManager.EVENT_TITLE,
                 event.getTitle(),
-                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) //, "storeUserTypeError")
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, referenceToItem, listener) //, "storeUserTypeError")
         );
 
         databaseManager.storeEventValueToFirestore(
                 event.getEventID(),
                 DatabaseManager.EVENT_DESCRIPTION,
                 event.getDescription(),
-                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) //, "storeUserTypeError")
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, referenceToItem, listener) //, "storeUserTypeError")
         );
 
         databaseManager.storeEventValueToFirestore(
                 event.getEventID(),
                 DatabaseManager.EVENT_ADDRESS,
                 event.getAddress(),
-                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) //, "storeUserTypeError")
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, referenceToItem, listener) //, "storeUserTypeError")
         );
 
         databaseManager.storeEventValueToFirestore(
                 event.getEventID(),
                 DatabaseManager.EVENT_START_TIME,
                 event.getStartTime(),
-                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserAddressError")
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, referenceToItem, listener) // , "storeUserAddressError")
         );
 
         databaseManager.storeEventValueToFirestore(
                 event.getEventID(),
                 DatabaseManager.EVENT_END_TIME,
                 event.getEndTime(),
-                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) //  , "storeUserEmailError")
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, referenceToItem, listener) //  , "storeUserEmailError")
         );
 
         databaseManager.storeEventValueToFirestore(
                 event.getEventID(),
                 DatabaseManager.EVENT_AUTO_ACCEPT,
                 event.isAutoAccept(),
-                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserPhoneError")
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, referenceToItem, listener) // , "storeUserPhoneError")
         );
 
         databaseManager.storeEventValueToFirestore(
                 event.getEventID(),
                 DatabaseManager.EVENT_REGISTRATIONS,
                 event.getRegistrations(),
-                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserFirstNameError")
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, referenceToItem, listener) // , "storeUserFirstNameError")
         );
         databaseManager.storeEventValueToFirestore(
                 event.getEventID(),
                 DatabaseManager.EVENT_ORGANIZER,
                 event.getOrganizer(),
-                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, listener) // , "storeUserFirstNameError")
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, referenceToItem, listener) // , "storeUserFirstNameError")
+        );
+        databaseManager.storeEventValueToFirestore(
+                event.getEventID(),
+                DatabaseManager.EVENT_REGISTRATIONS,
+                event.getRegistrations(),
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, referenceToItem, listener) // , "storeUserFirstNameError")
         );
     }
-    //---------------------------------------Joshua's part------------------------------------------------
+
+    public void deleteEventFromFirestore(DocumentReference eventReference, OnCompleteListener<Void> listener) {
+        deleteFromFirestore(eventReference, listener);
+    }
+
+    public void getEvent(String eventId, OnCompleteListener<EventOption> listener) {
+        // we want a datasnapshot of the event
+        firestoreDatabase.collection("events").document(eventId).get().addOnCompleteListener(
+                task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot snapshot = task.getResult();
+                        String title = snapshot.getString(EVENT_TITLE);
+                        String description = snapshot.getString(EVENT_DESCRIPTION);
+                        String address = snapshot.getString(EVENT_ADDRESS);
+                        Timestamp startTime = snapshot.getTimestamp(EVENT_START_TIME);
+                        Timestamp endTime = snapshot.getTimestamp(EVENT_END_TIME);
+                        Boolean autoAccept = snapshot.getBoolean(EVENT_AUTO_ACCEPT);
+                        List<DocumentReference> registrations = (List<DocumentReference>) snapshot.get(EVENT_REGISTRATIONS);
+                        DocumentReference organizer = snapshot.getDocumentReference(EVENT_ORGANIZER);
+                        EventOption eventOption = EventOption.oldEvent(eventId, title, description, address, startTime, endTime, autoAccept, registrations, organizer);
+                        listener.onComplete(Tasks.forResult(eventOption));
+                    } else {
+                        listener.onComplete(Tasks.forException(task.getException()));
+                    }
+                }
+        );
+    }
+
+    public void addEventAttendee(DocumentReference eventReference, DocumentReference registrationReference, OnCompleteListener<Void> listener) {
+        eventReference.update("registrations", FieldValue.arrayUnion(registrationReference)).addOnCompleteListener(listener);
+        // check if the event is auto accept
+        // if so, add the attendee to the event. get the event and check if the event is auto accept
+        firestoreDatabase.collection("events").document(eventReference.getId()).get().addOnCompleteListener(
+                task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot snapshot = task.getResult();
+                        Boolean autoAccept = snapshot.getBoolean(EVENT_AUTO_ACCEPT);
+                        if (autoAccept) {
+                            changeAttendeeStatus(registrationReference, User.ACCEPTED);
+                        }
+                    }
+                }
+        );
+    }
+
+    public void changeAttendeeStatus(DocumentReference registrationReference, String status) {
+        registrationReference.update(DatabaseManager.USER_REGISTRATION_STATE, status);
+    }
+
+    public void getAttendanceToEvent(String userId, DocumentReference eventReference, OnCompleteListener<String> listener) {
+        // get the registration within event that matches the user id and the eventReference, to do that we need to get all the registrations from the user
+        DocumentReference registrations = firestoreDatabase.collection("users").document(userId).collection("events").document(eventReference.getId());
+        registrations.get().addOnCompleteListener(
+                task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot snapshot = task.getResult();
+                        String status = snapshot.getString(DatabaseManager.USER_REGISTRATION_STATE);
+                        listener.onComplete(Tasks.forResult(status));
+                    } else {
+                        listener.onComplete(Tasks.forException(task.getException()));
+                    }
+                }
+        );
+    }
+
+
+//---------------------------------------Registration------------------------------------------------
+
+    public DocumentReference getRegistrationReference(String registrationId) {
+        return firestoreDatabase.collection("registrations").document(registrationId);
+    }
+
+    public void addRegistrationToEvent(DocumentReference eventReference, DocumentReference registrationReference, OnCompleteListener<Void> listener) {
+        eventReference.update("registrations", FieldValue.arrayUnion(registrationReference)).addOnCompleteListener(listener);
+    }
+
+    public void removeRegistrationFromEvent(DocumentReference eventReference, DocumentReference registrationReference, OnCompleteListener<Void> listener) {
+        eventReference.update("registrations", FieldValue.arrayRemove(registrationReference)).addOnCompleteListener(listener);
+    }
+
+    public void createNewRegistration(Registration registration, OnCompleteListener<DocumentReference> listener) {
+        int totalTasks = 2; // Number of Firestore tasks
+        AtomicInteger tasksCompleted = new AtomicInteger(0); // Use AtomicInteger for thread safety
+
+        DocumentReference referenceToItem = firestoreDatabase.collection("events").document(registration.getRegistrationId());
+
+        databaseManager.storeEventValueToFirestore(
+                registration.getRegistrationId(),
+                DatabaseManager.REGISTRATION_STATUS,
+                registration.getRegistrationStatus(),
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, referenceToItem, listener) //, "storeUserTypeError")
+        );
+
+        databaseManager.storeEventValueToFirestore(
+                registration.getRegistrationId(),
+                DatabaseManager.REGISTRATION_ATTENDEE,
+                registration.getAttendee(),
+                (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, referenceToItem, listener) //, "storeUserTypeError")
+        );
+
+    }
 
     //---------------------------------------MultiTaskHandler------------------------------------------------
-    private void handleTaskCompletion(Task<Void> task, AtomicInteger tasksCompleted, int totalTasks, OnCompleteListener<Void> listener) { //, String errorMessage, ) {
+    synchronized public void handleTaskCompletion(Task<Void> task, AtomicInteger tasksCompleted, int totalTasks, DocumentReference referenceToItem, OnCompleteListener<DocumentReference> listener) {
         if (task.isSuccessful()) {
-            Log.d("DatabaseManager", "Success: " + task.getResult());
+            Log.d("DatabaseManager", "Success: " + task.getResult());  // Logging success, if needed
         } else {
-//            Log.e("DatabaseManager", errorMessage + ": " + task.getException());
+            // Log the error and notify the listener with the exception
             Log.e("DatabaseManager", "Error in handleTaskCompletion: " + task.getException());
             listener.onComplete(Tasks.forException(task.getException()));
+            return; // Exit early if a task fails
         }
         // Increment the completed tasks count
         int completed = tasksCompleted.incrementAndGet();
+
+        // Check if all tasks are completed
         if (completed == totalTasks) {
             Log.d("DatabaseManager", "All tasks completed successfully!");
-            listener.onComplete(task);
+
+            // Return the reference to the item after all tasks are completed successfully
+            listener.onComplete(Tasks.forResult(referenceToItem));
         }
+    }
+
+    // Delete stuff from db
+    private void deleteFromFirestore(DocumentReference itemRef, OnCompleteListener<Void> listener) {
+        if (itemRef == null) {
+            Log.e("DatabaseManager", "Reference is null");
+            listener.onComplete(Tasks.forException(new Exception("Reference is null")));
+            return;
+        }
+        itemRef.delete().addOnCompleteListener(listener);
     }
 }

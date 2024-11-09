@@ -1,5 +1,7 @@
 package com.example.projectgroup5.users;
 
+import android.util.Log;
+
 import com.example.projectgroup5.database.DatabaseManager;
 
 import java.util.ArrayList;
@@ -43,6 +45,14 @@ public class UserOptions {
             for (String userId : userIds) {
                 DatabaseManager.getDatabaseManager().getUserDataFromFirestore(userId, DatabaseManager.USER_TYPE, userType -> {
                     User user = User.newUserFromDatabase(userId, userType.toString());
+                    if (user == null) {
+                        Log.e("UserOptions", "Failed to create user from database, user ID: " + userId);
+                        if (remainingCalls.decrementAndGet() == 0) {
+                            // Call the callback with the retrieved pending users
+                            callback.onDataReceived(pendingUsers);
+                        }
+                        return;
+                    }
                     pendingUsers.add(user);
                     // Decrement the counter and check if all callbacks are complete
                     if (remainingCalls.decrementAndGet() == 0) {

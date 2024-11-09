@@ -132,13 +132,15 @@ public class CreateEventFragment extends Fragment {
 
 
         binding.getRoot().findViewById(R.id.createEventCreateButton).setOnClickListener(v -> {
-            EventOption option = EventOption.newEvent(binding.eventTitleInput.getText().toString(), binding.eventDescriptionInput.getText().toString(), placeAddress, startTime, endTime, binding.autoAcceptSwitch.isChecked(), null, DatabaseManager.getDatabaseManager().getCurrentUserReference());
+            EventOption option = EventOption.newEvent(binding.eventTitleInput.getText().toString(), binding.eventDescriptionInput.getText().toString(), placeAddress, startTime, endTime, binding.autoAcceptSwitch.isChecked(), DatabaseManager.getDatabaseManager().getCurrentUserReference());
             if (option.holdsAnEvent()) {
                 navController.popBackStack();
                 Toast.makeText(getContext(), "Event created!", Toast.LENGTH_SHORT).show();
                 // TODO add event to database here
 
-                DatabaseManager.getDatabaseManager().createNewEvent(option.getEvent(), null);
+                DatabaseManager.getDatabaseManager().createNewEvent(option.getEvent(), (documentReference) -> {Log.d("CreateEventFragment", "Event created");
+                // we now have an event with all the fields filled in
+                });
             } else {
                 // based on the error add a warning to the corresponding field
                 switch (option.getError()) {

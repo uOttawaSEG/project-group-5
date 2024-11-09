@@ -10,7 +10,6 @@ public class Registration {
     public static final String EVENT_WAITLISTED = "Waitlisted";
     public static final String EVENT_REJECTED = "Rejected";
     public static final String EVENT_NOT_REGISTERED = "Not Registered";
-    public static final String EVENT_REGISTRATION_STATUS = "eventRegistrationStatus";
 
     public Registration(DocumentReference attendee, String registrationStatus) {
         this.attendee = attendee;
