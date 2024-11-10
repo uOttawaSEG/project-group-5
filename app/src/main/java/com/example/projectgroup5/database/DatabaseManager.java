@@ -868,12 +868,30 @@ public class DatabaseManager {
                         String address = snapshot.getString(EVENT_ADDRESS);
                         Timestamp startTime = snapshot.getTimestamp(EVENT_START_TIME);
                         Timestamp endTime = snapshot.getTimestamp(EVENT_END_TIME);
+                        Log.e("DatabaseManager", "Event start time: " + startTime);
                         Boolean autoAccept = snapshot.getBoolean(EVENT_AUTO_ACCEPT);
+                        Log.e("DatabaseManager", "Event auto accept: " + autoAccept);
+                        Log.e("DatabaseManager", "Event id: " + eventId);
                         List<DocumentReference> registrations = (List<DocumentReference>) snapshot.get(EVENT_REGISTRATIONS);
                         DocumentReference organizer = snapshot.getDocumentReference(EVENT_ORGANIZER);
                         EventOptional eventOptional = EventOptional.oldEvent(eventId, title, description, address, startTime, endTime, autoAccept, registrations, organizer);
                         listener.onComplete(Tasks.forResult(eventOptional));
                     } else {
+                        listener.onComplete(Tasks.forException(task.getException()));
+                    }
+                }
+        );
+    }
+
+    public void getEventFromRegistration(DocumentReference registrationReference, OnCompleteListener<EventOptional> listener) {
+        // we want a datasnapshot of the event
+        registrationReference.get().addOnCompleteListener(
+                task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot snapshot = task.getResult();
+                        DocumentReference eventId = snapshot.getDocumentReference(REGISTRATION_EVENT);
+                        getEvent(eventId.getId(), listener);
+                        } else {
                         listener.onComplete(Tasks.forException(task.getException()));
                     }
                 }
@@ -904,20 +922,19 @@ public class DatabaseManager {
         registrationReference.update(DatabaseManager.EVENT_REGISTRATION_STATUS, status);
     }
 
-    public void getAttendanceToEvent(String userId, DocumentReference eventReference, OnCompleteListener<String> listener) {
-        // get the registration within event that matches the user id and the eventReference, to do that we need to get all the registrations from the user
-        DocumentReference registrations = firestoreDatabase.collection("users").document(userId).collection("events").document(eventReference.getId());
-        registrations.get().addOnCompleteListener(
-                task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot snapshot = task.getResult();
-                        String status = snapshot.getString(DatabaseManager.USER_REGISTRATION_STATE);
-                        listener.onComplete(Tasks.forResult(status));
-                    } else {
-                        listener.onComplete(Tasks.forException(task.getException()));
-                    }
+    public void getAttendanceToEvent(DocumentReference eventReference, OnCompleteListener<String> listener) {
+        // take the registration that intersects both the event and the user, and return the registration status
+        getRegistrationReferenceToEvent(eventReference, task -> {
+            task.getResult().get().addOnCompleteListener(task2 -> {
+                if (task2.isSuccessful()) {
+                    DocumentSnapshot snapshot2 = task2.getResult();
+                    String status = snapshot2.getString(EVENT_REGISTRATION_STATUS);
+                    listener.onComplete(Tasks.forResult(status));
+                } else {
+                    listener.onComplete(Tasks.forException(task2.getException()));
                 }
-        );
+            });
+        });
     }
 
     public void changeEventAutoAccept(DocumentReference eventReference, boolean autoAccept) {
@@ -1034,10 +1051,37 @@ public class DatabaseManager {
                 // delete the reference from the event to the registration and from the attendee to the event
                 attendeeReference.update(USER_ATTENDEE_REGISTRATIONS, FieldValue.arrayRemove(registrationReference));
                 eventReference.update(EVENT_REGISTRATIONS, FieldValue.arrayRemove(registrationReference));
+                if (UserSession.getInstance().getUserRepresentation() instanceof Attendee attendee) {
+                    attendee.getAttendeeRegistrations().remove(registrationReference);
+                }
                 // now delete the registration object from the database
                 deleteFromFirestore(registrationReference, listener);
             }
         });
+    }
+
+    public void getRegistrationReferenceToEvent(DocumentReference eventReference, OnCompleteListener<DocumentReference> listener) {
+        // take the registration that intersects both the event and the user, and return the registration status
+        if (UserSession.getInstance().getUserRepresentation() instanceof Attendee attendee) {
+            eventReference.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot snapshot = task.getResult();
+                    List<DocumentReference> registrations = (List<DocumentReference>) snapshot.get(EVENT_REGISTRATIONS);
+                    registrations.retainAll(attendee.getAttendeeRegistrations());
+                    if (registrations.size() == 1) {
+                        DocumentReference registrationReference = registrations.get(0);
+                        listener.onComplete(Tasks.forResult(registrationReference));
+                    } else {
+                        listener.onComplete(Tasks.forException(new Exception("No registration found")));
+                    }
+                } else {
+                    listener.onComplete(Tasks.forException(task.getException()));
+                }
+            });
+
+        } else {
+            listener.onComplete(Tasks.forException(new Exception("User is not an attendee")));
+        }
     }
 
     public void createNewRegistration(Registration registration, OnCompleteListener<DocumentReference> listener) {

@@ -21,6 +21,10 @@
             android:gravity="center"
             android:text="Attendee Options" />
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="40sp" />
+
         <Button
             android:backgroundTint="@color/black"
             android:background="@drawable/rounded_rectangle_border"
@@ -34,45 +38,10 @@
             android:shadowDy="3"
             android:shadowColor="@color/text_shadow_button_form"
             android:layout_height="wrap_content"
-            android:id="@+id/Placeholder4"
-            android:text="Placeholder 4" />
+            android:id="@+id/AttendeeEventListButton"
+            android:text="Event List" />
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="40sp" />
 
-        <Button
-            android:backgroundTint="@color/white"
-            android:background="@drawable/rounded_rectangle_border"
-            android:elevation="30dp"
-            android:textColor="@color/white"
-            android:layout_width="wrap_content"
-            android:shadowRadius="1"
-            android:textSize="@dimen/form_text_size"
-            android:shadowDx="-1"
-            android:shadowDy="3"
-            android:shadowColor="@color/text_shadow_button_form"
-            android:layout_marginHorizontal="50sp"
-            android:layout_height="wrap_content"
-            android:id="@+id/Placeholder5"
-            android:text="Placeholder 5" />
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="40sp" />
-        <Button
-            android:backgroundTint="@color/white"
-            android:background="@drawable/rounded_rectangle_border"
-            android:elevation="30dp"
-            android:textColor="@color/white"
-            android:layout_width="wrap_content"
-            android:shadowRadius="1"
-            android:textSize="@dimen/form_text_size"
-            android:shadowDx="-1"
-            android:shadowDy="3"
-            android:shadowColor="@color/text_shadow_button_form"
-            android:layout_marginHorizontal="50sp"
-            android:layout_height="wrap_content"
-            android:id="@+id/Placeholder6"
-            android:text="Placeholder 6" />
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

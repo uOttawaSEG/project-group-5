@@ -131,7 +131,13 @@ public class DashboardEventList extends Fragment {
             if (UserSession.getInstance().getUserRepresentation() == null || !(UserSession.getInstance().getUserRepresentation() instanceof Attendee)) {
                 return false;
             }
+            // if the event has a time conflict with the other events, we dont register the user
+            if (view.findViewById(R.id.statusIcon).getVisibility() == (View.VISIBLE)) {
+                Toast.makeText(getContext(), "Event has a time conflict", Toast.LENGTH_SHORT).show();
+                return true;
+            }
             Event selectedEvent = (Event) parentView.getItemAtPosition(position);
+
             Toast.makeText(getContext(), "Keep pressing to register", Toast.LENGTH_SHORT).show();
             // we display the option to delete the event and delete it
             // Set up prolonged press detection

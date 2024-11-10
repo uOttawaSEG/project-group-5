@@ -129,6 +129,7 @@ public class Event {
     }
 
     public boolean timeConflict(Event otherEvent) {
+        Log.e("Event", "Checking time conflict between " + this.getTitle() + " and " + otherEvent.getTitle());
         return this.startTime.compareTo(otherEvent.getEndTime()) < 0 && this.endTime.compareTo(otherEvent.getStartTime()) > 0;
     }
 

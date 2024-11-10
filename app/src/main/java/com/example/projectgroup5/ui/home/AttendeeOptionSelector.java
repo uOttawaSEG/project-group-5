@@ -22,8 +22,8 @@ public class AttendeeOptionSelector extends Fragment {
         binding = FragmentAttendeeOptionSelectorBinding.inflate(inflater, container, false);
         NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
 
-        // set the buttons on click listeners for the accepted list button
-//        binding.getRoot().findViewById(R.id.Placeholder1).setOnClickListener(v -> navController.navigate(R.id.SOMEWHERE_TO_GO_TO));
+//         set the buttons on click listeners for the accepted list button
+        binding.getRoot().findViewById(R.id.AttendeeEventListButton).setOnClickListener(v -> navController.navigate(R.id.action_attendee_option_selector_to_attendee_event_list));
 //
 //        // same for the rejected list button
 //        binding.getRoot().findViewById(R.id.Placeholder2).setOnClickListener(v -> navController.navigate(R.id.SOMEWHERE_TO_GO_TO));

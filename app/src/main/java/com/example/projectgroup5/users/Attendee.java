@@ -34,6 +34,17 @@ public class Attendee extends User {
         return eventCache;
     }
 
+    public void addEventToCache(Event event) {
+        if (this.eventCache == null) {
+            this.eventCache = new ArrayList<>();
+        }
+        if (this.eventCache.contains(event)) {
+            return;
+        }
+        this.eventCache.add(event);
+    }
+
+    //TODO if this is called, event cache should also be updated
     public void addRegistration(DocumentReference attendeeRegistration) {
         this.attendeeRegistrations.add(attendeeRegistration);
     }
