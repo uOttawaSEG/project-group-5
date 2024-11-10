@@ -128,4 +128,8 @@ public class Event {
         }
     }
 
+    public boolean timeConflict(Event otherEvent) {
+        return this.startTime.compareTo(otherEvent.getEndTime()) < 0 && this.endTime.compareTo(otherEvent.getStartTime()) > 0;
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.example.projectgroup5.users;
 
+import com.example.projectgroup5.events.Event;
+import com.example.projectgroup5.events.Registration;
 import com.google.firebase.firestore.DocumentReference;
 
 import java.util.ArrayList;
@@ -8,6 +10,7 @@ import java.util.List;
 public class Attendee extends User {
 
     private List<DocumentReference> attendeeRegistrations = new ArrayList<>();
+    private List<Event> eventCache = new ArrayList<>();
 
     public Attendee(String userId) {
         super(userId);
@@ -21,6 +24,14 @@ public class Attendee extends User {
 
     public void setAttendeeRegistrations(List<DocumentReference> attendeeEvents) {
         this.attendeeRegistrations = attendeeEvents;
+    }
+
+    public void setEventCache(List<Event> eventCache) {
+        this.eventCache = eventCache;
+    }
+
+    public List<Event> getEventCache() {
+        return eventCache;
     }
 
     public void addRegistration(DocumentReference attendeeRegistration) {

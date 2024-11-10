@@ -101,6 +101,30 @@ public class DashboardEventList extends Fragment {
             }
         });
 
+
+        // set on click listener if the user is an attendee
+        listView.setOnItemClickListener((parentView, view, position, id) -> {
+            // if the user is not an instanceof attendee return
+            if (UserSession.getInstance().getUserRepresentation() == null || !(UserSession.getInstance().getUserRepresentation() instanceof Attendee)) {
+                return;
+            }
+            // we toggle the description and adress visibility
+            Event selectedEvent = (Event) parentView.getItemAtPosition(position);
+            if (selectedEvent.getDescription() != null) {
+                if (view.findViewById(R.id.eventDescriptionEntry).getVisibility() == (View.VISIBLE)) {
+                    view.findViewById(R.id.eventDescriptionEntry).setVisibility(View.GONE);
+                } else {
+                    view.findViewById(R.id.eventDescriptionEntry).setVisibility(View.VISIBLE);
+                }
+            }
+            if (selectedEvent.getAddress() != null) {
+                if (view.findViewById(R.id.eventAddressEntry).getVisibility() == (View.VISIBLE)) {
+                    view.findViewById(R.id.eventAddressEntry).setVisibility(View.GONE);}
+                else {
+                    view.findViewById(R.id.eventAddressEntry).setVisibility(View.VISIBLE);
+                }
+            }});
+
         listView.setOnItemLongClickListener((parentView, view, position, id) -> {
             // Handle long click event
             // if the user is not an instanceof attendee return

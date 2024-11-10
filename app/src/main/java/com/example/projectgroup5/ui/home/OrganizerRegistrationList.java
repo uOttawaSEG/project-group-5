@@ -10,7 +10,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -26,10 +25,10 @@ import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.RegistrationAdapterForOrganizerView;
 import com.example.projectgroup5.users.UserOptions;
 import com.example.projectgroup5.users.UserSession;
-import com.google.firebase.firestore.DocumentReference;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class OrganizerRegistrationList extends Fragment {
@@ -61,63 +60,28 @@ public class OrganizerRegistrationList extends Fragment {
             // if the switch is checked, we accept all the registrations if only event is false, otherwise we accept all the registrations for the selected event
             // then we update the database autoAccept field
             if (isChecked) {
+                AtomicReference<List<Event>> events = new AtomicReference<>(new ArrayList<>());
                 if (onlyEvent) {
                     DatabaseManager.getDatabaseManager().changeEventAutoAccept(DatabaseManager.getDatabaseManager().getEventReference(selectedEvent.getEventID()), true);
                     // then we update all the registrations to accepted
-                    UserOptions.getRegistrationsWithStatusToEvent(registrationsresult -> {
-                                for (Registration registration : registrationsresult) {
-                                    DatabaseManager.getDatabaseManager().changeAttendeeStatus(DatabaseManager.getDatabaseManager().getRegistrationReference(registration.getRegistrationId()), User.ACCEPTED);
-                                }
-                                // now we reload the list by refreshing the fragment
-                                navController.navigate(R.id.action_organizer_registration_list_self);
-                            },
-                            User.WAITLISTED,
-                            selectedEvent);
+                    events.get().add(selectedEvent);
+                    acceptCorresponding(spinner, navController, events);
                 } else {
                     DatabaseManager.getDatabaseManager().getOrganizerEvents(UserSession.getInstance().getUserId(), task -> {
-                        List<Event> events;
                         if (task == null || !task.isSuccessful()) {
                             Log.e("EventOptions", "Failed to get organizer events");
                         } else {
                             Log.w("OrganizerRegistrationList", "Organizer Events: " + task.getResult());
-                            events = task.getResult();
-                            // get the position of the spinner either 0 1 or 2
-                            String status = spinner.getSelectedItemPosition() == 0? User.ACCEPTED : spinner.getSelectedItemPosition() == 1 ? User.WAITLISTED : User.REJECTED;
-                            if (status.equals(User.ACCEPTED) || status.equals(User.WAITLISTED)) {
-                                Log.e("OrganizerRegistrationList", "Status of spinner: " + status);
-                                UserOptions.getRegistrationWithStatusToEvent(registrationsresult -> {
-                                    for (Registration registration : registrationsresult) {
-                                        DatabaseManager.getDatabaseManager().changeAttendeeStatus(DatabaseManager.getDatabaseManager().getRegistrationReference(registration.getRegistrationId()), User.ACCEPTED);
-                                        Log.d("OrganizerRegistrationList", "Registration accepted: " + registration.getAttendee());
-                                    }
-                                    // now we reload the list by refreshing the fragment
-                                    if (!registrationsresult.isEmpty()) {
-                                        //clear the event list and reload it
-                                        navController.popBackStack();
-                                        navController.navigate(R.id.organizer_registration_list);
-                                    }
-                                }, User.WAITLISTED, events);
-                            }
-                            if (status.equals(User.ACCEPTED) || status.equals(User.REJECTED)) {
-                                UserOptions.getRegistrationWithStatusToEvent(registrationsresult -> {
-                                    for (Registration registration : registrationsresult) {
-                                        DatabaseManager.getDatabaseManager().changeAttendeeStatus(DatabaseManager.getDatabaseManager().getRegistrationReference(registration.getRegistrationId()), User.ACCEPTED);
-                                        Log.d("OrganizerRegistrationList", "Registration accepted: " + registration.getAttendee());
-                                    }
-                                    // now we reload the list by refreshing the fragment
-                                    if (!registrationsresult.isEmpty()) {
-                                        //clear the event list and reload it
-                                        navController.popBackStack();
-                                        navController.navigate(R.id.organizer_registration_list);
-                                    }
-                                }, User.REJECTED, events);
-                            }
-
+                            events.set(task.getResult());
+                            acceptCorresponding(spinner, navController, events);
                         }
-
                     });
                 }
+                // get the position of the spinner either 0 1 or 2
+
+
             } else if (onlyEvent) {
+                // the switch has been set to false and we are in a single event mode
                 DatabaseManager.getDatabaseManager().changeEventAutoAccept(DatabaseManager.getDatabaseManager().getEventReference(selectedEvent.getEventID()), false);
                 // then we update all the registrations to accepted
             }
@@ -197,7 +161,7 @@ public class OrganizerRegistrationList extends Fragment {
                                         },
                                         User.ACCEPTED,
                                         events);
-                                        break;
+                                break;
                             case 1:
                                 UserOptions.getRegistrationWithStatusToEvent(registrations -> {
                                             registrationsList.clear();
@@ -235,6 +199,39 @@ public class OrganizerRegistrationList extends Fragment {
         });
 
         return binding.getRoot();
+    }
+
+    private static void acceptCorresponding(Spinner spinner, NavController navController, AtomicReference<List<Event>> events) {
+        String status = spinner.getSelectedItemPosition() == 0 ? User.ACCEPTED : spinner.getSelectedItemPosition() == 1 ? User.WAITLISTED : User.REJECTED;
+        if (status.equals(User.ACCEPTED) || status.equals(User.WAITLISTED)) {
+            Log.e("OrganizerRegistrationList", "Status of spinner: " + status);
+            UserOptions.getRegistrationWithStatusToEvent(registrationsresult -> {
+                for (Registration registration : registrationsresult) {
+                    DatabaseManager.getDatabaseManager().changeAttendeeStatus(DatabaseManager.getDatabaseManager().getRegistrationReference(registration.getRegistrationId()), User.ACCEPTED);
+                    Log.d("OrganizerRegistrationList", "Registration accepted: " + registration.getAttendee());
+                }
+                // now we reload the list by refreshing the fragment
+                if (!registrationsresult.isEmpty()) {
+                    //clear the event list and reload it
+                    navController.popBackStack();
+                    navController.navigate(R.id.organizer_registration_list);
+                }
+            }, User.WAITLISTED, events.get());
+        }
+        if (status.equals(User.ACCEPTED) || status.equals(User.REJECTED)) {
+            UserOptions.getRegistrationWithStatusToEvent(registrationsresult -> {
+                for (Registration registration : registrationsresult) {
+                    DatabaseManager.getDatabaseManager().changeAttendeeStatus(DatabaseManager.getDatabaseManager().getRegistrationReference(registration.getRegistrationId()), User.ACCEPTED);
+                    Log.d("OrganizerRegistrationList", "Registration accepted: " + registration.getAttendee());
+                }
+                // now we reload the list by refreshing the fragment
+                if (!registrationsresult.isEmpty()) {
+                    //clear the event list and reload it
+                    navController.popBackStack();
+                    navController.navigate(R.id.organizer_registration_list);
+                }
+            }, User.REJECTED, events.get());
+        }
     }
 
     public static Event getSelectedEvent() {
