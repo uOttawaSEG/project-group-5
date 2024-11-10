@@ -1,26 +1,43 @@
 package com.example.projectgroup5.ui.account;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.example.projectgroup5.BuildConfig;
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.database.DatabaseManager;
 import com.example.projectgroup5.databinding.FragmentCreateAccountBinding;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+
+import java.util.Arrays;
 
 public class CreateAccountFragment extends Fragment {
+    private EditText editTextLocation;
+    private ActivityResultLauncher<Intent> autocompleteLauncher;
+    private String placeAddress = null;
     private FragmentCreateAccountBinding binding;
     private NavController navController;
 
@@ -41,6 +58,44 @@ public class CreateAccountFragment extends Fragment {
 
         root.findViewById(R.id.cancelButtonCreate).setOnClickListener(v ->{
             navController.popBackStack();
+        });
+
+        // Define a variable to hold the Places API key.
+        String apiKey = BuildConfig.PLACES_API_KEY;
+
+        // Log an error if apiKey is not set.
+        if (TextUtils.isEmpty(apiKey)) {
+            Log.e("Places test", "No api key");
+            Toast.makeText(getContext(), "No api key", Toast.LENGTH_SHORT).show();
+            navController.popBackStack();
+        }
+
+        // Initialize the SDK
+        if (!Places.isInitialized()) {
+            Places.initializeWithNewPlacesApiEnabled(this.getContext(), apiKey);
+        }
+
+        editTextLocation = binding.editTextTextPostalAddressUserCreate;
+
+        autocompleteLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    // Handle the result of the Autocomplete Activity here
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        // You can retrieve the Place data here from the result
+                        Place place = Autocomplete.getPlaceFromIntent(result.getData());
+                        // Use the place object as needed
+                        placeAddress = place.getFormattedAddress();
+                        Log.d("CreateEventFragment", "Selected address: " + placeAddress);
+                        editTextLocation.setText(place.getDisplayName());
+                    }
+                });
+
+        // the edit text is not editable but allow the user to open the autocomplete fragment when clicking on it
+        editTextLocation.setOnClickListener(v -> {
+            // clear the error of the edit text
+            editTextLocation.setError(null);
+            openAutocompleteActivity();
         });
 
         root.findViewById(R.id.confirmCredentialAndCreateButton).setOnClickListener(v -> {
@@ -170,6 +225,14 @@ public class CreateAccountFragment extends Fragment {
         return root;
     }
 
+    private void openAutocompleteActivity() {
+        // Use the Places API to show autocomplete suggestions
+        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN,
+                Arrays.asList(Place.Field.ID, Place.Field.DISPLAY_NAME, Place.Field.FORMATTED_ADDRESS))
+                .build(getContext());
+        // Launch the autocomplete activity using the launcher initialized in OnCreate
+        autocompleteLauncher.launch(intent);
+    }
 
     @Override
     public void onDestroyView() {

@@ -108,19 +108,20 @@
                 android:textSize="@dimen/form_text_size" />
 
             <EditText
+                android:ems="10"
                 android:id="@+id/editTextTextPostalAddressUserCreate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5sp"
-                android:autofillHints="Address"
+                android:autofillHints="postalAddress"
                 android:background="@drawable/rectangular_input"
-                android:ems="10"
+                android:focusable="false"
                 android:gravity="center"
                 android:hint="@string/address"
                 android:inputType="textPostalAddress"
                 android:minHeight="48dp"
-                android:textColorHint="@color/material_dynamic_neutral30"
                 android:textColor="@color/black"
+                android:textColorHint="@color/material_dynamic_neutral30"
                 android:textSize="@dimen/form_text_size" />
 
             <EditText
