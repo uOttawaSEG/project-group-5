@@ -7,16 +7,11 @@
     tools:context=".ui.home.PendingList">
 
 
-        <ScrollView
+        <ListView
             android:layout_width="match_parent"
+            android:id="@+id/pendingListLayout"
             android:layout_marginBottom="70sp"
             android:layout_height="match_parent">
-
-            <LinearLayout
-                android:id="@+id/pendingListLinearLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
-        </ScrollView>
+        </ListView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

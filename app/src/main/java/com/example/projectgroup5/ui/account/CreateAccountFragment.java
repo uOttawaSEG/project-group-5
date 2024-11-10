@@ -1,29 +1,43 @@
 package com.example.projectgroup5.ui.account;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.example.projectgroup5.BuildConfig;
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.database.DatabaseManager;
 import com.example.projectgroup5.databinding.FragmentCreateAccountBinding;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
-import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Arrays;
 
 public class CreateAccountFragment extends Fragment {
+    private EditText editTextLocation;
+    private ActivityResultLauncher<Intent> autocompleteLauncher;
+    private String placeAddress = null;
     private FragmentCreateAccountBinding binding;
     private NavController navController;
 
@@ -40,6 +54,48 @@ public class CreateAccountFragment extends Fragment {
             } else {
                 binding.editTextTextOrganisation.setVisibility(View.GONE);
             }
+        });
+
+        root.findViewById(R.id.cancelButtonCreate).setOnClickListener(v ->{
+            navController.popBackStack();
+        });
+
+        // Define a variable to hold the Places API key.
+        String apiKey = BuildConfig.PLACES_API_KEY;
+
+        // Log an error if apiKey is not set.
+        if (TextUtils.isEmpty(apiKey)) {
+            Log.e("Places test", "No api key");
+            Toast.makeText(getContext(), "No api key", Toast.LENGTH_SHORT).show();
+            navController.popBackStack();
+        }
+
+        // Initialize the SDK
+        if (!Places.isInitialized()) {
+            Places.initializeWithNewPlacesApiEnabled(this.getContext(), apiKey);
+        }
+
+        editTextLocation = binding.editTextTextPostalAddressUserCreate;
+
+        autocompleteLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    // Handle the result of the Autocomplete Activity here
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        // You can retrieve the Place data here from the result
+                        Place place = Autocomplete.getPlaceFromIntent(result.getData());
+                        // Use the place object as needed
+                        placeAddress = place.getFormattedAddress();
+                        Log.d("CreateEventFragment", "Selected address: " + placeAddress);
+                        editTextLocation.setText(place.getDisplayName());
+                    }
+                });
+
+        // the edit text is not editable but allow the user to open the autocomplete fragment when clicking on it
+        editTextLocation.setOnClickListener(v -> {
+            // clear the error of the edit text
+            editTextLocation.setError(null);
+            openAutocompleteActivity();
         });
 
         root.findViewById(R.id.confirmCredentialAndCreateButton).setOnClickListener(v -> {
@@ -119,105 +175,64 @@ public class CreateAccountFragment extends Fragment {
             }
 
             Log.d("CreateAccountFragment", "Creating user with email: " + binding.editTextTextEmailAddressUserCreate.getText().toString());
-            DatabaseManager.getDatabaseManager().createUserWithEmailAndPassword(binding.editTextTextEmailAddressUserCreate.getText().toString(), binding.editTextTextPasswordUserCreate.getText().toString(), task -> {
-                // now we have tried to create the user, lets check if it was successful
-                if (!task.isSuccessful()) {
-                    binding.editTextTextEmailAddressUserCreate.setError("Invalid email or password");
-                    binding.editTextTextPasswordUserCreate.setError("Invalid email or password");
-                    Log.e("CreateAccountFragment", "User creation failed: " + task.getException());
-                    return;
-                } else {
-                    Log.d("CreateAccountFragment", "User creation successful");
+            User user = User.newUser(
+                    binding.OrganizerVSUserSwitch.isChecked() ? User.USER_TYPE_ORGANIZER : User.USER_TYPE_ATTENDEE,
+                    firstName,
+                    lastName,
+                    binding.editTextTextEmailAddressUserCreate.getText().toString(),
+                    Long.parseLong(phoneNumber),
+                    address,
+                    organisation
+            );
+
+            DatabaseManager.getDatabaseManager().createNewUser(user, password, onCompleteListener -> {
+                if (onCompleteListener.isSuccessful()) {
+                    // we have created the account, we must now login
+                    UserSession.getInstance().login(user.getUserEmail(), password, (MainActivity) getActivity(), onCompleteListener1 -> {
+                        if (onCompleteListener1.isSuccessful()) {
+                            Log.d("CreateAccountFragment", "login was successful");
+                            // Once we know the login was successful we can navigate to the account management fragment
+                            navController.navigate(R.id.action_create_account_to_account_management);
+                        } else {
+                            // show an error message
+                            Log.e("CreateAccountFragment", "login was not successful");
+                            binding.editTextTextEmailAddressUserCreate.setError("Invalid email or password");
+                        }
+                    });
+                } else if (onCompleteListener.getException() != null) {
+                    switch (onCompleteListener.getException().getMessage()) {
+                        case "The email address is badly formatted.":
+                            binding.editTextTextEmailAddressUserCreate.setError("Invalid email address");
+                            break;
+                        case "The given password is invalid. [ Password should be at least 6 characters ]":
+                            binding.editTextTextPasswordUserCreate.setError("Invalid password");
+                            break;
+                            case "The email address is already in use by another account.":
+                                binding.editTextTextEmailAddressUserCreate.setError("Email address already in use");
+                                break;
+
+                        default:
+                            Log.e("CreateAccountFragment", "Error creating user: " + onCompleteListener.getException().getMessage());
+                            binding.editTextTextEmailAddressUserCreate.setError("Invalid email or password");
+                            binding.editTextTextPasswordUserCreate.setError("Invalid email or password");
+                            break;
+                    }
                 }
-                // now we have created the user, lets store the user data
-                // we must first make sure that the UserSession userid is set
-                UserSession.getInstance().setUserId(task.getResult().getUser().getUid());
-                // Initialize a counter for the number of tasks
-                int totalTasks = binding.OrganizerVSUserSwitch.isChecked()? 8 : 7; // Number of Firestore tasks
-                AtomicInteger tasksCompleted = new AtomicInteger(0); // Use AtomicInteger for thread safety
+            });
 
-                DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
-                        DatabaseManager.USER_TYPE,
-                        binding.OrganizerVSUserSwitch.isChecked() ? User.USER_TYPE_ORGANIZER : User.USER_TYPE_ATTENDEE,
-                        (task0) -> handleTaskCompletion(task0, "storeUserTypeError", tasksCompleted, totalTasks)
-                );
 
-                DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
-                        DatabaseManager.USER_ADDRESS,
-                        address,
-                        (task0) -> handleTaskCompletion(task0, "storeUserAddressError", tasksCompleted, totalTasks)
-                );
-
-                DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
-                        DatabaseManager.USER_EMAIL,
-                        binding.editTextTextEmailAddressUserCreate.getText().toString(),
-                        (task0) -> handleTaskCompletion(task0, "storeUserEmailError", tasksCompleted, totalTasks)
-                );
-
-                DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
-                        DatabaseManager.USER_PHONE,
-                        Long.parseLong(phoneNumber),
-                        (task0) -> handleTaskCompletion(task0, "storeUserPhoneError", tasksCompleted, totalTasks)
-                );
-
-                DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
-                        DatabaseManager.USER_FIRST_NAME,
-                        firstName,
-                        (task0) -> handleTaskCompletion(task0, "storeUserFirstNameError", tasksCompleted, totalTasks)
-                );
-
-                DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
-                        DatabaseManager.USER_LAST_NAME,
-                        lastName,
-                        (task0) -> handleTaskCompletion(task0, "storeUserLastNameError", tasksCompleted, totalTasks)
-                );
-
-                DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
-                        DatabaseManager.USER_REGISTRATION_STATE,
-                        User.WAITLISTED,
-                        (task0) -> handleTaskCompletion(task0, "storeUserUserRegistrationState", tasksCompleted, totalTasks)
-                );
-
-                if (binding.OrganizerVSUserSwitch.isChecked()) {
-                    DatabaseManager.getDatabaseManager().storeUserValueToFirestore(
-                            DatabaseManager.USER_ORGANIZATION_NAME,
-                            organisation,
-                            (task0) -> handleTaskCompletion(task0, "storeUserOrganisationError", tasksCompleted, totalTasks)
-                    );
-                }
-            });});
-
-            root.findViewById(R.id.cancelButtonCreate).setOnClickListener(v -> navController.popBackStack());
-            return root;
+        });
+        return root;
     }
 
-    private void handleTaskCompletion(Task<Void> task, String errorMessage, AtomicInteger tasksCompleted, int totalTasks) {
-        if (task.isSuccessful()) {
-            Log.d("CreateAccountFragment", "Success: " + task.getResult());
-        } else {
-            Log.d("CreateAccountFragment", errorMessage + ": " + task.getException());
-        }
-
-        // Increment the completed tasks count
-        int completed = tasksCompleted.incrementAndGet();
-
-        // Check if all tasks are completed
-        if (completed == totalTasks) {
-            Log.d("CreateAccountFragment", "All tasks completed successfully!");
-            // We now have all the account data stored we can login
-            UserSession.getInstance().login(binding.editTextTextEmailAddressUserCreate.getText().toString(), binding.editTextTextPasswordUserCreate.getText().toString(), (MainActivity) getContext(), (task1) -> {
-                if (task1.isSuccessful()) {
-                    Log.e("LoginFragment", "login was successful");
-                    // Once we know the login was successful we can navigate to the account management fragment
-                    navController.navigate(R.id.action_create_account_to_account_management);
-                } else {
-                    // show an error message
-                    Log.e("LoginFragment", "login was not successful");
-                    binding.editTextTextEmailAddressUserCreate.setError("Invalid email or password");
-                }});
-        }
+    private void openAutocompleteActivity() {
+        // Use the Places API to show autocomplete suggestions
+        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN,
+                Arrays.asList(Place.Field.ID, Place.Field.DISPLAY_NAME, Place.Field.FORMATTED_ADDRESS))
+                .build(getContext());
+        // Launch the autocomplete activity using the launcher initialized in OnCreate
+        autocompleteLauncher.launch(intent);
     }
-
 
     @Override
     public void onDestroyView() {

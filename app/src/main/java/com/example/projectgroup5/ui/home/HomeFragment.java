@@ -32,14 +32,14 @@ public class HomeFragment extends Fragment {
             navController.navigate(R.id.action_navigation_home_to_home_not_logged_in);
         } else {
             DatabaseManager.getDatabaseManager().getUserDataFromFirestore(DatabaseManager.USER_REGISTRATION_STATE, userRegistrationState -> {
-                if (Integer.parseInt(userRegistrationState.toString()) != (User.ACCEPTED)) {
+                if (!(userRegistrationState.toString()).equals((User.ACCEPTED))) {
                     navController.navigate(R.id.action_navigation_home_to_home_not_registered_in);
-                } else if (UserSession.getInstance().getUserRepresentation().getUserType() == User.USER_TYPE_ADMIN) {
+                } else if (UserSession.getInstance().getUserRepresentation().getUserType().equals(User.USER_TYPE_ADMIN)) {
                     navController.navigate(R.id.action_navigation_home_to_admin_lists_option_selector);
-                } else if (UserSession.getInstance().getUserRepresentation().getUserType() == User.USER_TYPE_ORGANIZER) {
+                } else if (UserSession.getInstance().getUserRepresentation().getUserType().equals(User.USER_TYPE_ORGANIZER)) {
                     navController.navigate(R.id.action_navigation_home_to_organizer_option_selector);
-                } else if (UserSession.getInstance().getUserRepresentation().getUserType() == User.USER_TYPE_ATTENDEE) {
-                    navController.navigate(R.id.action_navigation_home_to_attendee_option_selector);
+                } else if (UserSession.getInstance().getUserRepresentation().getUserType().equals(User.USER_TYPE_ATTENDEE)) {
+                    navController.navigate(R.id.attendee_event_list);
                 }
             });
         }

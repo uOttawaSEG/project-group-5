@@ -24,4 +24,14 @@
     <string name="you_are_not_registered">You are not registered</string>
     <string name="pick_end_time">Pick end time</string>
     <string name="pick_start_time">Pick start time</string>
+    <string-array name="event_type_for_organizer">
+        <item>Upcoming</item>
+        <item>Past</item>
+        <item>Current</item>
+    </string-array>
+    <string-array name="user_registration_status">
+        <item>Registered</item>
+        <item>Waitlisted</item>
+        <item>Rejected</item>
+    </string-array>
 </resources>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center"
+    android:background="@drawable/rectangular_input">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <Space
+            android:id="@+id/spaceWithinTheEventEntry"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/eventTitleEntry"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:padding="8dp"
+            android:text="Event Title"
+            android:textSize="30sp" />
+
+        <ImageView
+            android:id="@+id/statusIcon"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:contentDescription="Status Icon"
+            android:src="@drawable/baseline_info_outline_24"
+            android:visibility="gone"
+            app:tint="@color/quantum_yellow" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/eventDescriptionEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="Description"
+        android:textSize="30sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/startTimeEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Time"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:padding="8dp" />
+
+    <TextView
+        android:id="@+id/endTimeEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="End Time"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:padding="8dp" />
+
+
+    <TextView
+        android:id="@+id/eventAddressEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="Address"
+        android:textSize="30sp"
+        android:visibility="gone" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/rejectUserButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reject"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/acceptUserButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Accept"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</LinearLayout>

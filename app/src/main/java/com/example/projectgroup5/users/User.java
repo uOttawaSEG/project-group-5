@@ -1,32 +1,36 @@
 package com.example.projectgroup5.users;
 
 import static com.example.projectgroup5.database.DatabaseManager.USER_ORGANIZATION_NAME;
+import static com.example.projectgroup5.database.DatabaseManager.USER_REGISTRATION_STATE;
 
-import android.content.Context;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import com.example.projectgroup5.R;
 import com.example.projectgroup5.database.DatabaseManager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class User {
-    public final static int USER_TYPE_ORGANIZER = 1;
-    public final static int USER_TYPE_ATTENDEE = 2;
-    public final static int USER_TYPE_ADMIN = 0;
-    public static final int REJECTED = 2;
-    public static final int ACCEPTED = 1;
-    public static final int WAITLISTED = 0;
+    public final static String USER_TYPE_ORGANIZER = "Organizer";
+    public final static String USER_TYPE_ATTENDEE = "Attendee";
+    public final static String USER_TYPE_ADMIN = "Admin";
+    public static final String REJECTED = "Rejected";
+    public static final String ACCEPTED = "Accepted";
+    public static final String WAITLISTED = "Waitlisted";
     private final String userId;
     private String userFirstName;
     private String userLastName;
     private String userEmail;
     private long userPhoneNumber;
     private String userAddress;
-    private int userRegistrationState;
-    private int userType;
+    private String userRegistrationState;
+    private String userType;
 
     /**
      * Creates a new User instance with the specified user ID.
@@ -44,62 +48,117 @@ public abstract class User {
      * based on the provided user ID and user type. If the user type does not match any known types,
      * it returns null.
      *
-     * @param userId   The unique identifier for the user.
-     * @param userType An integer representing the type of user to be created. This should match
-     *                 one of the predefined user types:
-     *                 <ul>
-     *                   <li><code>USER_TYPE_ORGANIZER</code></li>
-     *                   <li><code>USER_TYPE_USER</code></li>
-     *                   <li><code>USER_TYPE_ADMIN</code></li>
-     *                 </ul>
+     * @param userId The unique identifier for the user.
+     *               one of the predefined user types:
+     *               <ul>
+     *                 <li><code>USER_TYPE_ORGANIZER</code></li>
+     *                 <li><code>USER_TYPE_USER</code></li>
+     *                 <li><code>USER_TYPE_ADMIN</code></li>
+     *               </ul>
      * @return A new User instance of the specified type, or null if the user type is invalid.
      */
-    public static User newUser(String userId, int userType) {
-        final User user;
-        if (userType == USER_TYPE_ORGANIZER) {
-            user = new Organizer(userId);
-        } else if (userType == USER_TYPE_ATTENDEE) {
-            user = new Attendee(userId);
-        } else if (userType == USER_TYPE_ADMIN) {
-            user = new Administrator(userId);
-        } else {
-            return null;
-        }
-        DatabaseManager.getDatabaseManager().getAllUserDataFromFirestore(userId, value ->{
-            if (value != null) {
-                if (value.containsKey(DatabaseManager.USER_FIRST_NAME)) {
-                    user.setUserFirstName(value.get(DatabaseManager.USER_FIRST_NAME).toString());
+    public static void newUserFromDatabase(String userId, OnCompleteListener<User> listener) {
+        DatabaseManager.getDatabaseManager().getUserDataFromFirestore(userId, DatabaseManager.USER_TYPE, userType -> {
+            final User user;
+            switch (userType.toString()) {
+                case USER_TYPE_ORGANIZER -> user = new Organizer(userId);
+                case USER_TYPE_ATTENDEE -> user = new Attendee(userId);
+                case USER_TYPE_ADMIN -> user = new Administrator(userId);
+                default -> {
+                    listener.onComplete(Tasks.forException(new Exception("Failed to create user from database, user ID: " + userId + " user type: " + userType)));
+                    return;
+
                 }
-                if (value.containsKey(DatabaseManager.USER_LAST_NAME)) {
-                    user.setUserLastName(value.get(DatabaseManager.USER_LAST_NAME).toString());
-                }
-                if (value.containsKey(DatabaseManager.USER_EMAIL)) {
-                    user.setUserEmail(value.get(DatabaseManager.USER_EMAIL).toString());
-                }
-                if (value.containsKey(DatabaseManager.USER_PHONE)) {
-                    user.setUserPhoneNumber(Long.valueOf(value.get(DatabaseManager.USER_PHONE).toString().replace("\"", "")));
-                }
-                if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
-                    user.setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
-                }
-                if (value.containsKey(USER_ORGANIZATION_NAME)) {
-                    if (user instanceof Organizer organizer)
-                        organizer.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
-                }
-                if (value.containsKey(DatabaseManager.USER_REGISTRATION_STATE)) {
-                    user.setUserRegistrationState((int) (long) value.get(DatabaseManager.USER_REGISTRATION_STATE));
-                }
-                user.setUserType(userType);
             }
+
+            Log.d("User", "User data at database fetch: " + userId);
+            DatabaseManager.getDatabaseManager().getAllUserDataFromFirestore(userId, value -> {
+                Log.d("User", "User successful data at database fetch: " + value);
+                if (value != null) {
+                    Log.d("User", "User data done at database fetch: " + value);
+                    if (value.containsKey(DatabaseManager.USER_FIRST_NAME)) {
+                        user.setUserFirstName(value.get(DatabaseManager.USER_FIRST_NAME).toString());
+                    }
+                    if (value.containsKey(DatabaseManager.USER_LAST_NAME)) {
+                        user.setUserLastName(value.get(DatabaseManager.USER_LAST_NAME).toString());
+                    }
+                    if (value.containsKey(DatabaseManager.USER_EMAIL)) {
+                        user.setUserEmail(value.get(DatabaseManager.USER_EMAIL).toString());
+                    }
+                    if (value.containsKey(DatabaseManager.USER_PHONE)) {
+                        user.setUserPhoneNumber(Long.valueOf(value.get(DatabaseManager.USER_PHONE).toString().replace("\"", "")));
+                    }
+                    if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
+                        user.setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
+                    }
+                    if (value.containsKey(USER_ORGANIZATION_NAME)) {
+                        if (user instanceof Organizer organizer)
+                            organizer.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
+                    }
+                    if (value.containsKey(DatabaseManager.USER_ORGANIZER_EVENTS)) {
+                        if (user instanceof Organizer organizer) {
+                            // try the cast to list of document references
+                            Log.d("User", "User organizer events at database fetch: " + value.get(DatabaseManager.USER_ORGANIZER_EVENTS).toString());
+                            ArrayList<DocumentReference>  events =  (ArrayList<DocumentReference>) value.get(DatabaseManager.USER_ORGANIZER_EVENTS);
+                            Log.d("User", "After organizer events cast: " + events.toString());
+                            organizer.setOrganizerEvents(events);
+                            Log.d("User", "After organizer events set: " + organizer.getOrganizerEvents().toString());
+                        }
+                    }
+                    if (value.containsKey(USER_REGISTRATION_STATE)) {
+                        Log.d("User", "User registration state at database fetch: " + value.get(USER_REGISTRATION_STATE).toString());
+                        user.setUserRegistrationState(value.get(USER_REGISTRATION_STATE).toString());
+                        Log.d("User", "User registration state after fetch: " + user.getUserRegistrationState());
+                    }
+                    if (value.containsKey(DatabaseManager.USER_ATTENDEE_REGISTRATIONS)) {
+                        if (user instanceof Attendee attendee) {
+                            // try the cast to list of document references
+                            List<DocumentReference> registrations = (List<DocumentReference>) value.get(DatabaseManager.USER_ATTENDEE_REGISTRATIONS);
+                           if (registrations != null) {
+                               for (DocumentReference registration : registrations) {
+                                   // print the registrations
+                                   Log.d("User", "User attendee registrations event has at database fetch: " + registration.toString());
+                                   Log.d("User", "User attendee registrations event has at database fetch: " + registration.getId());
+                               }
+                           }
+                                attendee.setAttendeeRegistrations(registrations);
+                        }
+                    }
+                    user.setUserType(userType.toString());
+
+                    listener.onComplete(Tasks.forResult(user));
+                }
+            });
         });
+    }
+
+    //TODO: add documentation
+    public static User newUser(String userType, String firstName, String lastName, String email, long phoneNumber, String address, String organisation) {
+        final User user;
+        switch (userType) {
+            case USER_TYPE_ORGANIZER -> {
+                user = new Organizer(null);
+                ((Organizer) user).setUserOrganizationName(organisation);
+            }
+            case USER_TYPE_ATTENDEE -> user = new Attendee(null);
+            case USER_TYPE_ADMIN -> user = new Administrator(null);
+            default -> {
+                return null;
+            }
+        }
+        user.setUserFirstName(firstName);
+        user.setUserLastName(lastName);
+        user.setUserEmail(email);
+        user.setUserPhoneNumber(phoneNumber);
+        user.setUserAddress(address);
         return user;
     }
 
-    private void setUserRegistrationState(int userRegistrationState) {
+    public void setUserRegistrationState(String userRegistrationState) {
         this.userRegistrationState = userRegistrationState;
     }
 
-    public int getUserRegistrationState() {
+    public String getUserRegistrationState() {
         return userRegistrationState;
     }
 
@@ -143,7 +202,7 @@ public abstract class User {
      *
      * @param userType The type to be set for the user, typically represented as an integer.
      */
-    public void setUserType(int userType) {
+    public void setUserType(String userType) {
         this.userType = userType;
     }
 
@@ -152,7 +211,7 @@ public abstract class User {
      *
      * @return The current user type, represented as an integer.
      */
-    public int getUserType() {
+    public String getUserType() {
         return userType;
     }
 
@@ -163,7 +222,7 @@ public abstract class User {
      *
      * @param userAddress The address to be set for the user.
      */
-    private void setUserAddress(String userAddress) {
+    public void setUserAddress(String userAddress) {
         this.userAddress = userAddress;
     }
 
@@ -183,111 +242,6 @@ public abstract class User {
     }
 
     /**
-     * Adds a user entry to the specified layout, populating it with user data from the database.
-     * <p>
-     * This method inflates a custom view for a user entry and retrieves user data from the
-     * Firebase database. It sets the values for various TextViews and manages the visibility
-     * of buttons based on the user's registration state. Additionally, it sets up click listeners
-     * for the accept and reject buttons.
-     *
-     * @param layout  The LinearLayout to which the user entry will be added.
-     * @param context The context used to inflate the view and access resources.
-     */
-    public void addUserToLayout(LinearLayout layout, Context context) {
-
-        View customView = LayoutInflater.from(context).inflate(R.layout.account_entry, layout, false);
-        customView.setId(userId.hashCode());
-        // set get the data from firebase if possible
-        DatabaseManager.getDatabaseManager().getAllUserDataFromFirestore(userId, value -> {
-            if (value != null) {
-                if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
-                    setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
-                    TextView userAddressTextView = customView.findViewById(R.id.homeAddressEntry);
-                    userAddressTextView.setText(userAddress);
-                }
-                if (value.containsKey(USER_ORGANIZATION_NAME)) {
-                    if (this instanceof Organizer organizer) {
-                        organizer.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
-                        TextView userOrganizationNameTextView = customView.findViewById(R.id.organizationNameEntry);
-                        userOrganizationNameTextView.setVisibility(View.VISIBLE);
-                        userOrganizationNameTextView.setText(organizer.getUserOrganizationName());
-                    }
-                }
-                if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
-                    setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
-                    TextView userAddressTextView = customView.findViewById(R.id.homeAddressEntry);
-                    userAddressTextView.setText(userAddress);
-                }
-                if (value.containsKey(DatabaseManager.USER_FIRST_NAME)) {
-                    setUserFirstName(value.get(DatabaseManager.USER_FIRST_NAME).toString());
-                    TextView userFirstNameTextView = customView.findViewById(R.id.firstNameEntry);
-                    userFirstNameTextView.setText(userFirstName);
-                }
-                if (value.containsKey(DatabaseManager.USER_LAST_NAME)) {
-                    setUserLastName(value.get(DatabaseManager.USER_LAST_NAME).toString());
-                    TextView userLastNameTextView = customView.findViewById(R.id.lastNameEntry);
-                    userLastNameTextView.setText(userLastName);
-                }
-                if (value.containsKey(DatabaseManager.USER_EMAIL)) {
-                    setUserEmail(value.get(DatabaseManager.USER_EMAIL).toString());
-                    TextView userEmailTextView = customView.findViewById(R.id.emailAddressEntry);
-                    userEmailTextView.setText(userEmail);
-                }
-                if (value.containsKey(DatabaseManager.USER_PHONE)) {
-                    setUserPhoneNumber(Long.valueOf(value.get(DatabaseManager.USER_PHONE).toString().replace("\"", "")));
-                    TextView userPhoneNumberTextView = customView.findViewById(R.id.phoneNumberEntry);
-                    userPhoneNumberTextView.setText(userPhoneNumber + "");
-                }
-                if (value.containsKey(DatabaseManager.USER_REGISTRATION_STATE)) {
-                    int userRegistrationState = (int) (long) value.get(DatabaseManager.USER_REGISTRATION_STATE);
-                    switch (userRegistrationState) {
-                        case REJECTED: {
-                            Button rejectButton = customView.findViewById(R.id.rejectUserButton);
-                            rejectButton.setVisibility(View.GONE);
-                            Button acceptButton = customView.findViewById(R.id.acceptUserButton);
-                            acceptButton.setVisibility(View.VISIBLE);
-                            break;
-                        }
-                        case ACCEPTED: {
-                            Button rejectButton = customView.findViewById(R.id.rejectUserButton);
-                            rejectButton.setVisibility(View.GONE);
-                            Button acceptButton = customView.findViewById(R.id.acceptUserButton);
-                            acceptButton.setVisibility(View.GONE);
-                            break;
-                        }
-                        case WAITLISTED: {
-                            Button rejectButton = customView.findViewById(R.id.rejectUserButton);
-                            rejectButton.setVisibility(View.VISIBLE);
-                            Button acceptButton = customView.findViewById(R.id.acceptUserButton);
-                            acceptButton.setVisibility(View.VISIBLE);
-                            break;
-                        }
-                    }
-                }
-
-
-            }
-        });
-
-        Button rejectButton = customView.findViewById(R.id.rejectUserButton);
-        rejectButton.setOnClickListener(v -> {
-            removeUserFromLayout(layout);
-            // Handle reject button click
-            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(userId, DatabaseManager.USER_REGISTRATION_STATE, REJECTED, null);
-        });
-        Button acceptButton = customView.findViewById(R.id.acceptUserButton);
-        acceptButton.setOnClickListener(v -> {
-            removeUserFromLayout(layout);
-            // Handle accept button click
-            DatabaseManager.getDatabaseManager().storeUserValueToFirestore(userId, DatabaseManager.USER_REGISTRATION_STATE, ACCEPTED, null);
-        });
-
-
-        layout.addView(customView);
-
-    }
-
-    /**
      * Removes a user entry view from the specified layout.
      * <p>
      * This method searches for the user entry view associated with the user's ID (hashed)
@@ -301,5 +255,25 @@ public abstract class User {
         if (viewToRemove != null) {
             layout.removeView(viewToRemove);
         }
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getUserAddress() {
+        return userAddress;
+    }
+
+    public String getFirstName() {
+        return userFirstName;
+    }
+
+    public String getLastName() {
+        return userLastName;
+    }
+
+    public long getPhoneNumber() {
+        return userPhoneNumber;
     }
 }

@@ -7,6 +7,15 @@
     android:gravity="center"
     android:background="@drawable/rectangular_input">
 
+    <TextView
+        android:id="@+id/titleEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="Title"
+        android:textSize="30sp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/firstNameEntry"

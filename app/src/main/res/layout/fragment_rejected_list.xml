@@ -6,16 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.RejectedList">
 
-    <ScrollView
+    <ListView
         android:layout_width="match_parent"
         android:layout_marginBottom="70sp"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:id="@+id/rejectedListLinearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
+        android:layout_height="match_parent"
+        android:id="@+id/rejectedListLayout">
+    </ListView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

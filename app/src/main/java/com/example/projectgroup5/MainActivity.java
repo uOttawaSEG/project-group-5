@@ -4,10 +4,12 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
-import com.example.projectgroup5.database.DatabaseManager;
 import com.example.projectgroup5.database.Notification;
 import com.example.projectgroup5.users.UserSession;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +23,12 @@ import com.example.projectgroup5.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     private NavController navController;
+    private static OnCompleteListener<Boolean> onCompleteListener;
+    public static boolean complete = false;
+    public static void setOnCompleteListener(OnCompleteListener<Boolean> onCompleteListener) {
+        MainActivity.onCompleteListener = onCompleteListener;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,13 +64,20 @@ public class MainActivity extends AppCompatActivity {
         createNotificationChannel();
         UserSession.initialize(this, task -> {
             if (task.isSuccessful()) {
-                System.out.println("UserSession initialized successfully");
+                Log.d("MainActivity", "UserSession initialized successfully");
             } else {
-                System.out.println("UserSession initialization failed");
+                Log.e("MainActivity", "UserSession initialization failed", task.getException());
+            }
+            if (onCompleteListener != null) {
+                onCompleteListener.onComplete(Tasks.forResult(true));
+                complete = true;
             }
         });
-        DatabaseManager.getDatabaseManager().test();
+//        DatabaseManager.getDatabaseManager().test();
+
     }
+
+
 
     /**
      * Creates a notification channel for account-related notifications.

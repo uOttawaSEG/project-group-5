@@ -39,7 +39,7 @@ public class UserSession {
      * <p>
      * This method retrieves the current user from the database and updates the user ID.
      * It fetches the user's type from the database and creates a corresponding user representation
-     * using the {@link User#newUser(String, int)} method. If the user type is not found,
+     * using the {@link User#newUserFromDatabase(String, OnCompleteListener)} method. If the user type is not found,
      * an error is logged. Additionally, it navigates to the account management screen
      * after successfully instantiating the user representation.
      * <p>
@@ -49,30 +49,27 @@ public class UserSession {
         FirebaseUser user = DatabaseManager.getDatabaseManager().getCurrentUser();
         if (user == null) {
             Log.e("UserSession", "User is null");
+            listener.onComplete(Tasks.forResult(null));
             return;
         }
         userId = user.getUid();
         // update all the data from the database
-        DatabaseManager.getDatabaseManager().getUserDataFromFirestore(userId, DatabaseManager.USER_TYPE, userType -> {
-            if (userType != null) {
-                // Create a User representation based on the user type
-                if (userRepresentation != null) {
-                    Log.e("UserSession", "User representation is not initially null");
-                            return;
-                }
-                userRepresentation = User.newUser(userId, (int) (long) ((Long) userType));
+        // Create a User representation based on the user type
+        if (userRepresentation != null) {
+            Log.e("UserSession", "User representation is not initially null");
+            return;
+        }
+        User.newUserFromDatabase(userId, task -> {
+            if (task.isSuccessful()) {
+                userRepresentation = task.getResult();
+                Log.d("UserSession", "User representation created");
                 // Notification for prelogged in user
                 DatabaseListener.clearListeners();
-                Log.d("DatabaseListener", "User type: " + userType);
                 DatabaseListener.addValueAccountCreationEventListener(context);
-                //This was not working for some reason after 2 accounts logged in sequentially
-                Log.d("UserSession", "User type: " + userType);
                 // success on the listener
                 listener.onComplete(Tasks.forResult(null));
             } else {
-                Log.e("UserSession", "User type not found");
-                // failure on the listener
-                listener.onComplete(Tasks.forException(new Exception("User type not found")));
+                Log.e("UserSession", "User representation not created");
             }
         });
     }
@@ -96,32 +93,6 @@ public class UserSession {
                 UserSession.getInstance().instantiateUserRepresentation(context, listener);
         });
     }
-
-//    /**
-//     * Instantiates and stores the email for the specified user in the user representation and database.
-//     * <p>
-//     * This method retrieves the email of the provided {@link FirebaseUser} and stores it in the database.
-//     * It also updates the email in the user representation if it exists.
-//     *
-//     * @param user The {@link FirebaseUser} whose email is to be instantiated.
-//     *             Must not be null.
-//     */
-//    private void instantiateEmailForUser(FirebaseUser user) {
-//        //  set the user email
-//        DatabaseManager.getDatabaseManager().storeUserValueToFirestore(DatabaseManager.USER_EMAIL, user.getEmail(), (task) -> {
-//            if (task.isSuccessful()) {
-//                Log.d("UserSession", "Success instantiateEmailForUser: success");
-//            } else {
-//                Log.d("UserSession", "storeUserEmailError: " + task.getException());
-//            }
-//        });
-//        if (userRepresentation != null) {
-//            Log.d("UserSession", "Set the user email in the user representation to: " + user.getEmail());
-//            userRepresentation.setUserEmail(user.getEmail());
-//        } else {
-//            Log.e("UserSession", "User representation is null");
-//        }
-//    }
 
     /**
      * Retrieves the user representation associated with the current user session.
@@ -196,7 +167,7 @@ public class UserSession {
 //            if (userType != null) {
 //                Log.d("UserSession", "User type: " + userType);
 //                // Create a User representation based on the user type
-//                userRepresentation = User.newUser(userId, (int) (long) ((Long) userType));
+//                userRepresentation = User.newUserFromDatabase(userId, (int) (long) ((Long) userType));
 //                if (userRepresentation == null) {
 //                    Log.e("UserSession", "User representation is null 1");
 ////                            return;

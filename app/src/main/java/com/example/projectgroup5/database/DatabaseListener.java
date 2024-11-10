@@ -4,13 +4,12 @@ import static com.example.projectgroup5.database.DatabaseManager.USER_REGISTRATI
 
 import android.util.Log;
 
-import androidx.annotation.Nullable;
-
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.R;
+import com.example.projectgroup5.users.User;
+import com.example.projectgroup5.users.UserSession;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
@@ -18,8 +17,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DatabaseListener {
-
-    private static DatabaseListener instance;
 
     // list of listeners
     private static final List<ListenerRegistration> firestoreListeners = new ArrayList<>();
@@ -48,41 +45,73 @@ public class DatabaseListener {
         final AtomicInteger lastKnownValue = new AtomicInteger(-1);
 
         // Listener for USER_REGISTRATION_STATE
-        EventListener<DocumentSnapshot> registrationStateListener = new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot dataSnapshot, @Nullable FirebaseFirestoreException error) {
-                if (error != null) {
-                    Log.e("DatabaseListener", "Listen failed: " + error);
-                    return;
+        EventListener<DocumentSnapshot> registrationStateListener = (dataSnapshot, error) -> {
+            if (error != null) {
+                Log.e("DatabaseListener", "Listen failed: " + error);
+                return;
+            }
+            // Ensure the document exists
+            if (dataSnapshot == null || !dataSnapshot.exists()) return;
+            // Get the current value of USER_REGISTRATION_STATE
+            String currentValue = dataSnapshot.getString(USER_REGISTRATION_STATE);
+            if (currentValue == null) return;
+//                Log.d("DatabaseListener", "currentValue: " + currentValue);
+            // If the value has changed, proceed
+            if (!mapAtomicIntToRegistration(lastKnownValue).equals(currentValue)) {
+                // Send notifications if needed
+                if ((currentValue.equals(User.ACCEPTED)) && mapAtomicIntToRegistration(lastKnownValue).equals(User.WAITLISTED)) {
+                    Notification.sendAcceptedNotification(context);
+                    // set the user representation to accepted
+                    UserSession.getInstance().getUserRepresentation().setUserRegistrationState(User.ACCEPTED);
+                    context.getNavController().navigate(R.id.account);
+                } else if ((currentValue.equals(User.REJECTED)) && mapAtomicIntToRegistration(lastKnownValue).equals(User.WAITLISTED)) {
+                    Notification.sendRejectedNotification(context);
+                    // set the user representation to rejected
+                    UserSession.getInstance().getUserRepresentation().setUserRegistrationState(User.REJECTED);
+                    context.getNavController().navigate(R.id.account);
+                } else if ((currentValue.equals(User.ACCEPTED)) && mapAtomicIntToRegistration(lastKnownValue).equals(User.REJECTED)) {
+                    Notification.sendAcceptedNotification(context);
+                    // set the user representation to accepted
+                    UserSession.getInstance().getUserRepresentation().setUserRegistrationState(User.ACCEPTED);
+                    context.getNavController().navigate(R.id.account);
+                } else {
+                    Log.e("DatabaseListener", "Invalid value change: " + currentValue + " LastKnown: " + lastKnownValue.get());
                 }
-                // Ensure the document exists
-                if (dataSnapshot == null || !dataSnapshot.exists()) return;
-                // Get the current value of USER_REGISTRATION_STATE
-                Integer currentValue = dataSnapshot.getLong(USER_REGISTRATION_STATE).intValue();
-                if (currentValue == null) return;
-
-                // If the value has changed, proceed
-                if (lastKnownValue.get() != currentValue) {
-                    // Send notifications if needed
-                    if (currentValue == 1 && lastKnownValue.get() == 0) {
-                        Notification.sendAcceptedNotification(context);
-                        context.getNavController().navigate(R.id.account);
-                    } else if (currentValue == 2 && lastKnownValue.get() == 0) {
-                        Notification.sendRejectedNotification(context);
-                        context.getNavController().navigate(R.id.account);
-                    } else if (currentValue == 1 && lastKnownValue.get() == 2) {
-                        Notification.sendAcceptedNotification(context);
-                        context.getNavController().navigate(R.id.account);
-                    } else {
-                        Log.e("DatabaseListener", "Invalid value: " + currentValue + " LastKnown: " + lastKnownValue.get());
-                    }
-                    Log.d("DatabaseListener", "Values: " + currentValue + " LastKnown: " + lastKnownValue.get());
-                    // Update the last known value
-                    lastKnownValue.set(currentValue);
-                }
+                Log.d("DatabaseListener", "Values: " + currentValue + " LastKnown: " + lastKnownValue.get());
+                // Update the last known value
+                setRegistrationState(currentValue, lastKnownValue);
             }
         };
         // Add the listener to the specific field
         firestoreListeners.add(DatabaseManager.getDatabaseManager().addValueEventListenerToFirestore(registrationStateListener, USER_REGISTRATION_STATE));
+    }
+
+    // map the atomicInt to a registration state
+    private static String mapAtomicIntToRegistration(AtomicInteger atomicInt) {
+        return switch (atomicInt.get()) {
+            case 0 -> User.WAITLISTED;
+            case 1 -> User.ACCEPTED;
+            case 2 -> User.REJECTED;
+            default -> "Unknown";
+        };
+    }
+
+    private static void setRegistrationState(String registrationState, AtomicInteger lastKnownValue) {
+        Log.d("DatabaseListener", "setRegistrationState: " + registrationState + " from: " + mapAtomicIntToRegistration(lastKnownValue));
+        switch (registrationState) {
+            case User.WAITLISTED:
+                lastKnownValue.set(0);
+                break;
+            case User.ACCEPTED:
+                lastKnownValue.set(1);
+                break;
+            case User.REJECTED:
+                lastKnownValue.set(2);
+                break;
+            default:
+                lastKnownValue.set(-1);
+                Log.d("DatabaseListener", "Unset registration state: " + registrationState);
+                break;
+        }
     }
 }
