@@ -31,7 +31,17 @@
         android:id="@+id/search_event_dashboard"
         android:name="com.example.projectgroup5.ui.search.DashboardFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_dashboard" >
+        <action
+            android:id="@+id/action_search_event_dashboard_to_search_event_list"
+            app:destination="@id/search_event_list" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/search_event_list"
+        android:name="com.example.projectgroup5.ui.search.DashboardEventList"
+        android:label="Home"
+        tools:layout="@layout/fragment_dashboard_event_list"/>
     <fragment
         android:id="@id/account_management"
         android:name="com.example.projectgroup5.ui.account.AccountManagementFragment"
@@ -117,7 +127,20 @@
         android:id="@+id/organizer_event_list"
         android:name="com.example.projectgroup5.ui.home.OrganizerEventList"
         android:label="Home"
-        tools:layout="@layout/fragment_organizer_event_list"/>
+        tools:layout="@layout/fragment_organizer_event_list">
+        <action
+            android:id="@+id/action_organizer_event_list_to_organizer_registration_list"
+            app:destination="@id/organizer_registration_list" />
+    </fragment>
+    <fragment
+        android:id="@+id/organizer_registration_list"
+        android:name="com.example.projectgroup5.ui.home.OrganizerRegistrationList"
+        android:label="Home"
+        tools:layout="@layout/fragment_organizer_registration_list">
+        <action
+            android:id="@+id/action_organizer_registration_list_self"
+            app:destination="@id/organizer_registration_list" />
+    </fragment>
     <fragment
         android:id="@+id/accepted_list"
         android:name="com.example.projectgroup5.ui.home.AcceptedList"
@@ -154,6 +177,9 @@
         <action
             android:id="@+id/action_organizer_option_selector_to_organizer_event_list"
             app:destination="@id/organizer_event_list" />
+        <action
+            android:id="@+id/action_organizer_option_selector_to_organizer_registration_list"
+            app:destination="@id/organizer_registration_list" />
     </fragment>
     <fragment
         android:id="@+id/attendee_option_selector"

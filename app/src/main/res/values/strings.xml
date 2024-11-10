@@ -29,4 +29,9 @@
         <item>Past</item>
         <item>Current</item>
     </string-array>
+    <string-array name="user_registration_status">
+        <item>Registered</item>
+        <item>Waitlisted</item>
+        <item>Rejected</item>
+    </string-array>
 </resources>

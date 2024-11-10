@@ -12,13 +12,27 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-                <Spinner
-                    android:id="@+id/organizerEventSpinner"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                        <Switch
+                            android:id="@+id/acceptAllUserSwitch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="48sp"
+                            android:gravity="center"
+                            android:textSize="@dimen/form_text_size"
+                            android:text="Accept All" />
+
+                        <Spinner
+                            android:id="@+id/organizerRegistrationSpinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+                </LinearLayout>
 
                 <ListView
-                    android:id="@+id/organizerListLayout"
+                    android:id="@+id/organizerRegistrationListLayout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginBottom="70sp">

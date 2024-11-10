@@ -31,7 +31,7 @@ public class Event {
     /**
      * This constructor is used to create a new event.
      * It should not be called directly.
-     * Instead use the {@link EventOptional#newEvent(String, String, String, Timestamp, Timestamp, boolean, List, DocumentReference)}
+     * Instead use the {@link EventOptional#newEvent(String, String, String, Timestamp, Timestamp, boolean, DocumentReference)}
      * <p>or:          {@link EventOptional#oldEvent(String, String, String, String, Timestamp, Timestamp, boolean, List, DocumentReference)}</p>
      *
      * @param title         The title of the event
@@ -57,15 +57,16 @@ public class Event {
 
     }
 
-    protected Event(String title, String address, Timestamp startTime, Timestamp endTime, boolean autoAccept, List<DocumentReference> registrations, DocumentReference organizer, String eventID) {
+    protected Event(String title, String description, String address, Timestamp startTime, Timestamp endTime, boolean autoAccept, List<DocumentReference> registrations, DocumentReference organizer, String eventID) {
         this.title = title;
+        this.description = description;
         this.address = address;
         this.startTime = startTime;
         this.endTime = endTime;
         this.autoAccept = autoAccept;
         this.registrations = registrations;
         this.organizer = organizer;
-        this.eventID = UUID.randomUUID().toString();
+        this.eventID = eventID;
 
     }
 
@@ -125,4 +126,5 @@ public class Event {
             return PAST;
         }
     }
+
 }

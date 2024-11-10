@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class EventOption {
+
+
     /**
      * Callback interface for receiving a list of events.
      * <p>
@@ -27,7 +29,7 @@ public class EventOption {
     }
 
 
-    public static void getEventsWithTimeStatus(EventOption.EventsCallback callback, String eventTimeStatus) {
+    public static void getEventsWithTimeStatus(EventsCallback callback, String eventTimeStatus) {
         List<Event> events = new ArrayList<>();
         DatabaseManager databaseManager = DatabaseManager.getDatabaseManager();
         databaseManager.getOrganizerEvents(UserSession.getInstance().getUserId(), task -> {
@@ -36,27 +38,27 @@ public class EventOption {
                 callback.onDataReceived(events);
                 return;
             } else {
-                List<DocumentReference> eventIds = task.getResult();
+                List<Event> eventIds = task.getResult();
                 // Create a counter to track completed event data retrieval
                 AtomicInteger remainingCalls = new AtomicInteger(eventIds.size());
                 Log.d("EventOptions", "Got " + eventIds.size() + " events");
-                for (DocumentReference eventId : eventIds) {
-                    DatabaseManager.getDatabaseManager().getEvent(eventId.getId(), task2 -> {
+                for (Event event : eventIds) {
+                    DatabaseManager.getDatabaseManager().getEvent(event.getEventID(), task2 -> {
                         if (task2.getResult() == null || !task2.isSuccessful()) {
-                            Log.e("EventOptions", "Failed to create event from database, event ID: " + eventId);
+                            Log.e("EventOptions", "Failed to create event from database, event ID: " + event);
                             if (remainingCalls.decrementAndGet() == 0) {
                                 // Call the callback with the retrieved pending events
                                 callback.onDataReceived(events);
                             }
                             return;
                         }
-                        if (task2.getResult().holdsAnEvent()) {
-                            Event event = task2.getResult().getEvent();
+//                        if (task2.getResult().holdsAnEvent()) {
+//                            Event event = task2.getResult().getEvent();
                             // check if the event is in the correct time status
                             if (event.getTimeStatus().equals(eventTimeStatus)) {
                                 events.add(event);
                             }
-                        }
+//                        }
                         // Decrement the counter and check if all callbacks are complete
                         if (remainingCalls.decrementAndGet() == 0) {
                             // Call the callback with the retrieved pending events
@@ -71,6 +73,7 @@ public class EventOption {
             }
         });
     }
+
 
 
     public static void getCurrentEvents(EventOption.EventsCallback callback) {

@@ -47,7 +47,7 @@ public class EventOptional {
         if (checkFields(option, title, description, address, startTime, endTime, organizer, eventID)) {
             return option;
         }
-        Event event = new Event(title, address, startTime, endTime, autoAccept, registrations, organizer, eventID);
+        Event event = new Event(title, description, address, startTime, endTime, autoAccept, registrations, organizer, eventID);
         option.setEvent(event);
         return option;
     }

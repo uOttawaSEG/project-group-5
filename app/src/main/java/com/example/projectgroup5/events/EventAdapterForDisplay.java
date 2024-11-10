@@ -1,6 +1,7 @@
 package com.example.projectgroup5.events;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,16 +11,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.example.projectgroup5.R;
-import com.example.projectgroup5.database.DatabaseManager;
-import com.example.projectgroup5.users.User;
 
 import java.util.List;
 
-public class EventAdapterForOrganizer extends ArrayAdapter<Event> {
+public class EventAdapterForDisplay extends ArrayAdapter<Event> {
 
     Context context;
 
-    public EventAdapterForOrganizer(@NonNull Context context,  @NonNull List<Event> objects) {
+    public EventAdapterForDisplay(@NonNull Context context, @NonNull List<Event> objects) {
         super(context, 0, objects);
         this.context = context;
     }
@@ -37,9 +36,9 @@ public class EventAdapterForOrganizer extends ArrayAdapter<Event> {
             TextView titleTextView = convertView.findViewById(R.id.eventTitleEntry);
             titleTextView.setText(event.getTitle());
         }
-        // description
         if (event.getDescription() != null) {
             TextView descriptionTextView = convertView.findViewById(R.id.eventDescriptionEntry);
+            Log.d("EventAdapterForDisplay", "Description dash: " + event.getDescription());
             descriptionTextView.setText(event.getDescription());
         }
         // address
@@ -57,6 +56,7 @@ public class EventAdapterForOrganizer extends ArrayAdapter<Event> {
             TextView endTimeTextView = convertView.findViewById(R.id.endTimeEntry);
             endTimeTextView.setText(event.getEndTime().toDate().toString());
         }
+
 
 
         return convertView;

@@ -72,6 +72,6 @@
             android:layout_marginHorizontal="50sp"
             android:layout_height="wrap_content"
             android:id="@+id/organizer_event_requests"
-            android:text="My Requests" />
+            android:text="All Requests" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

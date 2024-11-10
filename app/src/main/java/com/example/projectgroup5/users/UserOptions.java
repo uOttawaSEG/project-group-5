@@ -3,6 +3,9 @@ package com.example.projectgroup5.users;
 import android.util.Log;
 
 import com.example.projectgroup5.database.DatabaseManager;
+import com.example.projectgroup5.events.Event;
+import com.example.projectgroup5.events.Registration;
+import com.google.firebase.firestore.DocumentReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,17 @@ public class UserOptions {
         void onDataReceived(List<User> userIds);
     }
 
+    public interface RegistrationsCallback {
+        /**
+         * Called when the data retrieval is complete and the user list is available.
+         *
+         * @param registrations A list of User registration objects that were retrieved.
+         */
+        void onDataReceived(List<Registration> registrations);
+    }
+
+
+
     /**
      * Retrieves a list of users with a specific registration status.
      * <p>
@@ -41,32 +55,127 @@ public class UserOptions {
         DatabaseManager databaseManager = DatabaseManager.getDatabaseManager();
         databaseManager.getUserIdByMatchingDataFromFirestore(DatabaseManager.USER_REGISTRATION_STATE, userRegistrationState, userIds -> {
             // Create a counter to track completed user data retrieval
+            // If there are no users, callback immediately
+            if (userIds.isEmpty()) {
+                callback.onDataReceived(pendingUsers);
+                return;
+            }
             AtomicInteger remainingCalls = new AtomicInteger(userIds.size());
             for (String userId : userIds) {
 //                DatabaseManager.getDatabaseManager().getUserDataFromFirestore(userId, DatabaseManager.USER_TYPE, userType -> {
-                    User.newUserFromDatabase(userId, task -> {
-                        if (!task.isSuccessful() || task.getResult() == null) {
-                            Log.e("UserOptions", "Failed to create user from database, user ID: " + userId);
-                            if (remainingCalls.decrementAndGet() == 0) {
-                                // Call the callback with the retrieved pending users
-                                callback.onDataReceived(pendingUsers);
-                            }
-                            return;
-                        }
-                        pendingUsers.add(task.getResult());
-                        // Decrement the counter and check if all callbacks are complete
+                User.newUserFromDatabase(userId, task -> {
+                    if (!task.isSuccessful() || task.getResult() == null) {
+                        Log.e("UserOptions", "Failed to create user from database, user ID: " + userId);
                         if (remainingCalls.decrementAndGet() == 0) {
                             // Call the callback with the retrieved pending users
                             callback.onDataReceived(pendingUsers);
                         }
-                    });
+                        return;
+                    }
+                    pendingUsers.add(task.getResult());
+                    // Decrement the counter and check if all callbacks are complete
+                    if (remainingCalls.decrementAndGet() == 0) {
+                        // Call the callback with the retrieved pending users
+                        callback.onDataReceived(pendingUsers);
+                    }
+                });
             }
-            // If there are no users, callback immediately
-            if (userIds.isEmpty()) {
-                callback.onDataReceived(pendingUsers);
-            }
+
         });
     }
+
+    public static void getRegistrationsWithStatusToEvent(RegistrationsCallback callback, String userRegistrationState, Event event) {
+        getRegistrationWithStatusToEvent(callback, userRegistrationState, List.of(event));
+    }
+
+    public static void getRegistrationWithStatusToEvent(RegistrationsCallback callback, String userRegistrationState, List<Event> events) {
+        List<Registration> registrations = new ArrayList<>();
+
+        List<DocumentReference> listOfRegistrations = new ArrayList<>();
+        for (Event event : events) {
+            listOfRegistrations.addAll(event.getRegistrations());
+        }
+        // If there are no users, callback immediately
+        if (listOfRegistrations.isEmpty()) {
+            callback.onDataReceived(registrations);
+            return;
+        }
+        // Create a counter to track completed user data retrieval
+        AtomicInteger remainingCalls = new AtomicInteger(listOfRegistrations.size());
+        for (DocumentReference registrationReference : listOfRegistrations) {
+            DatabaseManager.getDatabaseManager().getRegistration(registrationReference.getId(), task -> {
+                if (!task.isSuccessful() || task.getResult() == null) {
+                    Registration registration = task.getResult();
+                    Log.e("UserOptions", "Failed to create registration from database, registration ID: " + registrationReference.getId());
+                    if (registration.getRegistrationStatus().equals(userRegistrationState)) {
+                        DatabaseManager.getDatabaseManager().getRegistration(registrationReference.getId(), task2 -> {
+                            if (!task2.isSuccessful() || task2.getResult() == null) {
+                                Log.e("UserOptions", "Failed to create registration from database, registration ID: " + registrationReference.getId());
+                                return;
+                            }
+                            registrations.add(task2.getResult());
+                            // Decrement the counter and check if all callbacks are complete
+                            if (remainingCalls.decrementAndGet() == 0) {
+                                // Call the callback with the retrieved pending users
+                                callback.onDataReceived(registrations);
+                            }
+                        });
+                    }
+                    if (remainingCalls.decrementAndGet() == 0) {
+                        // Call the callback with the retrieved pending users
+                        callback.onDataReceived(registrations);
+                    }
+                }
+            });
+        }
+    }
+
+
+    /*
+    List<Event> events = new ArrayList<>();
+        DatabaseManager databaseManager = DatabaseManager.getDatabaseManager();
+        databaseManager.getOrganizerEvents(UserSession.getInstance().getUserId(), task -> {
+            if (task == null || !task.isSuccessful()) {
+                Log.e("EventOptions", "Failed to get organizer events");
+                callback.onDataReceived(events);
+                return;
+            } else {
+                List<DocumentReference> eventIds = task.getResult();
+                // Create a counter to track completed event data retrieval
+                AtomicInteger remainingCalls = new AtomicInteger(eventIds.size());
+                Log.d("EventOptions", "Got " + eventIds.size() + " events");
+                for (DocumentReference eventId : eventIds) {
+                    DatabaseManager.getDatabaseManager().getEvent(eventId.getId(), task2 -> {
+                        if (task2.getResult() == null || !task2.isSuccessful()) {
+                            Log.e("EventOptions", "Failed to create event from database, event ID: " + eventId);
+                            if (remainingCalls.decrementAndGet() == 0) {
+                                // Call the callback with the retrieved pending events
+                                callback.onDataReceived(events);
+                            }
+                            return;
+                        }
+                        if (task2.getResult().holdsAnEvent()) {
+                            Event event = task2.getResult().getEvent();
+                            // check if the event is in the correct time status
+                            if (event.getTimeStatus().equals(eventTimeStatus)) {
+                                events.add(event);
+                            }
+                        }
+                        // Decrement the counter and check if all callbacks are complete
+                        if (remainingCalls.decrementAndGet() == 0) {
+                            // Call the callback with the retrieved pending events
+                            callback.onDataReceived(events);
+                        }
+                    });
+                }
+                // If there are no events, callback immediately
+                if (eventIds.isEmpty()) {
+                    callback.onDataReceived(events);
+                }
+            }
+        });
+    * */
+
 
     /**
      * Retrieves a list of users who have been accepted.
