@@ -37,6 +37,7 @@ import com.example.projectgroup5.users.UserSession;
 import com.google.firebase.firestore.DocumentReference;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -53,52 +54,73 @@ public class DashboardEventList extends Fragment {
         SearchView searchView = binding.getRoot().findViewById(R.id.event_search_view);
         searchView.setQueryHint("Search for items");
         List<Event> events = new ArrayList<>();
-        // Add listener for when query changes
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                DatabaseManager.getDatabaseManager().getEventsThatMatchQuery(query, eventIds -> {
-                    if (eventIds == null) {
-                    } else {
-                        events.clear();
-                        events.addAll(eventIds);
-                        EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
-                        listView.setAdapter(eventOrganizerAdapter);
-                    }
-                });
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String query) {
-                if (query == null || query.isEmpty()) {
-                    List<Event> events = new ArrayList<>();
-                    DatabaseManager.getDatabaseManager().getEvents(eventIds -> {
-                        Log.d("DashboardEventList", "Event before ids: " + eventIds.getResult());
-                        if (eventIds == null) {
-                        } else {
-                            Log.d("DashboardEventList", "Event ids: " + eventIds.getResult());
-                            events.clear();
-                            events.addAll(eventIds.getResult());
-                            EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
-                            listView.setAdapter(eventOrganizerAdapter);
-                        }
-                    });
-                    return true;
-                }
-                return false;
-            }
-        });
         DatabaseManager.getDatabaseManager().getEvents(eventIds -> {
             Log.d("DashboardEventList", "Event before ids: " + eventIds.getResult());
             if (eventIds == null) {
             } else {
                 Log.d("DashboardEventList", "Event ids: " + eventIds.getResult());
                 events.addAll(eventIds.getResult());
+                // remove the past events
+                events.removeIf(event -> event.getStartTime().toDate().before(new java.util.Date()));
+                // now we must sort the events by starting date
+                events.sort(Comparator.comparing(Event::getStartTime));
                 EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
                 listView.setAdapter(eventOrganizerAdapter);
             }
         });
+        // Add listener for when query changes
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+//                DatabaseManager.getDatabaseManager().getEventsThatMatchQuery(query, eventIds -> {
+//                    if (eventIds == null) {
+//                    } else {
+//                        events.clear();
+//                        events.addAll(eventIds);
+//                        EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
+//                        listView.setAdapter(eventOrganizerAdapter);
+//                    }
+//                });
+                // sort the event using the query with the closest test to the query first
+                events.sort((o1, o2) -> {
+                    if (o1.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                        return -1;
+                    } else if (o2.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+                EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
+                listView.setAdapter(eventOrganizerAdapter);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                if (query == null || query.isEmpty()) {
+//                    List<Event> events = new ArrayList<>();
+//                    DatabaseManager.getDatabaseManager().getEvents(eventIds -> {
+//                        Log.d("DashboardEventList", "Event before ids: " + eventIds.getResult());
+//                        if (eventIds == null) {
+//                        } else {
+//                            Log.d("DashboardEventList", "Event ids: " + eventIds.getResult());
+//                            events.clear();
+//                            events.addAll(eventIds.getResult());
+//                            EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
+//                            listView.setAdapter(eventOrganizerAdapter);
+//                        }
+//                    });
+                    // now we must sort the events by starting date
+                    events.sort(Comparator.comparing(Event::getStartTime));
+                    EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
+                    listView.setAdapter(eventOrganizerAdapter);
+                    return true;
+                }
+                return false;
+            }
+        });
+
 
 
         // set on click listener if the user is an attendee
