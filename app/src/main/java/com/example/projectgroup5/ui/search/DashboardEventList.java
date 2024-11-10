@@ -41,7 +41,7 @@ import java.util.List;
 
 
 public class DashboardEventList extends Fragment {
-    private static final int LONG_PRESS_THRESHOLD = 1000; // 5 second for second action
+    private static final int LONG_PRESS_THRESHOLD = 2000; // 5 second for second action
     private final Handler handler = new Handler();
     private Runnable prolongedPressRunnable;
 
@@ -49,7 +49,6 @@ public class DashboardEventList extends Fragment {
         FragmentDashboardEventListBinding binding = FragmentDashboardEventListBinding.inflate(inflater, container, false);
         // Initialize the ListView
         ListView listView = binding.searchListLayout;
-        NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
         // get the navigator
         SearchView searchView = binding.getRoot().findViewById(R.id.event_search_view);
         searchView.setQueryHint("Search for items");
@@ -104,10 +103,6 @@ public class DashboardEventList extends Fragment {
 
         // set on click listener if the user is an attendee
         listView.setOnItemClickListener((parentView, view, position, id) -> {
-            // if the user is not an instanceof attendee return
-            if (UserSession.getInstance().getUserRepresentation() == null || !(UserSession.getInstance().getUserRepresentation() instanceof Attendee)) {
-                return;
-            }
             // we toggle the description and adress visibility
             Event selectedEvent = (Event) parentView.getItemAtPosition(position);
             if (selectedEvent.getDescription() != null) {

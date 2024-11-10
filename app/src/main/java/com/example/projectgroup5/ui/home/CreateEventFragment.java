@@ -213,7 +213,7 @@ public class CreateEventFragment extends Fragment {
             // Create a Calendar object and set the selected time
             calendarToSet.set(startCalendar.get(Calendar.YEAR), startCalendar.get(Calendar.MONTH), startCalendar.get(Calendar.DAY_OF_MONTH), hourOfDay, minute1, 0);
             // increase the day by 1 if the time is smaller than calendar
-            if (calendarToSet.getTimeInMillis() <= startCalendar.getTimeInMillis() && calendarToSet != startCalendar) {
+            if (calendarToSet.getTimeInMillis() <= startCalendar.getTimeInMillis() + 50000 && calendarToSet != startCalendar) {
                 calendarToSet.add(Calendar.DAY_OF_YEAR, 1);
             }
             // clear the Pick END time if the new start time is after the end time

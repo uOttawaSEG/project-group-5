@@ -4,6 +4,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.projectgroup5.database.Notification;
 import com.example.projectgroup5.users.UserSession;
@@ -63,9 +64,9 @@ public class MainActivity extends AppCompatActivity {
         createNotificationChannel();
         UserSession.initialize(this, task -> {
             if (task.isSuccessful()) {
-                System.out.println("UserSession initialized successfully");
+                Log.d("MainActivity", "UserSession initialized successfully");
             } else {
-                System.out.println("UserSession initialization failed");
+                Log.e("MainActivity", "UserSession initialization failed", task.getException());
             }
             if (onCompleteListener != null) {
                 onCompleteListener.onComplete(Tasks.forResult(true));

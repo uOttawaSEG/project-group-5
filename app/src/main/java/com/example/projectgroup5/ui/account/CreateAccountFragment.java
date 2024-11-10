@@ -40,7 +40,7 @@ public class CreateAccountFragment extends Fragment {
         });
 
         root.findViewById(R.id.cancelButtonCreate).setOnClickListener(v ->{
-            navController.navigate(R.id.action_create_account_to_login_or_create_account);
+            navController.popBackStack();
         });
 
         root.findViewById(R.id.confirmCredentialAndCreateButton).setOnClickListener(v -> {

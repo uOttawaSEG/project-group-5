@@ -49,6 +49,7 @@ public class UserSession {
         FirebaseUser user = DatabaseManager.getDatabaseManager().getCurrentUser();
         if (user == null) {
             Log.e("UserSession", "User is null");
+            listener.onComplete(Tasks.forResult(null));
             return;
         }
         userId = user.getUid();
