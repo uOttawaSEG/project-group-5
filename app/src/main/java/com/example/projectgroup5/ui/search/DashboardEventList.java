@@ -51,7 +51,6 @@ public class DashboardEventList extends Fragment {
         ListView listView = binding.searchListLayout;
         NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
         // get the navigator
-        String query = "";
         SearchView searchView = binding.getRoot().findViewById(R.id.event_search_view);
         searchView.setQueryHint("Search for items");
         List<Event> events = new ArrayList<>();
@@ -62,6 +61,7 @@ public class DashboardEventList extends Fragment {
                 DatabaseManager.getDatabaseManager().getEventsThatMatchQuery(query, eventIds -> {
                     if (eventIds == null) {
                     } else {
+                        events.clear();
                         events.addAll(eventIds);
                         EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
                         listView.setAdapter(eventOrganizerAdapter);
@@ -79,6 +79,7 @@ public class DashboardEventList extends Fragment {
                         if (eventIds == null) {
                         } else {
                             Log.d("DashboardEventList", "Event ids: " + eventIds.getResult());
+                            events.clear();
                             events.addAll(eventIds.getResult());
                             EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
                             listView.setAdapter(eventOrganizerAdapter);
@@ -138,7 +139,7 @@ public class DashboardEventList extends Fragment {
                                     // update the UserSession with the new event
                                     ((Attendee) UserSession.getInstance().getUserRepresentation()).addRegistration(registrationRef);
                                     // add the event to the user's list of events
-                                    DatabaseManager.getDatabaseManager().addRegistrationToAttendee(userRef.getId(), eventRef.getId(), task4 -> {
+                                    DatabaseManager.getDatabaseManager().addRegistrationToAttendee(userRef.getId(), registrationRef, task4 -> {
                                     Toast.makeText(getContext(), "Event registered", Toast.LENGTH_LONG).show();
                                     Log.d("DashboardEventList", "Event registered successfully and removed from list");
                                     events.remove(selectedEvent);

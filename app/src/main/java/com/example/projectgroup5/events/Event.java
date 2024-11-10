@@ -53,8 +53,8 @@ public class Event {
         this.autoAccept = autoAccept;
         this.registrations = registrations;
         this.organizer = organizer;
+        Log.d("Event", "Event constructor called event has been created");
         this.eventID = UUID.randomUUID().toString();
-
     }
 
     protected Event(String title, String description, String address, Timestamp startTime, Timestamp endTime, boolean autoAccept, List<DocumentReference> registrations, DocumentReference organizer, String eventID) {
@@ -66,6 +66,7 @@ public class Event {
         this.autoAccept = autoAccept;
         this.registrations = registrations;
         this.organizer = organizer;
+        Log.d("Event", "old Event constructor called event has been created id: " + eventID);
         this.eventID = eventID;
 
     }

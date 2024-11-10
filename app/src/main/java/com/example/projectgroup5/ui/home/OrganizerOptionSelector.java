@@ -29,7 +29,9 @@ public class OrganizerOptionSelector extends Fragment {
         binding.getRoot().findViewById(R.id.organizer_view_event_list).setOnClickListener(v -> navController.navigate(R.id.action_organizer_option_selector_to_organizer_event_list));
 //
 //        // and finally the pending list button
-        binding.getRoot().findViewById(R.id.organizer_event_requests).setOnClickListener(v -> navController.navigate(R.id.action_organizer_option_selector_to_organizer_registration_list));
+        binding.getRoot().findViewById(R.id.organizer_event_requests).setOnClickListener(v -> {
+            OrganizerRegistrationList.setGlobal();
+            navController.navigate(R.id.action_organizer_option_selector_to_organizer_registration_list);});
 
         return binding.getRoot();
     }

@@ -36,7 +36,7 @@ import java.util.List;
 
 
 public class OrganizerEventList extends Fragment {
-    private static final int LONG_PRESS_THRESHOLD = 5000; // 5 second for second action
+    private static final int LONG_PRESS_THRESHOLD = 3000; // 5 second for second action
     private final Handler handler = new Handler();
     private Runnable prolongedPressRunnable;
 
@@ -64,6 +64,7 @@ public class OrganizerEventList extends Fragment {
                 switch (position) {
                     case 0:
                         EventOption.getFutureEvents(eventIds -> {
+                            events.clear();
                             events.addAll(eventIds);
                             EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
                             listView.setAdapter(eventOrganizerAdapter);
@@ -71,6 +72,7 @@ public class OrganizerEventList extends Fragment {
                         break;
                     case 1:
                         EventOption.getPastEvents(eventIds -> {
+                            events.clear();
                             events.addAll(eventIds);
                             EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
                             listView.setAdapter(eventOrganizerAdapter);
@@ -78,6 +80,7 @@ public class OrganizerEventList extends Fragment {
                         break;
                     case 2:
                         EventOption.getCurrentEvents(eventIds -> {
+                            events.clear();
                             events.addAll(eventIds);
                             EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
                             listView.setAdapter(eventOrganizerAdapter);
@@ -91,21 +94,23 @@ public class OrganizerEventList extends Fragment {
 
                 listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
+
                     @Override
                     public boolean onItemLongClick(AdapterView<?> parentView, View view, int position, long id) {
+                        Log.d("OrganizerEventList", "Long click");
                         // Handle long click event
                         Event selectedEvent = (Event) parentView.getItemAtPosition(position);
                         // get the number of accepted registrations for the event
                         List<Registration> attendees = new ArrayList<>();
+                        Log.d("OrganizerEventList", "Selected event: " + selectedEvent);
                         UserOptions.getRegistrationsWithStatusToEvent(registrations -> {
                             attendees.addAll(registrations);
-                            if (selectedEvent.getRegistrations() != null && selectedEvent.getRegistrations().size() > 0 && attendees.size() > 0) {
+                            Log.d("OrganizerEventList", "Attendees: " + registrations);
+                            if (selectedEvent.getRegistrations() != null && !selectedEvent.getRegistrations().isEmpty() && !attendees.isEmpty()) {
                                 Toast.makeText(getContext(), "Some attendee", Toast.LENGTH_SHORT).show();
                                 // we display move to the list of registrations
                                 OrganizerRegistrationList.setSelectedEvent(selectedEvent);
-                                OrganizerRegistrationList.setOnlyEvent(true);
                                 navController.navigate(R.id.action_organizer_event_list_to_organizer_registration_list);
-
                             } else {
                                 Toast.makeText(getContext(), "No attendee, keep holding to delete", Toast.LENGTH_SHORT).show();
                                 // we display the option to delete the event and delete it

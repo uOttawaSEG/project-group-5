@@ -630,21 +630,20 @@ public class DatabaseManager {
         });
     }
 
-    public void addRegistrationToAttendee(String attendeeId, String registrationId, OnCompleteListener<Void> listener) {
+    public void addRegistrationToAttendee(String attendeeId, DocumentReference registrationId, OnCompleteListener<Void> listener) {
         User.newUserFromDatabase(attendeeId, userTask -> {
             if (userTask.isSuccessful()) {
                 User user = userTask.getResult();
                 if (user instanceof Attendee attendee) {
-                    getUserReference(attendeeId).update(USER_ATTENDEE_REGISTRATIONS, FieldValue.arrayUnion(registrationId)).addOnCompleteListener(listener).addOnCompleteListener(task -> attendee.addRegistration(getRegistrationReference(registrationId))).addOnCompleteListener(task -> {
+                    getUserReference(attendeeId).update(USER_ATTENDEE_REGISTRATIONS, FieldValue.arrayUnion(registrationId)).addOnCompleteListener(listener).addOnCompleteListener(task -> attendee.addRegistration(registrationId)).addOnCompleteListener(task -> {
                         Log.d("DatabaseManager", "Registration added to attendee in addRegistrationToAttendee: " + registrationId);
                     });
-                    attendee.addRegistration(getRegistrationReference(registrationId));
                 }
             }
         });
     }
 
-    public void addRegistrationToAttendee(String registrationId, OnCompleteListener<Void> listener) {
+    public void addRegistrationToAttendee(DocumentReference registrationId, OnCompleteListener<Void> listener) {
         addRegistrationToAttendee(UserSession.getInstance().getUserId(), registrationId, listener);
     }
 
@@ -942,17 +941,20 @@ public class DatabaseManager {
                         List<DocumentReference> newRegistrations = new ArrayList<>(registrations);
                         if (newRegistrations == null) {
                             Log.e("DatabaseManager", "Event has no registrations");
-                            return;
+                            continue;
                         }
                         newRegistrations.retainAll(attendee.getAttendeeRegistrations());
                         if (newRegistrations.size() == 1) {
                             Log.d("DatabaseManager", "Event has one registration");
-                            return;
+                            continue;
                         } else if (newRegistrations.size() > 1) {
                             Log.e("DatabaseManager", "Event has multiple registrations");
-                            return;
+                            continue;
                         } else {
                             Log.d("DatabaseManager", "Event has no registrations in common");
+                            // print the user registrations and the event registrations
+                            Log.d("DatabaseManager", "User event has registrations:  " + attendee.getAttendeeRegistrations());
+                            Log.d("DatabaseManager", "Event has registrations:       " + registrations);
                         }
                     }
 
@@ -977,6 +979,7 @@ public class DatabaseManager {
         getEvents(
                 task -> {
                     if (task.isSuccessful()) {
+                        Log.d("DatabaseManager", "Events has event unfiltered: " + task.getResult());
                         for (Event event : task.getResult()) {
                             if (event.getTitle().toLowerCase().contains(query.toLowerCase())) {
                                 events.add(event);
@@ -984,9 +987,10 @@ public class DatabaseManager {
                                 events.add(event);
                             }
                         }
+                        Log.d("DatabaseManager", "Events has event filtered: " + events);
                         callback.onDataReceived(events);
-                    }
-                    else {
+                    } else {
+                        Log.e("DatabaseManager", "Error has event getting events: " + task.getException());
                         callback.onDataReceived(events);
                     }
                 }

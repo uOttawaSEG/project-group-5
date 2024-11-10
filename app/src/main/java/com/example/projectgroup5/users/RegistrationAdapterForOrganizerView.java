@@ -43,15 +43,42 @@ public class RegistrationAdapterForOrganizerView extends ArrayAdapter<Registrati
             customView = LayoutInflater.from(context).inflate(R.layout.admin_account_entry, parent, false);
         }
 
-        Log.d("UserAdapterForAdminView", "getView called for position: " + position);
-
         // Get the user for the current position
         Registration registration = getItem(position);
 
         customView.setId(registration.getRegistrationId().hashCode());
         // set get the data from firebase if possible
         View finalCustomView = customView;
+        DatabaseManager.getDatabaseManager().getEventReference(registration.getEvent().getId()).get().addOnSuccessListener(value -> {
+            TextView titleTextView = finalCustomView.findViewById(R.id.titleEntry);
+            titleTextView.setText(value.getString(DatabaseManager.EVENT_TITLE));
+            titleTextView.setVisibility(View.VISIBLE);
+            //TODO look into this to check if buttons are alright
+        });
 
+                switch (registration.getRegistrationStatus()) {
+                    case REJECTED: {
+                        Button rejectButton = finalCustomView.findViewById(R.id.rejectUserButton);
+                        rejectButton.setVisibility(View.GONE);
+                        Button acceptButton = finalCustomView.findViewById(R.id.acceptUserButton);
+                        acceptButton.setVisibility(View.VISIBLE);
+                        break;
+                    }
+                    case ACCEPTED: {
+                        Button rejectButton = finalCustomView.findViewById(R.id.rejectUserButton);
+                        rejectButton.setVisibility(View.GONE);
+                        Button acceptButton = finalCustomView.findViewById(R.id.acceptUserButton);
+                        acceptButton.setVisibility(View.GONE);
+                        break;
+                    }
+                    case WAITLISTED: {
+                        Button rejectButton = finalCustomView.findViewById(R.id.rejectUserButton);
+                        rejectButton.setVisibility(View.VISIBLE);
+                        Button acceptButton = finalCustomView.findViewById(R.id.acceptUserButton);
+                        acceptButton.setVisibility(View.VISIBLE);
+                        break;
+                    }
+            }
         // get the user from the registration
         User.newUserFromDatabase(registration.getAttendee().getId(), userTask -> {
             User user;
@@ -61,20 +88,14 @@ public class RegistrationAdapterForOrganizerView extends ArrayAdapter<Registrati
                 Log.e("UserAdapterForAdminView", "Failed to create user from database, user ID: " + registration.getAttendee().getId());
                 return;
             }
+            // TODO add a title field to the registration display
+
             DatabaseManager.getDatabaseManager().getAllUserDataFromFirestore(user.getUserId(), value -> {
                 if (value != null) {
                     if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
                         user.setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
                         TextView userAddressTextView = finalCustomView.findViewById(R.id.homeAddressEntry);
                         userAddressTextView.setText(user.getUserAddress());
-                    }
-                    if (value.containsKey(USER_ORGANIZATION_NAME)) {
-                        if (user instanceof Organizer organizer) {
-                            organizer.setUserOrganizationName(value.get(USER_ORGANIZATION_NAME).toString());
-                            TextView userOrganizationNameTextView = finalCustomView.findViewById(R.id.organizationNameEntry);
-                            userOrganizationNameTextView.setVisibility(View.VISIBLE);
-                            userOrganizationNameTextView.setText(organizer.getUserOrganizationName());
-                        }
                     }
                     if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
                         user.setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
@@ -101,31 +122,7 @@ public class RegistrationAdapterForOrganizerView extends ArrayAdapter<Registrati
                         TextView userPhoneNumberTextView = finalCustomView.findViewById(R.id.phoneNumberEntry);
                         userPhoneNumberTextView.setText(user.getPhoneNumber() + "");
                     }
-                    if (value.containsKey(DatabaseManager.USER_REGISTRATION_STATE)) {
-                        switch (value.get(DatabaseManager.USER_REGISTRATION_STATE).toString()) {
-                            case REJECTED: {
-                                Button rejectButton = finalCustomView.findViewById(R.id.rejectUserButton);
-                                rejectButton.setVisibility(View.GONE);
-                                Button acceptButton = finalCustomView.findViewById(R.id.acceptUserButton);
-                                acceptButton.setVisibility(View.VISIBLE);
-                                break;
-                            }
-                            case ACCEPTED: {
-                                Button rejectButton = finalCustomView.findViewById(R.id.rejectUserButton);
-                                rejectButton.setVisibility(View.GONE);
-                                Button acceptButton = finalCustomView.findViewById(R.id.acceptUserButton);
-                                acceptButton.setVisibility(View.GONE);
-                                break;
-                            }
-                            case WAITLISTED: {
-                                Button rejectButton = finalCustomView.findViewById(R.id.rejectUserButton);
-                                rejectButton.setVisibility(View.VISIBLE);
-                                Button acceptButton = finalCustomView.findViewById(R.id.acceptUserButton);
-                                acceptButton.setVisibility(View.VISIBLE);
-                                break;
-                            }
-                        }
-                    }
+
                 }
 
             });

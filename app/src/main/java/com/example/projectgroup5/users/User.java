@@ -114,7 +114,13 @@ public abstract class User {
                         if (user instanceof Attendee attendee) {
                             // try the cast to list of document references
                             List<DocumentReference> registrations = (List<DocumentReference>) value.get(DatabaseManager.USER_ATTENDEE_REGISTRATIONS);
-                            if (registrations == null)
+                           if (registrations != null) {
+                               for (DocumentReference registration : registrations) {
+                                   // print the registrations
+                                   Log.d("User", "User attendee registrations event has at database fetch: " + registration.toString());
+                                   Log.d("User", "User attendee registrations event has at database fetch: " + registration.getId());
+                               }
+                           }
                                 attendee.setAttendeeRegistrations(registrations);
                         }
                     }

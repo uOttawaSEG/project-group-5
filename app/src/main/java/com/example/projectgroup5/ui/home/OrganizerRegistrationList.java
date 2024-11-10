@@ -60,17 +60,17 @@ public class OrganizerRegistrationList extends Fragment {
         acceptAllUserSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             // if the switch is checked, we accept all the registrations if only event is false, otherwise we accept all the registrations for the selected event
             // then we update the database autoAccept field
-            if (isChecked){
+            if (isChecked) {
                 if (onlyEvent) {
                     DatabaseManager.getDatabaseManager().changeEventAutoAccept(DatabaseManager.getDatabaseManager().getEventReference(selectedEvent.getEventID()), true);
                     // then we update all the registrations to accepted
                     UserOptions.getRegistrationsWithStatusToEvent(registrationsresult -> {
-                        for (Registration registration : registrationsresult) {
-                            DatabaseManager.getDatabaseManager().changeAttendeeStatus(DatabaseManager.getDatabaseManager().getRegistrationReference(registration.getRegistrationId()), User.ACCEPTED);
-                        }
-                        // now we reload the list by refreshing the fragment
-                        navController.navigate(R.id.action_organizer_registration_list_self);
-                    },
+                                for (Registration registration : registrationsresult) {
+                                    DatabaseManager.getDatabaseManager().changeAttendeeStatus(DatabaseManager.getDatabaseManager().getRegistrationReference(registration.getRegistrationId()), User.ACCEPTED);
+                                }
+                                // now we reload the list by refreshing the fragment
+                                navController.navigate(R.id.action_organizer_registration_list_self);
+                            },
                             User.WAITLISTED,
                             selectedEvent);
                 } else {
@@ -78,7 +78,6 @@ public class OrganizerRegistrationList extends Fragment {
                         List<Event> events;
                         if (task == null || !task.isSuccessful()) {
                             Log.e("EventOptions", "Failed to get organizer events");
-                            return;
                         } else {
                             events = task.getResult();
 
@@ -91,8 +90,9 @@ public class OrganizerRegistrationList extends Fragment {
                             }, User.WAITLISTED, events);
                         }
 
-                });
-            }} else if (onlyEvent) {
+                    });
+                }
+            } else if (onlyEvent) {
                 DatabaseManager.getDatabaseManager().changeEventAutoAccept(DatabaseManager.getDatabaseManager().getEventReference(selectedEvent.getEventID()), false);
                 // then we update all the registrations to accepted
             }
@@ -113,8 +113,8 @@ public class OrganizerRegistrationList extends Fragment {
                             UserOptions.getRegistrationsWithStatusToEvent(registrationsresult -> {
                                         registrationsList.addAll(registrationsresult);
                                         RegistrationAdapterForOrganizerView userAdapter = new RegistrationAdapterForOrganizerView(getContext(), registrationsList);
-                                listView.setAdapter(userAdapter);
-                            },
+                                        listView.setAdapter(userAdapter);
+                                    },
                                     User.ACCEPTED,
                                     selectedEvent
                             );
@@ -122,9 +122,9 @@ public class OrganizerRegistrationList extends Fragment {
                         case 1:
                             UserOptions.getRegistrationsWithStatusToEvent(registrationsresult -> {
                                         registrationsList.addAll(registrationsresult);
-                                RegistrationAdapterForOrganizerView userAdapter = new RegistrationAdapterForOrganizerView(getContext(), registrationsList);
-                                listView.setAdapter(userAdapter);
-                            }
+                                        RegistrationAdapterForOrganizerView userAdapter = new RegistrationAdapterForOrganizerView(getContext(), registrationsList);
+                                        listView.setAdapter(userAdapter);
+                                    }
                                     ,
                                     User.WAITLISTED,
                                     selectedEvent);
@@ -132,9 +132,9 @@ public class OrganizerRegistrationList extends Fragment {
                         case 2:
                             UserOptions.getRegistrationsWithStatusToEvent(registrationsresult -> {
                                         registrationsList.addAll(registrationsresult);
-                                RegistrationAdapterForOrganizerView userAdapter = new RegistrationAdapterForOrganizerView(getContext(), registrationsList);
-                                listView.setAdapter(userAdapter);
-                            },
+                                        RegistrationAdapterForOrganizerView userAdapter = new RegistrationAdapterForOrganizerView(getContext(), registrationsList);
+                                        listView.setAdapter(userAdapter);
+                                    },
                                     User.REJECTED,
                                     selectedEvent);
                             break;
@@ -146,66 +146,46 @@ public class OrganizerRegistrationList extends Fragment {
                     // get all the events and their registrations for each user
                     // get all the events of the organizer from the database
                     DatabaseManager.getDatabaseManager().getOrganizerEvents(UserSession.getInstance().getUserId(), task -> {
-                            List<Event> events;
-                            if (task == null || !task.isSuccessful()) {
+                        List<Event> events;
+                        if (task == null || !task.isSuccessful()) {
                             Log.e("EventOptions", "Failed to get organizer events");
                             return;
                         } else {
-                                events = task.getResult();
+                            events = task.getResult();
                         }
+                        Log.d("OrganizerRegistrationList", "All Organizer Events: " + events);
                         switch (position) {
 
                             case 0:
                                 UserOptions.getRegistrationWithStatusToEvent(registrations -> {
-                                            for (Registration registration : registrations) {
-                                                // get the user associated with the registration
-                                            }
+                                            registrationsList.addAll(registrations);
+                                            RegistrationAdapterForOrganizerView userAdapter = new RegistrationAdapterForOrganizerView(getContext(), registrationsList);
+                                            listView.setAdapter(userAdapter);
                                         },
                                         User.ACCEPTED,
                                         events);
                             case 1:
                                 UserOptions.getRegistrationWithStatusToEvent(registrations -> {
-                                            for (Registration registration : registrations) {
-                                                // get the user associated with the registration
-                                            }
+                                            registrationsList.addAll(registrations);
+                                            RegistrationAdapterForOrganizerView userAdapter = new RegistrationAdapterForOrganizerView(getContext(), registrationsList);
+                                            listView.setAdapter(userAdapter);
                                         },
                                         User.WAITLISTED,
                                         events);
                             case 2:
                                 UserOptions.getRegistrationWithStatusToEvent(registrations -> {
-                                            for (Registration registration : registrations) {
-                                                // get the user associated with the registration
-                                            }
+                                            registrationsList.addAll(registrations);
+                                            RegistrationAdapterForOrganizerView userAdapter = new RegistrationAdapterForOrganizerView(getContext(), registrationsList);
+                                            listView.setAdapter(userAdapter);
                                         },
                                         User.REJECTED,
                                         events);
 
 
-
                         }
                     });
                 }
-                // Set the Long Click Listener for the ListView items
-                listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                    @Override
-                    public boolean onItemLongClick(AdapterView<?> parentView, View view, int position, long id) {
-                        // Handle long click event
-                        Event selectedEvent = (Event) parentView.getItemAtPosition(position);
-                        if (selectedEvent.getRegistrations() != null && selectedEvent.getRegistrations().size() > 0) {
-                            Toast.makeText(getContext(), "Registrations for event", Toast.LENGTH_SHORT).show();
-                            // we display move to the list of registrations
-
-                        } else {
-                        Toast.makeText(getContext(), "No registrations for event", Toast.LENGTH_SHORT).show();
-
-                            // we display the option to delete the event and delete it
-
-                        }
-                        return true; // Return true to indicate the event is consumed
-                    }
-                });
             }
-
 
 
             @Override
@@ -222,15 +202,15 @@ public class OrganizerRegistrationList extends Fragment {
     }
 
     public static void setSelectedEvent(Event event) {
-        setOnlyEvent(false);
+        setOnlyEvent(true);
         selectedEvent = event;
     }
 
-    public static void setGlobal(Event event) {
+    public static void setGlobal() {
         setOnlyEvent(false);
     }
 
-    public static void setOnlyEvent(boolean onlyEvent) {
+    private static void setOnlyEvent(boolean onlyEvent) {
         OrganizerRegistrationList.onlyEvent = onlyEvent;
     }
 }

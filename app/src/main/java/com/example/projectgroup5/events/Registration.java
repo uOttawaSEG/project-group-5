@@ -1,5 +1,7 @@
 package com.example.projectgroup5.events;
 
+import android.util.Log;
+
 import com.google.firebase.firestore.DocumentReference;
 
 import java.util.UUID;
@@ -17,6 +19,7 @@ public class Registration {
     public Registration(DocumentReference attendee, String registrationStatus, DocumentReference event) {
         this.attendee = attendee;
         this.registrationStatus = registrationStatus;
+        Log.d("Registration", "Registration constructor called registration event has been created");
         this.registrationId = UUID.randomUUID().toString();
         this.event = event;
     }
@@ -24,6 +27,7 @@ public class Registration {
     public Registration(String registrationId, DocumentReference attendee, String registrationStatus, DocumentReference event) {
         this.attendee = attendee;
         this.registrationStatus = registrationStatus;
+        Log.d("Registration", "old Registration constructor called registration event has been created id: " + registrationId);
         this.registrationId = registrationId;
         this.event = event;
     }
