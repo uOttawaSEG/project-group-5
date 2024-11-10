@@ -1,6 +1,5 @@
 package com.example.projectgroup5.database;
 
-import android.os.Parcel;
 import android.util.Log;
 
 import com.example.projectgroup5.MainActivity;
@@ -33,7 +32,6 @@ import com.google.firebase.firestore.SetOptions;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +61,7 @@ public class DatabaseManager {
     public static final String EVENT_REGISTRATIONS = "EventRegistration"; // this is a list of registrations, they can be found in /registrations/{registrationID}
     public static final String EVENT_ORGANIZER = "EventOrganizer";
     public static final String REGISTRATION_ATTENDEE = "attendee";
-    public static final String REGISTRATION_STATUS = "eventRegistrationStatus";
+    public static final String EVENT_REGISTRATION_STATUS = "eventRegistrationStatus";
     public static final String REGISTRATION_EVENT = "event";
 
     //---------------------------------------------USER-------------------------------------------------------------------
@@ -903,7 +901,7 @@ public class DatabaseManager {
     }
 
     public void changeAttendeeStatus(DocumentReference registrationReference, String status) {
-        registrationReference.update(DatabaseManager.USER_REGISTRATION_STATE, status);
+        registrationReference.update(DatabaseManager.EVENT_REGISTRATION_STATUS, status);
     }
 
     public void getAttendanceToEvent(String userId, DocumentReference eventReference, OnCompleteListener<String> listener) {
@@ -1050,7 +1048,7 @@ public class DatabaseManager {
 
         databaseManager.storeRegistrationValueToFirestore(
                 registration.getRegistrationId(),
-                DatabaseManager.REGISTRATION_STATUS,
+                DatabaseManager.EVENT_REGISTRATION_STATUS,
                 registration.getRegistrationStatus(),
                 (task0) -> handleTaskCompletion(task0, tasksCompleted, totalTasks, referenceToItem, listener) //, "storeUserTypeError")
         );
@@ -1077,7 +1075,7 @@ public class DatabaseManager {
                 task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot snapshot = task.getResult();
-                        String status = snapshot.getString(REGISTRATION_STATUS);
+                        String status = snapshot.getString(EVENT_REGISTRATION_STATUS);
                         DocumentReference attendee = snapshot.getDocumentReference(REGISTRATION_ATTENDEE);
                         DocumentReference event = snapshot.getDocumentReference(REGISTRATION_EVENT);
                         Registration registration = new Registration(registrationId, attendee, status, event);

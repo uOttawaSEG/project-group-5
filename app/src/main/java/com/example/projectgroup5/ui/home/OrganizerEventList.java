@@ -92,6 +92,21 @@ public class OrganizerEventList extends Fragment {
                 }
                 // Set the Long Click Listener for the ListView items
 
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parentView, View view, int position, long id) {
+                        // go to the list of registrations if it is not empty
+                        Event selectedEvent = (Event) parentView.getItemAtPosition(position);
+                        if (selectedEvent.getRegistrations() != null && !selectedEvent.getRegistrations().isEmpty()) {
+                            OrganizerRegistrationList.setSelectedEvent(selectedEvent);
+                            navController.navigate(R.id.action_organizer_event_list_to_organizer_registration_list);
+                        } else {
+                            Toast.makeText(getContext(), "No registrations", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                });
+
                 listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
 
@@ -101,18 +116,18 @@ public class OrganizerEventList extends Fragment {
                         // Handle long click event
                         Event selectedEvent = (Event) parentView.getItemAtPosition(position);
                         // get the number of accepted registrations for the event
-                        List<Registration> attendees = new ArrayList<>();
+//                        List<Registration> attendees = new ArrayList<>();
                         Log.d("OrganizerEventList", "Selected event: " + selectedEvent);
                         UserOptions.getRegistrationsWithStatusToEvent(registrations -> {
-                            attendees.addAll(registrations);
+//                            attendees.addAll(registrations);
                             Log.d("OrganizerEventList", "Attendees: " + registrations);
-                            if (selectedEvent.getRegistrations() != null && !selectedEvent.getRegistrations().isEmpty() && !attendees.isEmpty()) {
-                                Toast.makeText(getContext(), "Some attendee", Toast.LENGTH_SHORT).show();
+                            if (selectedEvent.getRegistrations() != null && !selectedEvent.getRegistrations().isEmpty() && !registrations.isEmpty()) {
+//                                Toast.makeText(getContext(), "Cannot delete event with registrations", Toast.LENGTH_SHORT).show();
                                 // we display move to the list of registrations
                                 OrganizerRegistrationList.setSelectedEvent(selectedEvent);
                                 navController.navigate(R.id.action_organizer_event_list_to_organizer_registration_list);
                             } else {
-                                Toast.makeText(getContext(), "No attendee, keep holding to delete", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Keep holding to delete", Toast.LENGTH_SHORT).show();
                                 // we display the option to delete the event and delete it
                                 // Set up prolonged press detection
                                 prolongedPressRunnable = new Runnable() {

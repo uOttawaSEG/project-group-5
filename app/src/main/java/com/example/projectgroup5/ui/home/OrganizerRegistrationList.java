@@ -79,15 +79,40 @@ public class OrganizerRegistrationList extends Fragment {
                         if (task == null || !task.isSuccessful()) {
                             Log.e("EventOptions", "Failed to get organizer events");
                         } else {
+                            Log.w("OrganizerRegistrationList", "Organizer Events: " + task.getResult());
                             events = task.getResult();
+                            // get the position of the spinner either 0 1 or 2
+                            String status = spinner.getSelectedItemPosition() == 0? User.ACCEPTED : spinner.getSelectedItemPosition() == 1 ? User.WAITLISTED : User.REJECTED;
+                            if (status.equals(User.ACCEPTED) || status.equals(User.WAITLISTED)) {
+                                Log.e("OrganizerRegistrationList", "Status of spinner: " + status);
+                                UserOptions.getRegistrationWithStatusToEvent(registrationsresult -> {
+                                    for (Registration registration : registrationsresult) {
+                                        DatabaseManager.getDatabaseManager().changeAttendeeStatus(DatabaseManager.getDatabaseManager().getRegistrationReference(registration.getRegistrationId()), User.ACCEPTED);
+                                        Log.d("OrganizerRegistrationList", "Registration accepted: " + registration.getAttendee());
+                                    }
+                                    // now we reload the list by refreshing the fragment
+                                    if (!registrationsresult.isEmpty()) {
+                                        //clear the event list and reload it
+                                        navController.popBackStack();
+                                        navController.navigate(R.id.organizer_registration_list);
+                                    }
+                                }, User.WAITLISTED, events);
+                            }
+                            if (status.equals(User.ACCEPTED) || status.equals(User.REJECTED)) {
+                                UserOptions.getRegistrationWithStatusToEvent(registrationsresult -> {
+                                    for (Registration registration : registrationsresult) {
+                                        DatabaseManager.getDatabaseManager().changeAttendeeStatus(DatabaseManager.getDatabaseManager().getRegistrationReference(registration.getRegistrationId()), User.ACCEPTED);
+                                        Log.d("OrganizerRegistrationList", "Registration accepted: " + registration.getAttendee());
+                                    }
+                                    // now we reload the list by refreshing the fragment
+                                    if (!registrationsresult.isEmpty()) {
+                                        //clear the event list and reload it
+                                        navController.popBackStack();
+                                        navController.navigate(R.id.organizer_registration_list);
+                                    }
+                                }, User.REJECTED, events);
+                            }
 
-                            UserOptions.getRegistrationWithStatusToEvent(registrationsresult -> {
-                                for (Registration registration : registrationsresult) {
-                                    DatabaseManager.getDatabaseManager().changeAttendeeStatus(DatabaseManager.getDatabaseManager().getRegistrationReference(registration.getRegistrationId()), User.ACCEPTED);
-                                }
-                                // now we reload the list by refreshing the fragment
-                                navController.navigate(R.id.action_organizer_registration_list_self);
-                            }, User.WAITLISTED, events);
                         }
 
                     });
@@ -111,9 +136,11 @@ public class OrganizerRegistrationList extends Fragment {
                     switch (position) {
                         case 0:
                             UserOptions.getRegistrationsWithStatusToEvent(registrationsresult -> {
+                                        registrationsList.clear();
                                         registrationsList.addAll(registrationsresult);
                                         RegistrationAdapterForOrganizerView userAdapter = new RegistrationAdapterForOrganizerView(getContext(), registrationsList);
                                         listView.setAdapter(userAdapter);
+                                        Log.w("UserOptions", "Registrations accepted: " + registrationsList);
                                     },
                                     User.ACCEPTED,
                                     selectedEvent
@@ -121,9 +148,11 @@ public class OrganizerRegistrationList extends Fragment {
                             break;
                         case 1:
                             UserOptions.getRegistrationsWithStatusToEvent(registrationsresult -> {
+                                        registrationsList.clear();
                                         registrationsList.addAll(registrationsresult);
                                         RegistrationAdapterForOrganizerView userAdapter = new RegistrationAdapterForOrganizerView(getContext(), registrationsList);
                                         listView.setAdapter(userAdapter);
+                                        Log.w("UserOptions", "Registrations waitlisted: " + registrationsList);
                                     }
                                     ,
                                     User.WAITLISTED,
@@ -131,9 +160,11 @@ public class OrganizerRegistrationList extends Fragment {
                             break;
                         case 2:
                             UserOptions.getRegistrationsWithStatusToEvent(registrationsresult -> {
+                                        registrationsList.clear();
                                         registrationsList.addAll(registrationsresult);
                                         RegistrationAdapterForOrganizerView userAdapter = new RegistrationAdapterForOrganizerView(getContext(), registrationsList);
                                         listView.setAdapter(userAdapter);
+                                        Log.w("UserOptions", "Registrations rejected: " + registrationsList);
                                     },
                                     User.REJECTED,
                                     selectedEvent);
@@ -158,28 +189,37 @@ public class OrganizerRegistrationList extends Fragment {
 
                             case 0:
                                 UserOptions.getRegistrationWithStatusToEvent(registrations -> {
+                                            registrationsList.clear();
                                             registrationsList.addAll(registrations);
                                             RegistrationAdapterForOrganizerView userAdapter = new RegistrationAdapterForOrganizerView(getContext(), registrationsList);
                                             listView.setAdapter(userAdapter);
+                                            Log.w("UserOptions", "Registrations accepted all: " + registrationsList);
                                         },
                                         User.ACCEPTED,
                                         events);
+                                        break;
                             case 1:
                                 UserOptions.getRegistrationWithStatusToEvent(registrations -> {
+                                            registrationsList.clear();
                                             registrationsList.addAll(registrations);
                                             RegistrationAdapterForOrganizerView userAdapter = new RegistrationAdapterForOrganizerView(getContext(), registrationsList);
                                             listView.setAdapter(userAdapter);
+                                            Log.w("UserOptions", "Registrations waitlisted all: " + registrationsList);
                                         },
                                         User.WAITLISTED,
                                         events);
+                                break;
                             case 2:
                                 UserOptions.getRegistrationWithStatusToEvent(registrations -> {
+                                            registrationsList.clear();
                                             registrationsList.addAll(registrations);
                                             RegistrationAdapterForOrganizerView userAdapter = new RegistrationAdapterForOrganizerView(getContext(), registrationsList);
                                             listView.setAdapter(userAdapter);
+                                            Log.w("UserOptions", "Registrations rejected all: " + registrationsList);
                                         },
                                         User.REJECTED,
                                         events);
+                                break;
 
 
                         }

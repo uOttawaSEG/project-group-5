@@ -104,41 +104,48 @@ public class UserOptions {
         }
         // Create a counter to track completed user data retrieval
         AtomicInteger remainingCalls = new AtomicInteger(listOfRegistrations.size());
+        Log.d("UserOptions", "Event added OrganizerEvent list of registrations size: " + listOfRegistrations.size());
         for (DocumentReference registrationReference : listOfRegistrations) {
             DatabaseManager.getDatabaseManager().getRegistration(registrationReference.getId(), task -> {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    Registration registration = task.getResult();
-                    Log.e("UserOptions", "Failed to create registration from database, registration ID: " + registrationReference.getId());
-                    if (registration.getRegistrationStatus().equals(userRegistrationState)) {
-                        DatabaseManager.getDatabaseManager().getRegistration(registrationReference.getId(), task2 -> {
-                            if (!task2.isSuccessful() || task2.getResult() == null) {
-                                Log.e("UserOptions", "Failed to create registration from database, registration ID: " + registrationReference.getId());
-                                if (remainingCalls.decrementAndGet() == 0) {
-                                    // Call the callback with the retrieved pending users
-                                    Log.d("UserOptions", "Registration added OrganizerEvent0: " + registration);
-                                    callback.onDataReceived(registrations);
-                                }
-                                return;
-                            }
-                            registrations.add(task2.getResult());
-                            // Decrement the counter and check if all callbacks are complete
-                            if (remainingCalls.decrementAndGet() == 0) {
-                                // Call the callback with the retrieved pending users
-                                Log.d("UserOptions", "Registration added OrganizerEvent1: " + registration);
-                                callback.onDataReceived(registrations);
-                            }
-                        });
-                    } else if (remainingCalls.decrementAndGet() == 0) {
-                        // Call the callback with the retrieved pending users
-                        Log.d("UserOptions", "Registration added OrganizerEvent3: " + registration);
-                        callback.onDataReceived(registrations);
-                    }
-                } else if (remainingCalls.decrementAndGet() == 0) {
+                // now that we have the registration, we can check if it is the correct status
+                if (!task.isSuccessful() || task.getResult() == null || !task.getResult().getRegistrationStatus().equals(userRegistrationState)) {
+                    Log.e("UserOptions", "Failed to create registration from database, registration ID: " + registrationReference.getId() + " " + task.getResult().getRegistrationStatus());
+                } else {
+                    Log.d("UserOptions", "Registration added OrganizerEvent: " + task.getResult() + " " + task.getResult().getRegistrationStatus());
+                    registrations.add(task.getResult());
+                }
+                if (remainingCalls.decrementAndGet() == 0) {
                     // Call the callback with the retrieved pending users
-                    Log.d("UserOptions", "Registration added OrganizerEvent2: " + task.getResult());
                     callback.onDataReceived(registrations);
                 }
-            });
+                // Decrement the counter and check if all callbacks are complete
+//                    Registration registration = task.getResult();
+//                    Log.e("UserOptions", "Failed to create registration from database, registration ID: " + registrationReference.getId());
+//                    if (registration.getRegistrationStatus().equals(userRegistrationState)) {
+//                        DatabaseManager.getDatabaseManager().getRegistration(registrationReference.getId(), task2 -> {
+//                            if (!task2.isSuccessful() || task2.getResult() == null) {
+//                                Log.e("UserOptions", "Failed to create registration from database, registration ID: " + registrationReference.getId());
+//                                if (remainingCalls.decrementAndGet() == 0) {
+//                                    // Call the callback with the retrieved pending users
+//                                    Log.d("UserOptions", "Registration added OrganizerEvent0: " + registration);
+//                                    callback.onDataReceived(registrations);
+//                                }
+//                                return;
+//                            }
+//                            registrations.add(task2.getResult());
+//                            // Decrement the counter and check if all callbacks are complete
+//                            if (remainingCalls.decrementAndGet() == 0) {
+//                                // Call the callback with the retrieved pending users
+//                                Log.d("UserOptions", "Registration added OrganizerEvent1: " + registration);
+//                                callback.onDataReceived(registrations);
+//                            }
+//                        });
+//                    } else if (remainingCalls.decrementAndGet() == 0) {
+//                        // Call the callback with the retrieved pending users
+//                        Log.d("UserOptions", "Registration added OrganizerEvent3: " + registration);
+//                        callback.onDataReceived(registrations);
+//                    }
+                });
         }
     }
 
