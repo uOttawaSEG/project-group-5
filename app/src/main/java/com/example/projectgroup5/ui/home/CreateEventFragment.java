@@ -33,6 +33,7 @@ import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.Timestamp;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 public class CreateEventFragment extends Fragment {
@@ -48,6 +49,7 @@ public class CreateEventFragment extends Fragment {
     private final Calendar stopCalendar = Calendar.getInstance();
     private Timestamp startTime = new Timestamp(startCalendar.getTime());
     private Timestamp endTime = new Timestamp(stopCalendar.getTime());
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -217,7 +219,7 @@ public class CreateEventFragment extends Fragment {
                 calendarToSet.add(Calendar.DAY_OF_YEAR, 1);
             }
             // clear the Pick END time if the new start time is after the end time
-            if (endTime != null && calendarToSet.getTimeInMillis() > endTime.toDate().getTime() && calendarToSet == startCalendar) {
+            if (endTime != null && calendarToSet.getTimeInMillis() >= endTime.toDate().getTime() && calendarToSet == startCalendar) {
                 endTime = null;
                 binding.pickEndTime.setText(R.string.pick_end_time);
             } else {
@@ -230,7 +232,7 @@ public class CreateEventFragment extends Fragment {
             else
                 endTime = timestamp;
             // Set the text of the button to the selected time
-            button.setText(timestamp.toDate().toString());
+            button.setText(dateFormat.format(timestamp.toDate()));
         }, hour, minute, true);
 
         // Show the TimePickerDialog
