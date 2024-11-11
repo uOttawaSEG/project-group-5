@@ -114,7 +114,7 @@ public class EventOptional {
             option.setError(EventError.TITLE_EMPTY);
             return true;
         }
-        if (!title.matches("[a-zA-Z]+")) {
+        if (!title.matches("[a-zA-Z\\s]+")) {
             option.setError(EventError.TITLE_BADLY_FORMATTED);
             return true;
         }

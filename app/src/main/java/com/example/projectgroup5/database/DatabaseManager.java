@@ -779,7 +779,6 @@ public class DatabaseManager {
         Log.d("DatabaseManager", "Done storing data"); // Log completion
     }
 
-
     public void createNewEvent(Event event, OnCompleteListener<DocumentReference> listener) {
         // now we have tried to create the user, lets check if it was successful
         // now we have created the user, lets store the user data
@@ -1132,7 +1131,7 @@ public class DatabaseManager {
     }
 
     //---------------------------------------MultiTaskHandler------------------------------------------------
-    synchronized public void handleTaskCompletion(Task<Void> task, AtomicInteger tasksCompleted, int totalTasks, DocumentReference referenceToItem, OnCompleteListener<DocumentReference> listener) {
+    synchronized private void handleTaskCompletion(Task<Void> task, AtomicInteger tasksCompleted, int totalTasks, DocumentReference referenceToItem, OnCompleteListener<DocumentReference> listener) {
         if (task.isSuccessful()) {
             Log.d("DatabaseManager", "Success: " + task.getResult());  // Logging success, if needed
         } else {
