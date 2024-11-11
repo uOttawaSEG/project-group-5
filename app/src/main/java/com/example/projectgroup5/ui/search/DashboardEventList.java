@@ -148,6 +148,10 @@ public class DashboardEventList extends Fragment {
             if (UserSession.getInstance().getUserRepresentation() == null || !(UserSession.getInstance().getUserRepresentation() instanceof Attendee)) {
                 return false;
             }
+            // get the attendee registration status to the app
+            if (!UserSession.getInstance().getUserRepresentation().getUserRegistrationState().equals(User.ACCEPTED)) {
+                return false;
+            };
             // if the event has a time conflict with the other events, we dont register the user
             if (view.findViewById(R.id.statusIcon).getVisibility() == (View.VISIBLE)) {
                 Toast.makeText(getContext(), "Event has a time conflict", Toast.LENGTH_SHORT).show();
@@ -179,7 +183,7 @@ public class DashboardEventList extends Fragment {
                     DatabaseManager.getDatabaseManager().addRegistrationToEvent(eventRef, registrationRef, task2 -> {
                         if (task2.isSuccessful()) {
                             Log.d("DashboardEventList", "Registration created");
-                            DatabaseManager.getDatabaseManager().addEventAttendee(eventRef, userRef, task3 -> {
+                            DatabaseManager.getDatabaseManager().addEventAttendee(eventRef, registrationRef, task3 -> {
                                 Log.d("DashboardEventList", "Event attendee added");
                                 if (task3.isSuccessful()) {
                                     Log.d("DashboardEventList", "Event attendee added2");
