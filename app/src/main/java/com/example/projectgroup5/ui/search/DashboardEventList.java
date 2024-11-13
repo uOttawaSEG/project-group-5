@@ -125,7 +125,20 @@ public class DashboardEventList extends Fragment {
                         });
                     }
                     // now we must sort the events by starting date
-                    events.sort(Comparator.comparing(Event::getStartTime));
+                    events.removeIf(event -> event.getStartTime().toDate().before(new java.util.Date()));
+                    if (searchView.getQuery().toString().isEmpty()) {
+                        events.sort(Comparator.comparing(Event::getStartTime));
+                    } else {
+                        events.sort((o1, o2) -> {
+                            if (o1.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                                return -1;
+                            } else if (o2.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        });
+                    }
                     EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
                     listView.setAdapter(eventOrganizerAdapter);
                     return true;
@@ -206,14 +219,29 @@ public class DashboardEventList extends Fragment {
                                     DatabaseManager.getDatabaseManager().addRegistrationToAttendee(userRef.getId(), registrationRef, task4 -> {
                                     Toast.makeText(getContext(), "Event registered", Toast.LENGTH_LONG).show();
                                     Log.d("DashboardEventList", "Event registered successfully and removed from list");
+                                    String query = searchView.getQuery().toString();
                                         if (UserSession.getInstance().getUserRepresentation() instanceof Attendee) {
-                                            DatabaseManager.getDatabaseManager().getEventsThatMatchQuery(searchView.getQuery().toString(), eventIds -> {
+                                            DatabaseManager.getDatabaseManager().getEventsThatMatchQuery(query, eventIds -> {
                                                 if (eventIds == null) {
                                                 } else {
                                                     events.clear();
                                                     events.addAll(eventIds);
                                                     EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
                                                     listView.setAdapter(eventOrganizerAdapter);
+                                                }
+                                            });
+                                        }
+                                        events.removeIf(event -> event.getStartTime().toDate().before(new java.util.Date()));
+                                        if (searchView.getQuery().toString().isEmpty()) {
+                                            events.sort(Comparator.comparing(Event::getStartTime));
+                                        } else {
+                                            events.sort((o1, o2) -> {
+                                                if (o1.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                                                    return -1;
+                                                } else if (o2.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                                                    return 1;
+                                                } else {
+                                                    return 0;
                                                 }
                                             });
                                         }
