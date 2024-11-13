@@ -72,15 +72,17 @@ public class DashboardEventList extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-//                DatabaseManager.getDatabaseManager().getEventsThatMatchQuery(query, eventIds -> {
-//                    if (eventIds == null) {
-//                    } else {
-//                        events.clear();
-//                        events.addAll(eventIds);
-//                        EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
-//                        listView.setAdapter(eventOrganizerAdapter);
-//                    }
-//                });
+                if (UserSession.getInstance().getUserRepresentation() instanceof Attendee) {
+                    DatabaseManager.getDatabaseManager().getEventsThatMatchQuery(query, eventIds -> {
+                        if (eventIds == null) {
+                        } else {
+                            events.clear();
+                            events.addAll(eventIds);
+                            EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
+                            listView.setAdapter(eventOrganizerAdapter);
+                        }
+                    });
+                }
                 // sort the event using the query with the closest test to the query first
                 events.sort((o1, o2) -> {
                     if (o1.getTitle().toLowerCase().contains(query.toLowerCase())) {
@@ -111,6 +113,17 @@ public class DashboardEventList extends Fragment {
 //                            listView.setAdapter(eventOrganizerAdapter);
 //                        }
 //                    });
+                    if (UserSession.getInstance().getUserRepresentation() instanceof Attendee) {
+                        DatabaseManager.getDatabaseManager().getEventsThatMatchQuery(query, eventIds -> {
+                            if (eventIds == null) {
+                            } else {
+                                events.clear();
+                                events.addAll(eventIds);
+                                EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
+                                listView.setAdapter(eventOrganizerAdapter);
+                            }
+                        });
+                    }
                     // now we must sort the events by starting date
                     events.sort(Comparator.comparing(Event::getStartTime));
                     EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
@@ -193,8 +206,18 @@ public class DashboardEventList extends Fragment {
                                     DatabaseManager.getDatabaseManager().addRegistrationToAttendee(userRef.getId(), registrationRef, task4 -> {
                                     Toast.makeText(getContext(), "Event registered", Toast.LENGTH_LONG).show();
                                     Log.d("DashboardEventList", "Event registered successfully and removed from list");
-                                    events.remove(selectedEvent);
-                                    // TODO must refresh the events to be able to display the time conflicts
+                                        if (UserSession.getInstance().getUserRepresentation() instanceof Attendee) {
+                                            DatabaseManager.getDatabaseManager().getEventsThatMatchQuery(searchView.getQuery().toString(), eventIds -> {
+                                                if (eventIds == null) {
+                                                } else {
+                                                    events.clear();
+                                                    events.addAll(eventIds);
+                                                    EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
+                                                    listView.setAdapter(eventOrganizerAdapter);
+                                                }
+                                            });
+                                        }
+//                                    events.remove(selectedEvent);
                                     EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
                                     listView.setAdapter(eventOrganizerAdapter);
 
