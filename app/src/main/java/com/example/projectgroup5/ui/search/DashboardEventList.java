@@ -194,6 +194,7 @@ public class DashboardEventList extends Fragment {
                                     Toast.makeText(getContext(), "Event registered", Toast.LENGTH_LONG).show();
                                     Log.d("DashboardEventList", "Event registered successfully and removed from list");
                                     events.remove(selectedEvent);
+                                    // TODO must refresh the events to be able to display the time conflicts
                                     EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
                                     listView.setAdapter(eventOrganizerAdapter);
 
