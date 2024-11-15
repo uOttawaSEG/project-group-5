@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 R.id.search_event_dashboard,
                 R.id.account_management).build();
 
+
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
