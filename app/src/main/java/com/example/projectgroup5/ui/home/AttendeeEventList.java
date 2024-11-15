@@ -21,6 +21,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
+import com.example.projectgroup5.database.DatabaseListener;
 import com.example.projectgroup5.database.DatabaseManager;
 import com.example.projectgroup5.databinding.FragmentAttendeeEventListBinding;
 import com.example.projectgroup5.events.Event;
@@ -126,6 +127,8 @@ public class AttendeeEventList extends Fragment {
                                     selectedEvent.getRegistrations().remove(registrationRefTask.getResult());
                                     // update the adapter
                                         events.remove(selectedEvent);
+                                        // remove the listener
+                                        DatabaseListener.deleteEventStartListener(selectedEvent.getEventID());
                                         EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
                                         listView.setAdapter(eventOrganizerAdapter);
                                     });

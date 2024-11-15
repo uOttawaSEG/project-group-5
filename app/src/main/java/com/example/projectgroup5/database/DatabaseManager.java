@@ -341,7 +341,7 @@ public class DatabaseManager {
      * @param eventListener The listener to be added for value events.
      * @param key           The key for the user data to listen to.
      */
-    public ListenerRegistration addValueEventListenerToFirestore(String userId, EventListener<DocumentSnapshot> eventListener, String key) {
+    public ListenerRegistration addValueEventListenerToFirestoreUserData(String userId, EventListener<DocumentSnapshot> eventListener, String key) {
 
         if (userId == null) {
             Log.e("DatabaseManager", "User ID is null");
@@ -376,15 +376,15 @@ public class DatabaseManager {
         });
     }
 
-    public ListenerRegistration addValueEventListenerToFirestore(EventListener<DocumentSnapshot> eventListener, String key) {
-        return addValueEventListenerToFirestore(UserSession.getInstance().getUserId(), eventListener, key);
+    public ListenerRegistration addValueEventListenerToFirestoreUserData(EventListener<DocumentSnapshot> eventListener, String key) {
+        return addValueEventListenerToFirestoreUserData(UserSession.getInstance().getUserId(), eventListener, key);
     }
 
     /**
      * Removes a previously attached EventListener from the Firestore Database reference.
      *
      * <p>This method is used to detach a listener that was previously registered with
-     * {@link #addValueEventListenerToFirestore(EventListener, String)}. It is important to call this
+     * {@link #addValueEventListenerToFirestoreUserData(EventListener, String)}. It is important to call this
      * method when the listener is no longer needed to avoid memory leaks and
      * unintended behavior, especially in lifecycle-aware components such as Activities or Fragments.</p>
      *
@@ -1129,6 +1129,39 @@ public class DatabaseManager {
                     }
                 }
         );
+    }
+
+    public ListenerRegistration addValueEventListenerToFirestoreRegistration(String registrationId, EventListener<DocumentSnapshot> eventListener, String key) {
+
+        if (registrationId == null) {
+            Log.e("DatabaseManager", "User ID is null");
+            return null;
+        }
+
+        // Reference to Firestore
+        DocumentReference docRef = firestoreDatabase.collection("registrations").document(registrationId);
+
+        // Use the event listener to listen for document changes
+        // Debug log
+        // Call the provided eventListener
+        return docRef.addSnapshotListener((snapshot, error) -> {
+            if (error != null) {
+                Log.e("FirebaseError", "Listen failed: " + error.getMessage());
+                return;
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+                Map<String, Object> data = snapshot.getData();
+                if (data != null && data.containsKey(key)) {
+                    Log.d("DatabaseManager", "Data updated for key " + key + ": " + data.get(key)); // Debug log
+                    eventListener.onEvent(snapshot, null); // Call the provided eventListener
+                } else {
+                    Log.e("DatabaseManager", "Key does not exist in document: " + key);
+                }
+            } else {
+                Log.e("DatabaseManager", "Document does not exist for user ID: " + registrationId);
+            }
+        });
     }
 
     //---------------------------------------MultiTaskHandler------------------------------------------------

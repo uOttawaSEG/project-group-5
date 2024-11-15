@@ -7,13 +7,17 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.example.projectgroup5.MainActivity;
+import com.example.projectgroup5.database.DatabaseListener;
 import com.example.projectgroup5.database.DatabaseManager;
+import com.example.projectgroup5.events.Event;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public abstract class User {
@@ -114,13 +118,7 @@ public abstract class User {
                         if (user instanceof Attendee attendee) {
                             // try the cast to list of document references
                             List<DocumentReference> registrations = (List<DocumentReference>) value.get(DatabaseManager.USER_ATTENDEE_REGISTRATIONS);
-                           if (registrations != null) {
-                               for (DocumentReference registration : registrations) {
-                                   // print the registrations
-                                   Log.d("User", "User attendee registrations event has at database fetch: " + registration.toString());
-                                   Log.d("User", "User attendee registrations event has at database fetch: " + registration.getId());
-                               }
-                           }
+
                                 attendee.setAttendeeRegistrations(registrations);
                         }
                     }

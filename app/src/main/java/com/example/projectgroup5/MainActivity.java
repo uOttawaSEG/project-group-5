@@ -28,6 +28,10 @@ public class MainActivity extends AppCompatActivity {
     public static void setOnCompleteListener(OnCompleteListener<Boolean> onCompleteListener) {
         MainActivity.onCompleteListener = onCompleteListener;
     }
+    private static MainActivity instance;
+    public static MainActivity getInstance() {
+        return instance;
+    }
 
 
     @Override
@@ -37,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         com.example.projectgroup5.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
+        instance = this;
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home,

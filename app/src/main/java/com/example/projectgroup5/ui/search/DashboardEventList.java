@@ -21,7 +21,9 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.R;
+import com.example.projectgroup5.database.DatabaseListener;
 import com.example.projectgroup5.database.DatabaseManager;
 import com.example.projectgroup5.databinding.FragmentDashboardEventListBinding;
 import com.example.projectgroup5.events.Event;
@@ -218,9 +220,11 @@ public class DashboardEventList extends Fragment {
                                     // add the event to the user's list of events
                                     DatabaseManager.getDatabaseManager().addRegistrationToAttendee(userRef.getId(), registrationRef, task4 -> {
                                     Toast.makeText(getContext(), "Event registered", Toast.LENGTH_LONG).show();
+                                    // add the listener to the event to send a notification 24 hours before
+                                        DatabaseListener.addEventStartListener((MainActivity) getActivity().getApplicationContext(), selectedEvent, registration);
                                     Log.d("DashboardEventList", "Event registered successfully and removed from list");
                                     String query = searchView.getQuery().toString();
-                                        if (UserSession.getInstance().getUserRepresentation() instanceof Attendee) {
+//                                        if (UserSession.getInstance().getUserRepresentation() instanceof Attendee) {
                                             DatabaseManager.getDatabaseManager().getEventsThatMatchQuery(query, eventIds -> {
                                                 if (eventIds == null) {
                                                 } else {
@@ -230,7 +234,7 @@ public class DashboardEventList extends Fragment {
                                                     listView.setAdapter(eventOrganizerAdapter);
                                                 }
                                             });
-                                        }
+//                                        }
                                         events.removeIf(event -> event.getStartTime().toDate().before(new java.util.Date()));
                                         if (searchView.getQuery().toString().isEmpty()) {
                                             events.sort(Comparator.comparing(Event::getStartTime));
