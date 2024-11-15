@@ -221,7 +221,7 @@ public class DashboardEventList extends Fragment {
                                     DatabaseManager.getDatabaseManager().addRegistrationToAttendee(userRef.getId(), registrationRef, task4 -> {
                                     Toast.makeText(getContext(), "Event registered", Toast.LENGTH_LONG).show();
                                     // add the listener to the event to send a notification 24 hours before
-//                                        DatabaseListener.addEventStartListener((MainActivity) getActivity().getApplicationContext(), selectedEvent, registration);
+                                        DatabaseListener.addEventStartListener((MainActivity) getActivity().getApplicationContext(), selectedEvent, registration);
                                     Log.d("DashboardEventList", "Event registered successfully and removed from list");
                                     String query = searchView.getQuery().toString();
 //                                        if (UserSession.getInstance().getUserRepresentation() instanceof Attendee) {

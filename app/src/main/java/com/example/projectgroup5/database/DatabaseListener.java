@@ -140,7 +140,7 @@ public class DatabaseListener {
             if (currentValue == null) return;
             // If the user is accepted and the event starts in more than 24 hours, send a notification at the 24 hour mark
             Date datePlus24Hours = new Date(event.getStartTime().toDate().getTime() + 24 * 60 * 60 * 1000);
-            if (User.ACCEPTED.equals(currentValue) && event.getStartTime().toDate().before(datePlus24Hours)) {
+            if (User.ACCEPTED.equals(currentValue) && event.getStartTime().toDate().after(datePlus24Hours)) {
                 // Delay until 24 hours before the event start
                 new android.os.Handler().postDelayed(() -> {
                     Notification.sendEventNotification(context, event);

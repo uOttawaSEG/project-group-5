@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.database.DatabaseListener;
 import com.example.projectgroup5.database.DatabaseManager;
+import com.example.projectgroup5.events.Event;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
@@ -124,20 +125,33 @@ public abstract class User {
 //                                   Log.d("User", "User attendee registrations event has at database fetch: " + registration.getId());
                                    // add a listener to the registration to events that start in more than 24 hours
                                    DatabaseManager.getDatabaseManager().getEventFromRegistration(registration, task -> {
-                                       if (task.isSuccessful()) {
-                                           attendee.addEventToCache(task.getResult().getEvent());
-                                           // get the date + 24 hours
-                                           Date date = new Date();
-                                           if (task.getResult().getEvent().getStartTime().toDate().before(date)) {
+                                       if (task.isSuccessful() && task.getResult() != null) {
+                                           // Get the event
+                                           Event event = task.getResult().getEvent();
+
+                                           // Get the date + 24 hours
+                                           Date datePlus24Hours = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000);
+
+                                           // Check if event starts in more than 24 hours
+                                           if (event.getStartTime().toDate().after(datePlus24Hours)) {
+                                               // Add the event to cache
+                                               attendee.addEventToCache(event);
+
+                                               // Fetch the registration
                                                DatabaseManager.getDatabaseManager().getRegistration(registration.getId(), task1 -> {
-                                                   if (task1.isSuccessful()) {
-                                                       Log.d("User", "User attendee registrations event has at database fetch: " + task1.getResult().toString() + " event: " + task.getResult().getEvent().toString());
-                                                       Log.d("User", "Time remaining until event: " + (task.getResult().getEvent().getStartTime().toDate().getTime() - date.getTime()));
+                                                   if (task1.isSuccessful() && task1.getResult() != null) {
+                                                       Log.d("User", "User attendee registrations event has at database fetch: " + task1.getResult().toString() + " event: " + event.toString());
+                                                       Log.d("User", "Time remaining until event (24 hours): " + (event.getStartTime().toDate().getTime() - datePlus24Hours.getTime()));
+
                                                        // Context, Event, Registration
-                                                       DatabaseListener.addEventStartListener(MainActivity.getInstance(), task.getResult().getEvent(), task1.getResult());
+                                                       DatabaseListener.addEventStartListener(MainActivity.getInstance(), event, task1.getResult());
+                                                   } else {
+                                                       Log.e("DatabaseListener", "Failed to fetch registration: " + task1.getException());
                                                    }
                                                });
                                            }
+                                       } else {
+                                           Log.e("DatabaseListener", "Failed to fetch event: " + task.getException());
                                        }
                                    });
                                }
