@@ -62,7 +62,7 @@ public class AttendeeEventList extends Fragment {
                         events.add(task.getResult().getEvent());
                         if (count.decrementAndGet() == 0) {
                             // now we must remove all the events that are already passed
-                            events.removeIf(event -> event.getStartTime().toDate().before(new java.util.Date()));
+                            events.removeIf(event -> event.getEndTime().toDate().before(new java.util.Date()));
                             // now we must sort the events by starting date
                             events.sort(Comparator.comparing(Event::getStartTime));
                             EventAdapterForDisplay eventAttendeeAdapter = new EventAdapterForDisplay(getContext(), events);
