@@ -146,6 +146,7 @@ public class DatabaseListener {
             if (User.ACCEPTED.equals(currentValue) && event.getStartTime().toDate().before(datePlus24Hours)) {
                 // Delay until 24 hours before the event start
                 Log.d("DatabaseListener", "Event UserSession start notification in : " + (event.getStartTime().toDate().getTime() - new Date().getTime()  - 24 * 60 * 60 * 1000) + " milliseconds or " + (event.getStartTime().toDate().getTime() - new Date().getTime() - 24 * 60 * 60 * 1000) / 1000 / 60  + " minutes");
+                // TODO save this in a runnable to avoid weird edge cases with double relog or things like that
                 new android.os.Handler().postDelayed(() -> {
                     // only trigger if it can be found in the database listener hashmap
                     if (!firestoreEventStartListeners.containsKey(registration.getRegistrationId())) {
