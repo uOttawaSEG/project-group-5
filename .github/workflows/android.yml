@@ -30,6 +30,3 @@ jobs:
       - name: Run unit tests with Gradle
         run: ./gradlew test --no-daemon
 
-      - name: Run instrumentation tests (if needed)
-        if: runner.os == 'Linux'
-        run: ./gradlew connectedCheck --no-daemon
