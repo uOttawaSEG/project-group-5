@@ -100,7 +100,7 @@ public class UserSession {
                                                 Log.d("UserSession", "Time remaining until event (24 hours): " + (event.getStartTime().toDate().getTime() - datePlus24Hours.getTime()));
 
                                                 // Context, Event, Registration
-                                                DatabaseListener.addEventStartListener(MainActivity.getInstance(), event, task1.getResult());
+                                                DatabaseListener.addEventStartListener(context, event, task1.getResult());
                                             } else {
                                                 Log.e("UserSession", "Failed to fetch registration: " + task1.getException());
                                             }
