@@ -40,7 +40,7 @@
     <fragment
         android:id="@+id/search_event_list"
         android:name="com.example.projectgroup5.ui.search.DashboardEventList"
-        android:label="Home"
+        android:label="Events"
         tools:layout="@layout/fragment_dashboard_event_list"/>
     <fragment
         android:id="@id/account_management"

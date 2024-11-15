@@ -988,6 +988,7 @@ public class DatabaseManager {
 
     public void getEventsThatMatchQuery(String query, EventOption.EventsCallback callback) {
         List<Event> events = new ArrayList<>();
+        boolean check = query == null || query.isEmpty();
 
         // get all the events then filter them by the query
         getEvents(
@@ -995,7 +996,7 @@ public class DatabaseManager {
                     if (task.isSuccessful()) {
                         Log.d("DatabaseManager", "Events has event unfiltered: " + task.getResult());
                         for (Event event : task.getResult()) {
-                            if (event.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                            if (event.getTitle().toLowerCase().contains(query.toLowerCase()) || check) {
                                 events.add(event);
                             } else if (event.getDescription().toLowerCase().contains(query.toLowerCase())) {
                                 events.add(event);

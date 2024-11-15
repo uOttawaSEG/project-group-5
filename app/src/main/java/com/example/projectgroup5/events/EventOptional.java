@@ -1,5 +1,6 @@
 package com.example.projectgroup5.events;
 
+import com.example.projectgroup5.database.FieldValidator;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -114,7 +115,7 @@ public class EventOptional {
             option.setError(EventError.TITLE_EMPTY);
             return true;
         }
-        if (!title.matches("[a-zA-Z\\s]+")) {
+        if (FieldValidator.checkIfIsNotAlphabetWithSpaces(title)) {
             option.setError(EventError.TITLE_BADLY_FORMATTED);
             return true;
         }

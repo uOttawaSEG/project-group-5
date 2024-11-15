@@ -36,10 +36,6 @@ public class Registration {
         return registrationId;
     }
 
-    public void setRegistrationId(String registrationId) {
-        this.registrationId = registrationId;
-    }
-
     public DocumentReference getAttendee() {
         return attendee;
     }
