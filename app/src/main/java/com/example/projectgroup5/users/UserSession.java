@@ -7,11 +7,16 @@ import androidx.navigation.NavController;
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.database.DatabaseListener;
 import com.example.projectgroup5.database.DatabaseManager;
+import com.example.projectgroup5.events.Event;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+
+import java.util.Date;
+import java.util.List;
 
 public class UserSession {
     private static UserSession instance;
@@ -66,6 +71,48 @@ public class UserSession {
                 // Notification for prelogged in user
                 DatabaseListener.clearListeners();
                 DatabaseListener.addValueAccountCreationEventListener(context);
+                if (userRepresentation instanceof Attendee attendee) {
+                    List<DocumentReference> registrations = attendee.getAttendeeRegistrations();
+                    if (registrations != null) {
+                        for (DocumentReference registration : registrations) {
+                            // print the registrations
+//                                   Log.d("User", "User attendee registrations event has at database fetch: " + registration.toString());
+//                                   Log.d("User", "User attendee registrations event has at database fetch: " + registration.getId());
+                            // add a listener to the registration to events that start in more than 24 hours
+                            DatabaseManager.getDatabaseManager().getEventFromRegistration(registration, task2 -> {
+                                if (task2.isSuccessful() && task2.getResult() != null) {
+                                    // Get the event
+                                    Event event = task2.getResult().getEvent();
+
+                                    // Get the date + 24 hours
+                                    Date datePlus24Hours = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000);
+                                    Log.d("UserSession", "Time remaining until event (24 hours): " + (event.getStartTime().toDate().getTime() - datePlus24Hours.getTime()));
+
+                                    // Check if event starts in more than 24 hours
+                                    if (event.getStartTime().toDate().after(datePlus24Hours)) {
+                                        // Add the event to cache
+                                        attendee.addEventToCache(event);
+
+                                        // Fetch the registration
+                                        DatabaseManager.getDatabaseManager().getRegistration(registration.getId(), task1 -> {
+                                            if (task1.isSuccessful() && task1.getResult() != null) {
+                                                Log.d("UserSession", "User attendee registrations event has at database fetch: " + task1.getResult().toString() + " event: " + event);
+                                                Log.d("UserSession", "Time remaining until event (24 hours): " + (event.getStartTime().toDate().getTime() - datePlus24Hours.getTime()));
+
+                                                // Context, Event, Registration
+                                                DatabaseListener.addEventStartListener(MainActivity.getInstance(), event, task1.getResult());
+                                            } else {
+                                                Log.e("UserSession", "Failed to fetch registration: " + task1.getException());
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    Log.e("UserSession", "Failed to fetch event: " + task2.getException());
+                                }
+                            });
+                        }
+                    }
+                }
                 // success on the listener
                 listener.onComplete(Tasks.forResult(null));
             } else {

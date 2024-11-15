@@ -92,7 +92,7 @@ public class Notification {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID) // Use the correct channel ID
                 .setSmallIcon(R.drawable.ic_notifications)
                 .setContentTitle("Event starting soon")
-                .setContentText("Get ready! " + event.getTitle() + " 24 hours left before it starts!")
+                .setContentText("Get ready! The event: " + event.getTitle() + " has 24 hours left before it starts!")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);

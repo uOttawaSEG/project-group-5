@@ -141,12 +141,16 @@ public class DatabaseListener {
             if (currentValue == null) return;
             // If the user is accepted and the event starts in more than 24 hours, send a notification at the 24 hour mark
             Date datePlus24Hours = new Date(event.getStartTime().toDate().getTime() + 24 * 60 * 60 * 1000);
-            if (User.ACCEPTED.equals(currentValue) && event.getStartTime().toDate().after(datePlus24Hours)) {
+            Log.d("DatabaseListener", "UserSession current value " + currentValue + " event start time: " + event.getStartTime().toDate().getTime() + " datePlus24Hours: " + datePlus24Hours.getTime());
+            Log.d("DatabaseListener", "UserSession dateafter: " + event.getStartTime().toDate().before(datePlus24Hours));
+            if (User.ACCEPTED.equals(currentValue) && event.getStartTime().toDate().before(datePlus24Hours)) {
                 // Delay until 24 hours before the event start
+                Log.d("DatabaseListener", "Event UserSession start notification in : " + (event.getStartTime().toDate().getTime() - new Date().getTime()  - 24 * 60 * 60 * 1000) + " milliseconds or " + (event.getStartTime().toDate().getTime() - new Date().getTime() - 24 * 60 * 60 * 1000) / 1000 / 60  + " minutes");
                 new android.os.Handler().postDelayed(() -> {
+                    Log.d("DatabaseListener", "Event start notification sent");
                     Notification.sendEventNotification(context, event);
-                    context.getNavController().navigate(R.id.search_event_dashboard);
-                }, datePlus24Hours.getTime() - new Date().getTime());
+//                    context.getNavController().navigate(R.id.search_event_dashboard);
+                }, (event.getStartTime().toDate().getTime() - new Date().getTime()  - 24 * 60 * 60 * 1000));
             }
         };
         // Add the listener to the specific field
