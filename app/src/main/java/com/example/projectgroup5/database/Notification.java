@@ -13,6 +13,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.R;
+import com.example.projectgroup5.events.Event;
 
 public class Notification {
     public static final String CHANNEL_ID = "account_creation_channel";
@@ -83,7 +84,7 @@ public class Notification {
         notificationManager.notify(1002, builder.build());
     }
 
-    public static void sendEventNotification(Context context, String eventTitle) {
+    public static void sendEventNotification(Context context, Event event) {
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
@@ -91,7 +92,7 @@ public class Notification {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID) // Use the correct channel ID
                 .setSmallIcon(R.drawable.ic_notifications)
                 .setContentTitle("Event starting soon")
-                .setContentText("Get ready! " + eventTitle + " 24 hours left before it starts!")
+                .setContentText("Get ready! " + event.getTitle() + " 24 hours left before it starts!")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);

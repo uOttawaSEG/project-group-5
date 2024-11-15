@@ -18,6 +18,8 @@ import com.google.firebase.firestore.ListenerRegistration;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,6 +34,27 @@ public class DatabaseListener {
             DatabaseManager.getDatabaseManager().removeEventListenerFromFirestore(listener);
         }
         firestoreListeners.clear();
+    }
+
+    // list of event start listeners
+    private static final HashMap<String, ListenerRegistration> firestoreEventStartListeners = new HashMap<>();
+
+    public static void clearEventStartListeners() {
+        // convert the firestoreEventStartListeners to a list
+        List<ListenerRegistration> firestoreEventStartListenersList = new ArrayList<>(firestoreEventStartListeners.values());
+        for (ListenerRegistration listener : firestoreEventStartListenersList) {
+            Log.e("DatabaseListener", "clearing listener " + listener.toString());
+            DatabaseManager.getDatabaseManager().removeEventListenerFromFirestore(listener);
+        }
+        firestoreEventStartListeners.clear();
+    }
+
+    // try to delete a listener to a specific event
+    public static void deleteEventStartListener(String eventId) {
+        if (firestoreEventStartListeners.containsKey(eventId)) {
+            DatabaseManager.getDatabaseManager().removeEventListenerFromFirestore(firestoreEventStartListeners.get(eventId));
+            firestoreEventStartListeners.remove(eventId);
+        }
     }
 
 
@@ -119,18 +142,19 @@ public class DatabaseListener {
             // If the value has changed, proceed
             if (User.ACCEPTED.equals(currentValue)) {
                 // Send notifications if event starts in less than 24 hours
-                if (event.getStartTime().isBefore(LocalDateTime.now().plusHours(24))) {
-                    Notification.sendAcceptedNotification(context);
+                Date datePlus24Hours = new Date(event.getStartTime().toDate().getTime() + 24 * 60 * 60 * 1000);
+                if (event.getStartTime().toDate().before(datePlus24Hours)) {
+                    Notification.sendEventNotification(context, event);
                     // set the user representation to accepted
                     UserSession.getInstance().getUserRepresentation().setUserRegistrationState(User.ACCEPTED);
                     context.getNavController().navigate(R.id.search_event_dashboard);
                 }
-                Log.d("DatabaseListener", "Values: " + currentValue + " LastKnown: " + lastKnownValue.get());
+//                Log.d("DatabaseListener", "Values: " + currentValue + " LastKnown: " + lastKnownValue.get());
                 // Update the last known value
             }
         };
         // Add the listener to the specific field
-        firestoreListeners.add(DatabaseManager.getDatabaseManager().addValueEventListenerToFirestoreRegistration(registration.getRegistrationId(), registrationStateListener, EVENT_REGISTRATION_STATUS));
+        firestoreEventStartListeners.put(event.getEventID(), DatabaseManager.getDatabaseManager().addValueEventListenerToFirestoreRegistration(registration.getRegistrationId(), registrationStateListener, EVENT_REGISTRATION_STATUS));
     }
 
     // map the atomicInt to a registration state
