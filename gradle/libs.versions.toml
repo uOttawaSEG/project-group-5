@@ -18,6 +18,7 @@ firebaseDatabase = "21.0.0"
 firebaseMessaging = "24.0.2"
 firebaseFirestore = "25.1.1"
 places = "4.0.0"
+playServicesAds = "23.5.0"
 secretsGradlePlugin = "2.0.1"
 
 [libraries]
@@ -41,6 +42,7 @@ firebase-database = { group = "com.google.firebase", name = "firebase-database",
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 places = { module = "com.google.android.libraries.places:places", version.ref = "places" }
+play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 
 [plugins]

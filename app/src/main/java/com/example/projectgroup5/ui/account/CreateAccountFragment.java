@@ -3,7 +3,6 @@ package com.example.projectgroup5.ui.account;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +23,7 @@ import com.example.projectgroup5.BuildConfig;
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.database.DatabaseManager;
+import com.example.projectgroup5.database.FieldValidator;
 import com.example.projectgroup5.databinding.FragmentCreateAccountBinding;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
@@ -107,7 +107,7 @@ public class CreateAccountFragment extends Fragment {
             }
 
 
-            if (password.isEmpty() || password.length() < 6) {
+            if (FieldValidator.checkIfPasswordIsInvalid(password)) {
                 binding.editTextTextPasswordUserCreate.setError("Invalid password");
                 errorFlag = true;
             }
@@ -130,7 +130,7 @@ public class CreateAccountFragment extends Fragment {
             }
 
             String phoneNumber = binding.editTextPhoneUserCreate.getText().toString().trim();
-            if (!PhoneNumberUtils.isGlobalPhoneNumber(phoneNumber) || phoneNumber.length() != 10) {
+            if (FieldValidator.checkIfPhoneNumberIsInvalid(phoneNumber)) {
                 binding.editTextPhoneUserCreate.setError("Invalid phone number");
                 errorFlag = true;
             }
@@ -140,7 +140,7 @@ public class CreateAccountFragment extends Fragment {
                 binding.editTextTextUserCreate.setError("Please enter a first name");
                 errorFlag = true;
             }
-            if (!firstName.matches("[a-zA-Z]+")) {
+            if (FieldValidator.checkIfIsNotAlphabet(firstName)) {
                 binding.editTextTextUserCreate.setError("Invalid first name");
                 errorFlag = true;
             }
@@ -150,7 +150,7 @@ public class CreateAccountFragment extends Fragment {
                 binding.editTextText2UserCreate.setError("Please enter a last name");
                 errorFlag = true;
             }
-            if (!lastName.matches("[a-zA-Z]+")) {
+            if (FieldValidator.checkIfIsNotAlphabet(lastName)) {
                 binding.editTextText2UserCreate.setError("Invalid last name");
                 errorFlag = true;
             }
@@ -162,7 +162,7 @@ public class CreateAccountFragment extends Fragment {
                     binding.editTextTextOrganisation.setError("Please enter an organisation");
                     errorFlag = true;
                 }
-                if (!organisation.matches("[a-zA-Z]+")) {
+                if (FieldValidator.checkIfIsNotAlphabet(organisation)) {
                     binding.editTextTextOrganisation.setError("Invalid organisation");
                     errorFlag = true;
                 }
