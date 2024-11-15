@@ -83,5 +83,29 @@ public class Notification {
         notificationManager.notify(1002, builder.build());
     }
 
+    public static void sendEventNotification(Context context, String eventTitle) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID) // Use the correct channel ID
+                .setSmallIcon(R.drawable.ic_notifications)
+                .setContentTitle("Event starting soon")
+                .setContentText("Get ready! " + eventTitle + " 24 hours left before it starts!")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            // Handle the case where permission is not granted
+            Log.e("AccountStatusNotification", "Notification permission not granted.");
+            return;
+        }
+
+        notificationManager.notify(1002, builder.build());
+    }
+
 
 }
