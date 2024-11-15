@@ -138,19 +138,14 @@ public class DatabaseListener {
             // Get the current value of USER_REGISTRATION_STATE
             String currentValue = dataSnapshot.getString(EVENT_REGISTRATION_STATUS);
             if (currentValue == null) return;
-//                Log.d("DatabaseListener", "currentValue: " + currentValue);
-            // If the value has changed, proceed
-            if (User.ACCEPTED.equals(currentValue)) {
-                // Send notifications if event starts in less than 24 hours
-                Date datePlus24Hours = new Date(event.getStartTime().toDate().getTime() + 24 * 60 * 60 * 1000);
-                if (event.getStartTime().toDate().before(datePlus24Hours)) {
+            // If the user is accepted and the event starts in more than 24 hours, send a notification at the 24 hour mark
+            Date datePlus24Hours = new Date(event.getStartTime().toDate().getTime() + 24 * 60 * 60 * 1000);
+            if (User.ACCEPTED.equals(currentValue) && event.getStartTime().toDate().before(datePlus24Hours)) {
+                // Delay until 24 hours before the event start
+                new android.os.Handler().postDelayed(() -> {
                     Notification.sendEventNotification(context, event);
-                    // set the user representation to accepted
-                    UserSession.getInstance().getUserRepresentation().setUserRegistrationState(User.ACCEPTED);
                     context.getNavController().navigate(R.id.search_event_dashboard);
-                }
-//                Log.d("DatabaseListener", "Values: " + currentValue + " LastKnown: " + lastKnownValue.get());
-                // Update the last known value
+                }, datePlus24Hours.getTime() - new Date().getTime());
             }
         };
         // Add the listener to the specific field

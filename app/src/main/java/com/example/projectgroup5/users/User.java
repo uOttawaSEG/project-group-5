@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.example.projectgroup5.MainActivity;
+import com.example.projectgroup5.database.DatabaseListener;
 import com.example.projectgroup5.database.DatabaseManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
@@ -14,6 +16,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public abstract class User {
@@ -117,8 +120,26 @@ public abstract class User {
                            if (registrations != null) {
                                for (DocumentReference registration : registrations) {
                                    // print the registrations
-                                   Log.d("User", "User attendee registrations event has at database fetch: " + registration.toString());
-                                   Log.d("User", "User attendee registrations event has at database fetch: " + registration.getId());
+//                                   Log.d("User", "User attendee registrations event has at database fetch: " + registration.toString());
+//                                   Log.d("User", "User attendee registrations event has at database fetch: " + registration.getId());
+                                   // add a listener to the registration to events that start in more than 24 hours
+                                   DatabaseManager.getDatabaseManager().getEventFromRegistration(registration, task -> {
+                                       if (task.isSuccessful()) {
+                                           attendee.addEventToCache(task.getResult().getEvent());
+                                           // get the date + 24 hours
+                                           Date date = new Date();
+                                           if (task.getResult().getEvent().getStartTime().toDate().before(date)) {
+                                               DatabaseManager.getDatabaseManager().getRegistration(registration.getId(), task1 -> {
+                                                   if (task1.isSuccessful()) {
+                                                       Log.d("User", "User attendee registrations event has at database fetch: " + task1.getResult().toString() + " event: " + task.getResult().getEvent().toString());
+                                                       Log.d("User", "Time remaining until event: " + (task.getResult().getEvent().getStartTime().toDate().getTime() - date.getTime()));
+                                                       // Context, Event, Registration
+                                                       DatabaseListener.addEventStartListener(MainActivity.getInstance(), task.getResult().getEvent(), task1.getResult());
+                                                   }
+                                               });
+                                           }
+                                       }
+                                   });
                                }
                            }
                                 attendee.setAttendeeRegistrations(registrations);
