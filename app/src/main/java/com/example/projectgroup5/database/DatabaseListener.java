@@ -34,6 +34,7 @@ public class DatabaseListener {
             DatabaseManager.getDatabaseManager().removeEventListenerFromFirestore(listener);
         }
         firestoreListeners.clear();
+        clearEventStartListeners();
     }
 
     // list of event start listeners
