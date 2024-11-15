@@ -51,10 +51,10 @@ public class DatabaseListener {
     }
 
     // try to delete a listener to a specific event
-    public static void deleteEventStartListener(String eventId) {
-        if (firestoreEventStartListeners.containsKey(eventId)) {
-            DatabaseManager.getDatabaseManager().removeEventListenerFromFirestore(firestoreEventStartListeners.get(eventId));
-            firestoreEventStartListeners.remove(eventId);
+    public static void deleteEventStartListener(String registrationId) {
+        if (firestoreEventStartListeners.containsKey(registrationId)) {
+            DatabaseManager.getDatabaseManager().removeEventListenerFromFirestore(firestoreEventStartListeners.get(registrationId));
+            firestoreEventStartListeners.remove(registrationId);
         }
     }
 
@@ -147,14 +147,17 @@ public class DatabaseListener {
                 // Delay until 24 hours before the event start
                 Log.d("DatabaseListener", "Event UserSession start notification in : " + (event.getStartTime().toDate().getTime() - new Date().getTime()  - 24 * 60 * 60 * 1000) + " milliseconds or " + (event.getStartTime().toDate().getTime() - new Date().getTime() - 24 * 60 * 60 * 1000) / 1000 / 60  + " minutes");
                 new android.os.Handler().postDelayed(() -> {
-                    Log.d("DatabaseListener", "Event start notification sent");
+                    // only trigger if it can be found in the database listener hashmap
+                    if (!firestoreEventStartListeners.containsKey(registration.getRegistrationId())) {
+                        Log.d("DatabaseListener", "Event start notification not sent could not find listener");
+                        return;}
                     Notification.sendEventNotification(context, event);
 //                    context.getNavController().navigate(R.id.search_event_dashboard);
                 }, (event.getStartTime().toDate().getTime() - new Date().getTime()  - 24 * 60 * 60 * 1000));
             }
         };
         // Add the listener to the specific field
-        firestoreEventStartListeners.put(event.getEventID(), DatabaseManager.getDatabaseManager().addValueEventListenerToFirestoreRegistration(registration.getRegistrationId(), registrationStateListener, EVENT_REGISTRATION_STATUS));
+        firestoreEventStartListeners.put(registration.getRegistrationId(), DatabaseManager.getDatabaseManager().addValueEventListenerToFirestoreRegistration(registration.getRegistrationId(), registrationStateListener, EVENT_REGISTRATION_STATUS));
     }
 
     // map the atomicInt to a registration state
