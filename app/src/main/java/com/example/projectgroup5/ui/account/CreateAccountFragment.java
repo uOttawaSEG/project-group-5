@@ -56,9 +56,7 @@ public class CreateAccountFragment extends Fragment {
             }
         });
 
-        root.findViewById(R.id.cancelButtonCreate).setOnClickListener(v ->{
-            navController.popBackStack();
-        });
+        root.findViewById(R.id.cancelButtonCreate).setOnClickListener(v -> navController.popBackStack());
 
         // Define a variable to hold the Places API key.
         String apiKey = BuildConfig.PLACES_API_KEY;

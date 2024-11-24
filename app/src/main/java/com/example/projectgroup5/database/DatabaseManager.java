@@ -2,7 +2,6 @@ package com.example.projectgroup5.database;
 
 import android.util.Log;
 
-import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.events.Event;
 import com.example.projectgroup5.events.EventOption;
 import com.example.projectgroup5.events.EventOptional;
@@ -66,57 +65,6 @@ public class DatabaseManager {
 
     //---------------------------------------------USER-------------------------------------------------------------------
 
-    // test function to make sure stuff saves to the firestore database
-    public void test() {
-        Log.d("DatabaseManager", "test() called");
-        firestoreDatabase.collection("users").document("test").set(Collections.singletonMap("test", "test"));
-        Log.d("DatabaseManager", "test() finished");
-        // get the data from the database
-        firestoreDatabase.collection("users").document("test").get().addOnCompleteListener(task ->
-                Log.d("DatabaseManager", "test() finished: " + task.getResult().getData()));
-        Log.d("DatabaseManager", "test() waiting for result");
-
-        // Display all the users in the firestore
-        CollectionReference usersRef = firestoreDatabase.collection("users");
-        usersRef.limit(10).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    Log.d("DatabaseManager", "User: " + document.getId() + " => " + document.getData());
-                }
-            } else {
-                Log.d("DatabaseManager", "Error getting documents: ", task.getException());
-            }
-        });
-        Log.d("DatabaseManager", "test() finished");
-        test2();
-    }
-
-    private void test2() {
-        // test of the storeUserValueToFirestore method
-        Log.d("DatabaseManager", "test2() called");
-        storeUserValueToFirestore("userIdvaluetest", "testkey", "testvalue", null);
-        storeUserValueToFirestore("userIdvaluetest", USER_TYPE, User.USER_TYPE_ATTENDEE, null);
-        Log.d("DatabaseManager", "test2() finished");
-
-        // test of the getUserDataFromFirestore method
-        Log.d("DatabaseManager", "test2() called");
-        getUserDataFromFirestore("userIdvaluetest", "testkey", (Object data) -> {
-            if (data != null) {
-                Log.d("DatabaseManager", "test2() finished: " + data);
-            } else {
-                Log.d("DatabaseManager", "test2() finished: null");
-            }
-        });
-        getUserDataFromFirestore("userIdvaluetest", "nokey", (Object data) -> {
-            if (data != null) {
-                Log.d("DatabaseManager", "test2() finished: " + data);
-            } else {
-                Log.d("DatabaseManager", "test2() finished for key \"noKey\": null");
-            }
-        });
-        Log.d("DatabaseManager", "test2() finished");
-    }
-
 
     /**
      * Retrieves the singleton instance of the DatabaseManager.
@@ -152,7 +100,7 @@ public class DatabaseManager {
      * @param password The password of the user attempting to log in.
      * @param listener A listener that will be notified when the login operation is complete.
      */
-    public void login(String email, String password, MainActivity context, OnCompleteListener<AuthResult> listener, OnSuccessListener<AuthResult> listener2) {
+    public void login(String email, String password, OnCompleteListener<AuthResult> listener, OnSuccessListener<AuthResult> listener2) {
         logout();
         if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
             Log.e("DatabaseManager", "Email or password is empty");
@@ -401,8 +349,6 @@ public class DatabaseManager {
         }
     }
 
-    public void safeDeleteEvent(String eventID) {
-    }
 
     /**
      * Callback interface for receiving a list of user IDs.
@@ -633,19 +579,11 @@ public class DatabaseManager {
             if (userTask.isSuccessful()) {
                 User user = userTask.getResult();
                 if (user instanceof Attendee attendee) {
-                    getUserReference(attendeeId).update(USER_ATTENDEE_REGISTRATIONS, FieldValue.arrayUnion(registrationId)).addOnCompleteListener(listener).addOnCompleteListener(task -> attendee.addRegistration(registrationId)).addOnCompleteListener(task -> {
-                        Log.d("DatabaseManager", "Registration added to attendee in addRegistrationToAttendee: " + registrationId);
-                    });
+                    getUserReference(attendeeId).update(USER_ATTENDEE_REGISTRATIONS, FieldValue.arrayUnion(registrationId)).addOnCompleteListener(listener).addOnCompleteListener(task -> attendee.addRegistration(registrationId)).addOnCompleteListener(task -> Log.d("DatabaseManager", "Registration added to attendee in addRegistrationToAttendee: " + registrationId));
                 }
             }
         });
     }
-
-    public void addRegistrationToAttendee(DocumentReference registrationId, OnCompleteListener<Void> listener) {
-        addRegistrationToAttendee(UserSession.getInstance().getUserId(), registrationId, listener);
-    }
-
-
 
     public void removeEventFromOrganizer(DocumentReference eventRef, OnCompleteListener<Void> listener) {
         if (UserSession.getInstance().getUserRepresentation() instanceof Organizer organizer) {
@@ -654,24 +592,6 @@ public class DatabaseManager {
             getCurrentUserReference().update(USER_ORGANIZER_EVENTS, FieldValue.arrayRemove(eventRef)).addOnCompleteListener(listener).addOnCompleteListener(task -> organizer.removeEvent(eventRef));
         }
     }
-
-    public void removeRegistrationFromAttendee(String registrationId, OnCompleteListener<Void> listener) {
-        if (UserSession.getInstance().getUserRepresentation() instanceof Attendee attendee) {
-            // now we have an organizer we have to add the event to him in the database
-            getCurrentUserReference().update(USER_ATTENDEE_REGISTRATIONS, FieldValue.arrayRemove(registrationId)).addOnCompleteListener(listener).addOnCompleteListener(task -> attendee.removeRegistration(getRegistrationReference(registrationId)));
-        }
-    }
-
-
-//    public void getUser(String userId, OnCompleteListener<User> listener) {
-//        // get the data from the database for the user
-//        // get the user type from the database if it exists
-//
-//        getUserDataFromFirestore(getUserReference(userId), value -> {
-//            DocumentSnapshot documentSnapshot = (DocumentSnapshot) value;
-//            listener.onComplete(Tasks.forResult(newUserFromDatabase(userId, documentSnapshot.getString(DatabaseManager.USER_TYPE))));
-//        });
-//    }
 
     public void getAttendeeRegistrations(String userId, OnCompleteListener<List<DocumentReference>> listener) {
         // get the user data from the database
@@ -953,10 +873,6 @@ public class DatabaseManager {
                         // if the registration list has a single item in commpn with attendee.getAttendeeRegistrations() we return
                         // clone the registrations list and remove all the registrations that are not in attendee.getAttendeeRegistrations()
                         List<DocumentReference> newRegistrations = new ArrayList<>(registrations);
-                        if (newRegistrations == null) {
-                            Log.e("DatabaseManager", "Event has no registrations");
-                            continue;
-                        }
                         newRegistrations.retainAll(attendee.getAttendeeRegistrations());
                         if (newRegistrations.size() == 1) {
                             Log.d("DatabaseManager", "Event has one registration");

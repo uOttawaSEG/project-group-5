@@ -39,7 +39,7 @@ public class HomeFragment extends Fragment {
                 } else if (UserSession.getInstance().getUserRepresentation().getUserType().equals(User.USER_TYPE_ORGANIZER)) {
                     navController.navigate(R.id.action_navigation_home_to_organizer_option_selector);
                 } else if (UserSession.getInstance().getUserRepresentation().getUserType().equals(User.USER_TYPE_ATTENDEE)) {
-                    navController.navigate(R.id.attendee_event_list);
+                    navController.navigate(R.id.action_navigation_home_to_attendee_event_list);
                 }
             });
         }

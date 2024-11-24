@@ -19,23 +19,29 @@ public class Notification {
     public static final String CHANNEL_ID = "account_creation_channel";
 
     /**
-     * Sends a notification to the user indicating that their account has been created.
+     * Sends a notification to the user with a message and title.
      * <p>
-     * This method constructs a notification that informs the user about the successful creation
-     * of their account. It includes an intent that launches the MainActivity when the notification
-     * is tapped. The notification is shown only if the necessary permissions are granted.
+     * This method constructs a notification that informs the user about something happening.
+     * The notification is shown only if the necessary permissions are granted.
      *
      * @param context The context from which the notification is sent, typically an Activity or Application context.
+     * @param title   The title of the notification.
+     * @param message The content of the notification.
      */
-    public static void sendAcceptedNotification(Context context) {
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+
+    public static void sendMessageNotification(Context context, String title, String message) {
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                new Intent(), // Empty intent
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT // Flags to ensure the intent doesn't change
+        );
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID) // Use the correct channel ID
                 .setSmallIcon(R.drawable.ic_notifications)
-                .setContentTitle("Account Created")
-                .setContentText("Your account has been successfully created.")
+                .setContentTitle(title)
+                .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
@@ -44,70 +50,7 @@ public class Notification {
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             // Handle the case where permission is not granted
-            Log.e("CreateAccountFragment", "Notification permission not granted.");
-            return;
-        }
-
-        notificationManager.notify(1001, builder.build());
-    }
-
-    /**
-     * Sends a notification to the user indicating that their account has been rejected.
-     * <p>
-     * This method constructs a notification that informs the user about the rejection
-     * of their account. It includes an intent that launches the MainActivity when the notification
-     * is tapped. The notification is shown only if the necessary permissions are granted.
-     *
-     * @param context The context from which the notification is sent, typically an Activity or Application context.
-     */
-    public static void sendRejectedNotification(Context context) {
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID) // Use the correct channel ID
-                .setSmallIcon(R.drawable.ic_notifications)
-                .setContentTitle("Account Rejected")
-                .setContentText("Your account has been rejected. Please check your in the application for details.")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // Handle the case where permission is not granted
-            Log.e("AccountStatusNotification", "Notification permission not granted.");
-            return;
-        }
-
-        notificationManager.notify(1002, builder.build());
-    }
-
-    public static void sendEventNotification(Context context, Event event) {
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(
-//                context,
-//                0,
-//                new Intent(), // Empty intent
-//                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT // Flags to ensure the intent doesn't change
-//        );
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID) // Use the correct channel ID
-                .setSmallIcon(R.drawable.ic_notifications)
-                .setContentTitle("Event starting soon")
-                .setContentText("Get ready! The event: " + event.getTitle() + " has 24 hours left before it starts!")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // Handle the case where permission is not granted
-            Log.e("AccountStatusNotification", "Notification permission not granted.");
+            Log.e("Notification", "Notification permission not granted.");
             return;
         }
 

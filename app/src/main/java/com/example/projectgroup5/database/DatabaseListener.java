@@ -1,7 +1,6 @@
 package com.example.projectgroup5.database;
 
 import static com.example.projectgroup5.database.DatabaseManager.EVENT_REGISTRATION_STATUS;
-import static com.example.projectgroup5.database.DatabaseManager.REGISTRATION_EVENT;
 import static com.example.projectgroup5.database.DatabaseManager.USER_REGISTRATION_STATE;
 
 import android.util.Log;
@@ -16,7 +15,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.ListenerRegistration;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -84,29 +82,30 @@ public class DatabaseListener {
             // Get the current value of USER_REGISTRATION_STATE
             String currentValue = dataSnapshot.getString(USER_REGISTRATION_STATE);
             if (currentValue == null) return;
-//                Log.d("DatabaseListener", "currentValue: " + currentValue);
             // If the value has changed, proceed
             if (!mapAtomicIntToRegistration(lastKnownValue).equals(currentValue)) {
                 // Send notifications if needed
                 if ((currentValue.equals(User.ACCEPTED)) && mapAtomicIntToRegistration(lastKnownValue).equals(User.WAITLISTED)) {
-                    Notification.sendAcceptedNotification(context);
+                    Notification.sendMessageNotification(context, "Account Accepted",
+                            "Your account has been accepted. Please check your in the application for details.");
                     // set the user representation to accepted
                     UserSession.getInstance().getUserRepresentation().setUserRegistrationState(User.ACCEPTED);
                     context.getNavController().navigate(R.id.account);
                 } else if ((currentValue.equals(User.REJECTED)) && mapAtomicIntToRegistration(lastKnownValue).equals(User.WAITLISTED)) {
-                    Notification.sendRejectedNotification(context);
+                    Notification.sendMessageNotification(context, "Account Rejected",
+                            "Your account has been rejected. Please check your in the application for details.");
                     // set the user representation to rejected
                     UserSession.getInstance().getUserRepresentation().setUserRegistrationState(User.REJECTED);
                     context.getNavController().navigate(R.id.account);
                 } else if ((currentValue.equals(User.ACCEPTED)) && mapAtomicIntToRegistration(lastKnownValue).equals(User.REJECTED)) {
-                    Notification.sendAcceptedNotification(context);
+                    Notification.sendMessageNotification(context, "Account Accepted",
+                            "Your account has been accepted. Please check your in the application for details.");
                     // set the user representation to accepted
                     UserSession.getInstance().getUserRepresentation().setUserRegistrationState(User.ACCEPTED);
                     context.getNavController().navigate(R.id.account);
                 } else {
                     Log.e("DatabaseListener", "Invalid value change: " + currentValue + " LastKnown: " + lastKnownValue.get());
                 }
-                Log.d("DatabaseListener", "Values: " + currentValue + " LastKnown: " + lastKnownValue.get());
                 // Update the last known value
                 setRegistrationState(currentValue, lastKnownValue);
             }
@@ -115,17 +114,6 @@ public class DatabaseListener {
         firestoreListeners.add(DatabaseManager.getDatabaseManager().addValueEventListenerToFirestoreUserData(registrationStateListener, USER_REGISTRATION_STATE));
     }
 
-    /**
-     * Adds a listener to monitor changes in the user registration state in the database.
-     * <p>
-     * This static method registers an EventListener to check the user registration state.
-     * It first checks if the initial value exists and is not equal to 1. If so, it adds another
-     * listener that checks for updates to the registration state. If the value updates to 1,
-     * a notification is sent to the specified context. Logs are generated for any errors encountered
-     * during the database operations.
-     *
-     * @param context The context in which the notification should be sent.
-     */
     public static void addEventStartListener(MainActivity context, Event event, Registration registration) {
 
         // Listener for USER_REGISTRATION_STATE
@@ -141,8 +129,8 @@ public class DatabaseListener {
             if (currentValue == null) return;
             // If the user is accepted and the event starts in more than 24 hours, send a notification at the 24 hour mark
             Date datePlus24Hours = new Date(event.getStartTime().toDate().getTime() + 24 * 60 * 60 * 1000);
-            Log.d("DatabaseListener", "UserSession current value " + currentValue + " event start time: " + event.getStartTime().toDate().getTime() + " datePlus24Hours: " + datePlus24Hours.getTime());
-            Log.d("DatabaseListener", "UserSession dateafter: " + event.getStartTime().toDate().before(datePlus24Hours));
+//            Log.d("DatabaseListener", "UserSession current value " + currentValue + " event start time: " + event.getStartTime().toDate().getTime() + " datePlus24Hours: " + datePlus24Hours.getTime());
+//            Log.d("DatabaseListener", "UserSession dateafter: " + event.getStartTime().toDate().before(datePlus24Hours));
             if (User.ACCEPTED.equals(currentValue) && event.getStartTime().toDate().before(datePlus24Hours)) {
                 // Delay until 24 hours before the event start
                 Log.d("DatabaseListener", "Event UserSession start notification in : " + (event.getStartTime().toDate().getTime() - new Date().getTime()  - 24 * 60 * 60 * 1000) + " milliseconds or " + (event.getStartTime().toDate().getTime() - new Date().getTime() - 24 * 60 * 60 * 1000) / 1000 / 60  + " minutes");
@@ -152,8 +140,7 @@ public class DatabaseListener {
                     if (!firestoreEventStartListeners.containsKey(registration.getRegistrationId())) {
                         Log.d("DatabaseListener", "Event start notification not sent could not find listener");
                         return;}
-                    Notification.sendEventNotification(context, event);
-//                    context.getNavController().navigate(R.id.search_event_dashboard);
+                    Notification.sendMessageNotification(context, "Event starting soon", "Get ready! The event: " + event.getTitle() + " has 24 hours left before it starts!");
                 }, (event.getStartTime().toDate().getTime() - new Date().getTime()  - 24 * 60 * 60 * 1000));
             }
         };
