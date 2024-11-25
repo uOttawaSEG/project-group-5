@@ -16,9 +16,9 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="40sp"
             android:gravity="center"
-            android:text="Organizer Options" />
+            android:text="Organizer Options"
+            android:textSize="40sp" />
 
         <Button
             android:backgroundTint="@color/black"
@@ -41,37 +41,38 @@
             android:layout_height="40sp" />
 
         <Button
-            android:backgroundTint="@color/white"
+            android:id="@+id/organizer_view_event_list"
+            android:layout_width="216dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="50sp"
             android:background="@drawable/rounded_rectangle_border"
+            android:backgroundTint="@color/white"
             android:elevation="30dp"
-            android:textColor="@color/white"
-            android:layout_width="wrap_content"
-            android:shadowRadius="1"
-            android:textSize="@dimen/form_text_size"
+            android:shadowColor="@color/text_shadow_button_form"
             android:shadowDx="-1"
             android:shadowDy="3"
-            android:shadowColor="@color/text_shadow_button_form"
-            android:layout_marginHorizontal="50sp"
-            android:layout_height="wrap_content"
-            android:id="@+id/organizer_view_event_list"
-            android:text="My Events" />
+            android:shadowRadius="1"
+            android:text="My Events"
+            android:textColor="@color/white"
+            android:textSize="@dimen/form_text_size" />
         <Space
             android:layout_width="match_parent"
             android:layout_height="40sp" />
+
         <Button
-            android:backgroundTint="@color/white"
+            android:id="@+id/organizer_event_requests"
+            android:layout_width="217dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="50sp"
             android:background="@drawable/rounded_rectangle_border"
+            android:backgroundTint="@color/white"
             android:elevation="30dp"
-            android:textColor="@color/white"
-            android:layout_width="wrap_content"
-            android:shadowRadius="1"
-            android:textSize="@dimen/form_text_size"
+            android:shadowColor="@color/text_shadow_button_form"
             android:shadowDx="-1"
             android:shadowDy="3"
-            android:shadowColor="@color/text_shadow_button_form"
-            android:layout_marginHorizontal="50sp"
-            android:layout_height="wrap_content"
-            android:id="@+id/organizer_event_requests"
-            android:text="All Requests" />
+            android:shadowRadius="1"
+            android:text="All Requests"
+            android:textColor="@color/white"
+            android:textSize="@dimen/form_text_size" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

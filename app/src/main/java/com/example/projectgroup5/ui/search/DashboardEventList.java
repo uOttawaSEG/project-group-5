@@ -288,4 +288,5 @@ public class DashboardEventList extends Fragment {
 //                // Handle the case where nothing is select
         return binding.getRoot();
     }
+
 }
