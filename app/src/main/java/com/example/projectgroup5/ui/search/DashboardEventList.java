@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.R;
@@ -50,6 +51,8 @@ public class DashboardEventList extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         FragmentDashboardEventListBinding binding = FragmentDashboardEventListBinding.inflate(inflater, container, false);
+        // Initialize the SwipeRefreshLayout
+        SwipeRefreshLayout swipeRefreshLayout = binding.getRoot().findViewById(R.id.swipeRefreshLayout);
         // Initialize the ListView
         ListView listView = binding.searchListLayout;
         // get the navigator
@@ -70,6 +73,26 @@ public class DashboardEventList extends Fragment {
                 listView.setAdapter(eventOrganizerAdapter);
             }
         });
+
+        // Set up the swipe-to-refresh listener
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            // Simulate refreshing events (you can add actual logic to refresh data from the database)
+            DatabaseManager.getDatabaseManager().getEvents(eventIds -> {
+                if (eventIds != null) {
+                    events.clear();
+                    events.addAll(eventIds.getResult());
+                    events.removeIf(event -> event.getStartTime().toDate().before(new java.util.Date()));
+                    events.sort(Comparator.comparing(Event::getStartTime));
+
+                    EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
+                    listView.setAdapter(eventOrganizerAdapter);
+                    Toast.makeText(getContext(), "Refreshed", Toast.LENGTH_SHORT).show();
+                }
+                // Stop the refresh animation once the data is loaded
+                swipeRefreshLayout.setRefreshing(false);
+            });
+        });
+
         // Add listener for when query changes
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -278,7 +301,11 @@ public class DashboardEventList extends Fragment {
                 return false; // Don't consume the touch event
             });
             return true;
+
+
         });
+
+
 
 
 //

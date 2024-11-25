@@ -67,6 +67,12 @@ public class AttendeeEventList extends Fragment {
                             // now we must sort the events by starting date
                             events.sort(Comparator.comparing(Event::getStartTime));
                             EventAdapterForDisplay eventAttendeeAdapter = new EventAdapterForDisplay(getContext(), events);
+                            if (events.isEmpty()) {
+                                // set the textview text to show that there are no events
+                                binding.statusBarText.setText("No events");
+                            } else {
+                                binding.statusBarText.setText("My registrations");
+                            }
                             listView.setAdapter(eventAttendeeAdapter);
                         }
                     }
@@ -130,6 +136,12 @@ public class AttendeeEventList extends Fragment {
                                         // remove the listener
                                         DatabaseListener.deleteEventStartListener(selectedEvent.getEventID());
                                         EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
+                                        if (events.isEmpty()) {
+                                            // set the textview text to show that there are no events
+                                            binding.statusBarText.setText("No events");
+                                        } else {
+                                            binding.statusBarText.setText("My registrations");
+                                        }
                                         listView.setAdapter(eventOrganizerAdapter);
                                     });
                                 }
