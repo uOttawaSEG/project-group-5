@@ -47,6 +47,8 @@ public class AccountManagementFragment extends Fragment {
         root.findViewById(R.id.logoutButton).setOnClickListener(v -> {
             UserSession.getInstance().logout();
             // go back to the login fragment
+            // haptic feedback
+
             navController.navigate(R.id.action_account_management_to_login_or_create_account);
         });
 

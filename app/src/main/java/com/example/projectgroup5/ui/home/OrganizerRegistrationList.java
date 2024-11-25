@@ -48,6 +48,7 @@ public class OrganizerRegistrationList extends Fragment {
                 , android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+        spinner.setSelection(1);
         Switch acceptAllUserSwitch = binding.getRoot().findViewById(R.id.acceptAllUserSwitch);
         // set the switch to the correct state
         if (onlyEvent) {

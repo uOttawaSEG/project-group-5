@@ -9,12 +9,14 @@ import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -49,7 +51,7 @@ public class CreateEventFragment extends Fragment {
     private final Calendar stopCalendar = Calendar.getInstance();
     private Timestamp startTime = new Timestamp(startCalendar.getTime());
     private Timestamp endTime = new Timestamp(stopCalendar.getTime());
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -99,7 +101,6 @@ public class CreateEventFragment extends Fragment {
         long minDate = startCalendar.getTimeInMillis();
 
 
-
         binding.getRoot().findViewById(R.id.pickStartTime).setOnClickListener(v -> {
             // clear the error of the edit text
             binding.pickStartTime.setError(null);
@@ -133,15 +134,15 @@ public class CreateEventFragment extends Fragment {
 
 
         binding.getRoot().findViewById(R.id.createEventCreateButton).setOnClickListener(v -> {
+            this.getView().performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
             EventOptional option = EventOptional.newEvent(binding.eventTitleInput.getText().toString(), binding.eventDescriptionInput.getText().toString(), placeAddress, startTime, endTime, binding.autoAcceptSwitch.isChecked(), DatabaseManager.getDatabaseManager().getCurrentUserReference());
             if (option.holdsAnEvent()) {
                 navController.popBackStack();
-                Toast.makeText(getContext(), "Event created!", Toast.LENGTH_SHORT).show();
-                // TODO add event to database here
+
 
                 DatabaseManager.getDatabaseManager().createNewEvent(option.getEvent(), (task1) -> {
-                    Log.d("CreateEventFragment", "Event created");
-                // we now have an event with all the fields filled in
+//                    Log.d("CreateEventFragment", "Event created");
+                    // we now have an event with all the fields filled in
                     // add the event to the organizer's list of events
                     if (!task1.isSuccessful()) {
                         Log.e("CreateEventFragment", "Event creation failed");
@@ -151,6 +152,9 @@ public class CreateEventFragment extends Fragment {
                         DatabaseManager.getDatabaseManager().addEventToOrganizer(task1.getResult(), task2 -> {
                             if (!task2.isSuccessful()) {
                                 Log.e("CreateEventFragment", "Error adding event to organizer");
+                            } else {
+                                this.getView().performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+                                Toast.makeText(getContext(), "Event created!", Toast.LENGTH_SHORT).show();
                             }
                         });
 
@@ -158,13 +162,14 @@ public class CreateEventFragment extends Fragment {
 
                 });
             } else {
+                this.getView().performHapticFeedback(HapticFeedbackConstants.REJECT);
                 // based on the error add a warning to the corresponding field
                 switch (option.getError()) {
                     case TITLE_EMPTY:
                         binding.eventTitleInput.setError("Please enter a title");
                         break;
-                        case TITLE_BADLY_FORMATTED:
-                            binding.eventTitleInput.setError("Please enter a valid title");
+                    case TITLE_BADLY_FORMATTED:
+                        binding.eventTitleInput.setError("Please enter a valid title");
                         break;
                     case DESCRIPTION_EMPTY:
                         binding.eventDescriptionInput.setError("Please enter a description");
