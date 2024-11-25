@@ -1,9 +1,11 @@
 package com.example.projectgroup5.ui.search;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcel;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SearchEvent;
@@ -17,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -49,6 +52,7 @@ public class DashboardEventList extends Fragment {
     private final Handler handler = new Handler();
     private Runnable prolongedPressRunnable;
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         FragmentDashboardEventListBinding binding = FragmentDashboardEventListBinding.inflate(inflater, container, false);
         // Initialize the SwipeRefreshLayout
@@ -173,7 +177,6 @@ public class DashboardEventList extends Fragment {
         });
 
 
-
         // set on click listener if the user is an attendee
         listView.setOnItemClickListener((parentView, view, position, id) -> {
             // we toggle the description and adress visibility
@@ -187,29 +190,32 @@ public class DashboardEventList extends Fragment {
             }
             if (selectedEvent.getAddress() != null) {
                 if (view.findViewById(R.id.eventAddressEntry).getVisibility() == (View.VISIBLE)) {
-                    view.findViewById(R.id.eventAddressEntry).setVisibility(View.GONE);}
-                else {
+                    view.findViewById(R.id.eventAddressEntry).setVisibility(View.GONE);
+                } else {
                     view.findViewById(R.id.eventAddressEntry).setVisibility(View.VISIBLE);
                 }
-            }});
+            }
+        });
 
         listView.setOnItemLongClickListener((parentView, view, position, id) -> {
+
             // Handle long click event
             // if the user is not an instanceof attendee return
             if (UserSession.getInstance().getUserRepresentation() == null || !(UserSession.getInstance().getUserRepresentation() instanceof Attendee)) {
                 return false;
             }
+
             // get the attendee registration status to the app
             if (!UserSession.getInstance().getUserRepresentation().getUserRegistrationState().equals(User.ACCEPTED)) {
                 return false;
-            };
+            }
             // if the event has a time conflict with the other events, we dont register the user
             if (view.findViewById(R.id.statusIcon).getVisibility() == (View.VISIBLE)) {
                 Toast.makeText(getContext(), "Event has a time conflict", Toast.LENGTH_SHORT).show();
                 return true;
             }
             Event selectedEvent = (Event) parentView.getItemAtPosition(position);
-
+            this.getView().performHapticFeedback(HapticFeedbackConstants.GESTURE_START);
             Toast.makeText(getContext(), "Keep pressing to register", Toast.LENGTH_SHORT).show();
             // we display the option to delete the event and delete it
             // Set up prolonged press detection
@@ -242,39 +248,39 @@ public class DashboardEventList extends Fragment {
                                     ((Attendee) UserSession.getInstance().getUserRepresentation()).addRegistration(registrationRef);
                                     // add the event to the user's list of events
                                     DatabaseManager.getDatabaseManager().addRegistrationToAttendee(userRef.getId(), registrationRef, task4 -> {
-                                    Toast.makeText(getContext(), "Event registered", Toast.LENGTH_LONG).show();
-                                    // add the listener to the event to send a notification 24 hours before
-                                        DatabaseListener.addEventStartListener((MainActivity) getActivity().getApplicationContext(), selectedEvent, registration);
-                                    Log.d("DashboardEventList", "Event registered successfully and removed from list");
-                                    String query = searchView.getQuery().toString();
+                                        Toast.makeText(getContext(), "Event registered", Toast.LENGTH_LONG).show();
+                                        this.getView().performHapticFeedback(HapticFeedbackConstants.GESTURE_END);
+                                        // add the listener to the event to send a notification 24 hours before
+                                        DatabaseListener.addEventStartListener(MainActivity.getInstance(), selectedEvent, registration);
+                                        Log.d("DashboardEventList", "Event registered successfully and removed from list");
+                                        String query = searchView.getQuery().toString();
 //                                        if (UserSession.getInstance().getUserRepresentation() instanceof Attendee) {
-                                            DatabaseManager.getDatabaseManager().getEventsThatMatchQuery(query, eventIds -> {
-                                                if (eventIds == null) {
+                                        DatabaseManager.getDatabaseManager().getEventsThatMatchQuery(query, eventIds -> {
+                                            if (eventIds == null) {
+                                            } else {
+                                                events.clear();
+                                                events.addAll(eventIds);
+                                                events.removeIf(event -> event.getStartTime().toDate().before(new java.util.Date()));
+                                                if (searchView.getQuery().toString().isEmpty()) {
+                                                    events.sort(Comparator.comparing(Event::getStartTime));
                                                 } else {
-                                                    events.clear();
-                                                    events.addAll(eventIds);
-                                                    EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
-                                                    listView.setAdapter(eventOrganizerAdapter);
+                                                    events.sort((o1, o2) -> {
+                                                        if (o1.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                                                            return -1;
+                                                        } else if (o2.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                                                            return 1;
+                                                        } else {
+                                                            return 0;
+                                                        }
+                                                    });
                                                 }
-                                            });
-//                                        }
-                                        events.removeIf(event -> event.getStartTime().toDate().before(new java.util.Date()));
-                                        if (searchView.getQuery().toString().isEmpty()) {
-                                            events.sort(Comparator.comparing(Event::getStartTime));
-                                        } else {
-                                            events.sort((o1, o2) -> {
-                                                if (o1.getTitle().toLowerCase().contains(query.toLowerCase())) {
-                                                    return -1;
-                                                } else if (o2.getTitle().toLowerCase().contains(query.toLowerCase())) {
-                                                    return 1;
-                                                } else {
-                                                    return 0;
-                                                }
-                                            });
-                                        }
 //                                    events.remove(selectedEvent);
-                                    EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
-                                    listView.setAdapter(eventOrganizerAdapter);
+                                                EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
+                                                listView.setAdapter(eventOrganizerAdapter);
+                                            }
+                                        });
+//                                        }
+
 
                                     });
                                 } else {
@@ -304,8 +310,6 @@ public class DashboardEventList extends Fragment {
 
 
         });
-
-
 
 
 //

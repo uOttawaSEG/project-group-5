@@ -1,8 +1,12 @@
 package com.example.projectgroup5.ui.home;
 
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,6 +20,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -67,12 +72,7 @@ public class AttendeeEventList extends Fragment {
                             // now we must sort the events by starting date
                             events.sort(Comparator.comparing(Event::getStartTime));
                             EventAdapterForDisplay eventAttendeeAdapter = new EventAdapterForDisplay(getContext(), events);
-                            if (events.isEmpty()) {
-                                // set the textview text to show that there are no events
-                                binding.statusBarText.setText("No events");
-                            } else {
-                                binding.statusBarText.setText("My registrations");
-                            }
+                            change_status_bar_message(events, binding);
                             listView.setAdapter(eventAttendeeAdapter);
                         }
                     }
@@ -105,6 +105,7 @@ public class AttendeeEventList extends Fragment {
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             // will try to unregister the user from the event if possible
+            @RequiresApi(api = Build.VERSION_CODES.R)
             @Override
             public boolean onItemLongClick(AdapterView<?> parentView, View view, int position, long id) {
                 Log.d("AttendeeEventList", "Long click");
@@ -121,7 +122,8 @@ public class AttendeeEventList extends Fragment {
                         Toast.makeText(getContext(), "Less than 24 hours left", Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        Toast.makeText(getContext(), "Keep holding to delete", Toast.LENGTH_SHORT).show();
+                        getView().performHapticFeedback(HapticFeedbackConstants.GESTURE_START);
+                        Toast.makeText(getContext(), "Keep holding to remove", Toast.LENGTH_SHORT).show();
                         // we display the option to delete the event and delete it
                         prolongedPressRunnable = () -> {
                             // delete the registration from the user, the event and then the registration object from firestore
@@ -130,18 +132,15 @@ public class AttendeeEventList extends Fragment {
                                 if (registrationRefTask.isSuccessful()) {
                                     DatabaseManager.getDatabaseManager().deleteRegistration(registrationRefTask.getResult(), task -> {
                                         Log.d("AttendeeEventList", "Registration deleted from firestore " + registrationRefTask.getResult().getId());
+                                        getView().performHapticFeedback(HapticFeedbackConstants.GESTURE_END);
+                                        Toast.makeText(getContext(), "Event removed", Toast.LENGTH_SHORT).show();
                                     selectedEvent.getRegistrations().remove(registrationRefTask.getResult());
                                     // update the adapter
                                         events.remove(selectedEvent);
                                         // remove the listener
                                         DatabaseListener.deleteEventStartListener(selectedEvent.getEventID());
                                         EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
-                                        if (events.isEmpty()) {
-                                            // set the textview text to show that there are no events
-                                            binding.statusBarText.setText("No events");
-                                        } else {
-                                            binding.statusBarText.setText("My registrations");
-                                        }
+                                        change_status_bar_message(events, binding);
                                         listView.setAdapter(eventOrganizerAdapter);
                                     });
                                 }
@@ -166,5 +165,14 @@ public class AttendeeEventList extends Fragment {
         });
 
         return binding.getRoot();
+    }
+
+    private static void change_status_bar_message(List<Event> events, FragmentAttendeeEventListBinding binding) {
+        if (events.isEmpty()) {
+            // set the textview text to show that there are no events
+            binding.statusBarText.setText("No registrations, go to the event list and hold an event to register!");
+        } else {
+            binding.statusBarText.setText("My registrations");
+        }
     }
 }
