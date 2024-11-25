@@ -100,7 +100,7 @@ public class DatabaseManager {
      * @param password The password of the user attempting to log in.
      * @param listener A listener that will be notified when the login operation is complete.
      */
-    public void login(String email, String password, OnCompleteListener<AuthResult> listener, OnSuccessListener<AuthResult> listener2) {
+    public void login(String email, String password, OnCompleteListener<AuthResult> listener) {
         logout();
         if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
             Log.e("DatabaseManager", "Email or password is empty");
@@ -108,7 +108,7 @@ public class DatabaseManager {
             listener.onComplete(Tasks.forException(new Exception("Email or password is empty")));
             return;
         }
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnSuccessListener(listener2);
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(listener);
     }
 
     public String getAuthID() {
