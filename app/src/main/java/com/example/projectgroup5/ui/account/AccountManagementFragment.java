@@ -1,13 +1,16 @@
 package com.example.projectgroup5.ui.account;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -21,6 +24,7 @@ import com.example.projectgroup5.users.UserSession;
 public class AccountManagementFragment extends Fragment {
     private FragmentAccountManagementBinding binding;
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -48,6 +52,7 @@ public class AccountManagementFragment extends Fragment {
             UserSession.getInstance().logout();
             // go back to the login fragment
             // haptic feedback
+            this.getView().performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
 
             navController.navigate(R.id.action_account_management_to_login_or_create_account);
         });

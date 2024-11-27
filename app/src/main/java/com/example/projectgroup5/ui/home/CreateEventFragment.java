@@ -137,7 +137,7 @@ public class CreateEventFragment extends Fragment {
             this.getView().performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
             EventOptional option = EventOptional.newEvent(binding.eventTitleInput.getText().toString(), binding.eventDescriptionInput.getText().toString(), placeAddress, startTime, endTime, binding.autoAcceptSwitch.isChecked(), DatabaseManager.getDatabaseManager().getCurrentUserReference());
             if (option.holdsAnEvent()) {
-                navController.popBackStack();
+                this.getView().performHapticFeedback(HapticFeedbackConstants.CONFIRM);
 
 
                 DatabaseManager.getDatabaseManager().createNewEvent(option.getEvent(), (task1) -> {
@@ -147,19 +147,20 @@ public class CreateEventFragment extends Fragment {
                     if (!task1.isSuccessful()) {
                         Log.e("CreateEventFragment", "Event creation failed");
                         Toast.makeText(getContext(), "Event creation failed", Toast.LENGTH_SHORT).show();
+                        navController.popBackStack();
                     } else {
                         Log.d("CreateEventFragment", "Event created now adding to organizer");
                         DatabaseManager.getDatabaseManager().addEventToOrganizer(task1.getResult(), task2 -> {
                             if (!task2.isSuccessful()) {
                                 Log.e("CreateEventFragment", "Error adding event to organizer");
                             } else {
-                                this.getView().performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+
                                 Toast.makeText(getContext(), "Event created!", Toast.LENGTH_SHORT).show();
+
                             }
+                            navController.popBackStack();
                         });
-
                     }
-
                 });
             } else {
                 this.getView().performHapticFeedback(HapticFeedbackConstants.REJECT);

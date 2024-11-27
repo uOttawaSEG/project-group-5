@@ -7,6 +7,7 @@ import static com.example.projectgroup5.users.User.WAITLISTED;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -127,12 +128,14 @@ public class UserAdapterForAdminView extends ArrayAdapter<User> {
 
         Button rejectButton = customView.findViewById(R.id.rejectUserButton);
         rejectButton.setOnClickListener(v -> {
+            rejectButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
             this.remove(user);
             // Handle reject button click
             DatabaseManager.getDatabaseManager().storeUserValueToFirestore(user.getUserId(), DatabaseManager.USER_REGISTRATION_STATE, REJECTED, null);
         });
         Button acceptButton = customView.findViewById(R.id.acceptUserButton);
         acceptButton.setOnClickListener(v -> {
+            acceptButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
             this.remove(user);
             // Handle accept button click
             DatabaseManager.getDatabaseManager().storeUserValueToFirestore(user.getUserId(), DatabaseManager.USER_REGISTRATION_STATE, ACCEPTED, null);
