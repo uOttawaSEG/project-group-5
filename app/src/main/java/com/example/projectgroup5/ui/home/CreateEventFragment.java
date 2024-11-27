@@ -91,6 +91,9 @@ public class CreateEventFragment extends Fragment {
 
         // the edit text is not editable but allow the user to open the autocomplete fragment when clicking on it
         editTextLocation.setOnClickListener(v -> {
+            // remove focus from edit text fields
+            binding.eventDescriptionInput.clearFocus();
+            binding.eventTitleInput.clearFocus();
             // clear the error of the edit text
             editTextLocation.setError(null);
             openAutocompleteActivity();
@@ -102,6 +105,9 @@ public class CreateEventFragment extends Fragment {
 
 
         binding.getRoot().findViewById(R.id.pickStartTime).setOnClickListener(v -> {
+            // remove focus from edit text fields
+            binding.eventDescriptionInput.clearFocus();
+            binding.eventTitleInput.clearFocus();
             // clear the error of the edit text
             binding.pickStartTime.setError(null);
             DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
@@ -121,6 +127,9 @@ public class CreateEventFragment extends Fragment {
 
 
         binding.getRoot().findViewById(R.id.pickEndTime).setOnClickListener(v -> {
+            // remove focus from edit text fields
+            binding.eventDescriptionInput.clearFocus();
+            binding.eventTitleInput.clearFocus();
             // clear the error of the edit text
             binding.pickEndTime.setError(null);
             // set the text of the button to the time selected
@@ -168,12 +177,18 @@ public class CreateEventFragment extends Fragment {
                 switch (option.getError()) {
                     case TITLE_EMPTY:
                         binding.eventTitleInput.setError("Please enter a title");
+                        // set the focus on the title field
+                        binding.eventTitleInput.requestFocus();
                         break;
                     case TITLE_BADLY_FORMATTED:
                         binding.eventTitleInput.setError("Please enter a valid title");
+                        // set the focus on the title field
+                        binding.eventTitleInput.requestFocus();
                         break;
                     case DESCRIPTION_EMPTY:
                         binding.eventDescriptionInput.setError("Please enter a description");
+                        // set the focus on the description field
+                        binding.eventDescriptionInput.requestFocus();
                         break;
                     case ADDRESS_EMPTY:
                         editTextLocation.setError("Please enter an address");
