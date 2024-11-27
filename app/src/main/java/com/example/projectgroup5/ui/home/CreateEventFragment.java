@@ -240,7 +240,7 @@ public class CreateEventFragment extends Fragment {
                 calendarToSet.add(Calendar.DAY_OF_YEAR, 1);
             }
             // clear the Pick END time if the new start time is after the end time
-            if (endTime != null && calendarToSet.getTimeInMillis() >= endTime.toDate().getTime() && calendarToSet == startCalendar) {
+            if (endTime != null && calendarToSet.getTimeInMillis() >= endTime.toDate().getTime() - 1000 * 60 * 30 - 1 && calendarToSet == startCalendar) {
                 endTime = null;
                 binding.pickEndTime.setText(R.string.pick_end_time);
             } else {
