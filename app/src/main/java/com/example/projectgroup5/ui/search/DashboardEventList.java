@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.SearchEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -77,8 +78,32 @@ public class DashboardEventList extends Fragment {
                 listView.setAdapter(eventOrganizerAdapter);
             }
         });
+        // ---------------------------
+        // Disable swipe refresh initially
+        swipeRefreshLayout.setEnabled(false);
 
-        // Set up the swipe-to-refresh listener
+// Add an onScrollListener to check if the ListView is at the top
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                // Only enable swipe refresh when the list is fully at the top
+                if (scrollState == SCROLL_STATE_IDLE) {
+                    // Ensure the first visible position is 0 and the top of the first child is 0
+                    if (listView.getFirstVisiblePosition() == 0 && listView.getChildAt(0).getTop() == 0) {
+                        swipeRefreshLayout.setEnabled(true); // Enable swipe to refresh
+                    } else {
+                        swipeRefreshLayout.setEnabled(false); // Disable swipe to refresh
+                    }
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                // Not necessary to handle this, the state change is enough
+            }
+        });
+
+// Set up the swipe-to-refresh listener
         swipeRefreshLayout.setOnRefreshListener(() -> {
             // Simulate refreshing events (you can add actual logic to refresh data from the database)
             DatabaseManager.getDatabaseManager().getEvents(eventIds -> {

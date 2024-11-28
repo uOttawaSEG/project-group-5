@@ -1,8 +1,10 @@
 package com.example.projectgroup5.ui.home;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -110,6 +113,7 @@ public class OrganizerEventList extends Fragment {
                 listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
 
+                    @RequiresApi(api = Build.VERSION_CODES.R)
                     @Override
                     public boolean onItemLongClick(AdapterView<?> parentView, View view, int position, long id) {
                         Log.d("OrganizerEventList", "Long click");
@@ -128,6 +132,7 @@ public class OrganizerEventList extends Fragment {
                                 navController.navigate(R.id.action_organizer_event_list_to_organizer_registration_list);
                             } else {
                                 Toast.makeText(getContext(), "Keep holding to delete", Toast.LENGTH_SHORT).show();
+                                getView().performHapticFeedback(HapticFeedbackConstants.GESTURE_START);
                                 // we display the option to delete the event and delete it
                                 // Set up prolonged press detection
                                 prolongedPressRunnable = new Runnable() {
@@ -155,6 +160,7 @@ public class OrganizerEventList extends Fragment {
                                                         events.remove(selectedEvent);
                                                         EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
                                                         listView.setAdapter(eventOrganizerAdapter);
+                                                        getView().performHapticFeedback(HapticFeedbackConstants.GESTURE_END);
                                                     });
                                                 });
                                             }

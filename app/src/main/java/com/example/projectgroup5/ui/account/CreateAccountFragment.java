@@ -2,9 +2,11 @@ package com.example.projectgroup5.ui.account;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -41,6 +44,7 @@ public class CreateAccountFragment extends Fragment {
     private FragmentCreateAccountBinding binding;
     private NavController navController;
 
+    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -49,14 +53,17 @@ public class CreateAccountFragment extends Fragment {
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
         // Switch between user and organizer
         root.findViewById(R.id.OrganizerVSUserSwitch).setOnClickListener(v -> {
+
             if (binding.OrganizerVSUserSwitch.isChecked()) {
                 binding.editTextTextOrganisation.setVisibility(View.VISIBLE);
+                this.getView().performHapticFeedback(HapticFeedbackConstants.TOGGLE_ON);
             } else {
                 binding.editTextTextOrganisation.setVisibility(View.GONE);
+                this.getView().performHapticFeedback(HapticFeedbackConstants.TOGGLE_OFF);
             }
         });
 
-        root.findViewById(R.id.cancelButtonCreate).setOnClickListener(v -> navController.popBackStack());
+        root.findViewById(R.id.cancelButtonCreate).setOnClickListener(v -> {this.getView().performHapticFeedback(HapticFeedbackConstants.CONFIRM);navController.popBackStack();});
 
         // Define a variable to hold the Places API key.
         String apiKey = BuildConfig.PLACES_API_KEY;
@@ -97,6 +104,7 @@ public class CreateAccountFragment extends Fragment {
         });
 
         root.findViewById(R.id.confirmCredentialAndCreateButton).setOnClickListener(v -> {
+            this.getView().performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
             boolean errorFlag = false;
             String password = binding.editTextTextPasswordUserCreate.getText().toString().trim();
             if (binding.editTextTextEmailAddressUserCreate.getText().toString().isEmpty()) {
@@ -169,6 +177,7 @@ public class CreateAccountFragment extends Fragment {
             }
 
             if (errorFlag) {
+                this.getView().performHapticFeedback(HapticFeedbackConstants.REJECT);
                 return;
             }
 
@@ -190,10 +199,12 @@ public class CreateAccountFragment extends Fragment {
                         if (onCompleteListener1.isSuccessful()) {
                             Log.d("CreateAccountFragment", "login was successful");
                             // Once we know the login was successful we can navigate to the account management fragment
+                            this.getView().performHapticFeedback(HapticFeedbackConstants.CONFIRM);
                             navController.navigate(R.id.action_create_account_to_account_management);
                         } else {
                             // show an error message
                             Log.e("CreateAccountFragment", "login was not successful");
+                            this.getView().performHapticFeedback(HapticFeedbackConstants.REJECT);
                             binding.editTextTextEmailAddressUserCreate.setError("Invalid email or password");
                         }
                     });
@@ -201,18 +212,22 @@ public class CreateAccountFragment extends Fragment {
                     switch (onCompleteListener.getException().getMessage()) {
                         case "The email address is badly formatted.":
                             binding.editTextTextEmailAddressUserCreate.setError("Invalid email address");
+                            this.getView().performHapticFeedback(HapticFeedbackConstants.REJECT);
                             break;
                         case "The given password is invalid. [ Password should be at least 6 characters ]":
                             binding.editTextTextPasswordUserCreate.setError("Invalid password");
+                            this.getView().performHapticFeedback(HapticFeedbackConstants.REJECT);
                             break;
                             case "The email address is already in use by another account.":
                                 binding.editTextTextEmailAddressUserCreate.setError("Email address already in use");
+                                this.getView().performHapticFeedback(HapticFeedbackConstants.REJECT);
                                 break;
 
                         default:
                             Log.e("CreateAccountFragment", "Error creating user: " + onCompleteListener.getException().getMessage());
                             binding.editTextTextEmailAddressUserCreate.setError("Invalid email or password");
                             binding.editTextTextPasswordUserCreate.setError("Invalid email or password");
+                            this.getView().performHapticFeedback(HapticFeedbackConstants.REJECT);
                             break;
                     }
                 }
