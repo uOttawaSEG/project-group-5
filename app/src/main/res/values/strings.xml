@@ -24,6 +24,7 @@
     <string name="you_are_not_registered">You are not registered</string>
     <string name="pick_end_time">Pick end time</string>
     <string name="pick_start_time">Pick start time</string>
+    <string name="SignUp">Sign Up</string>
     <string-array name="event_type_for_organizer">
         <item>Upcoming</item>
         <item>Past</item>

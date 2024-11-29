@@ -11,4 +11,9 @@
     <color name="loginButton2">#7AA941</color>
     <color name="text_shadow_button_form">#59454B5F</color>
     <color name="background_color">#A0E1EAF4</color>
+    <color name="gray_background">#A3A3A3</color>
+    <color name="button_light_gray">#ededed</color> <!-- Lighter gray for buttons -->
+    <color name="material_dynamic_neutral30">#D6D6D6</color>
+    <color name="dark_gray_background">#2A2A2A</color> <!-- A dark gray shade -->
+
 </resources>

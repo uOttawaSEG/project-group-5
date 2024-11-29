@@ -1,243 +1,210 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.account.CreateAccountFragment">
+    android:background="@color/gray_background">
 
-    <LinearLayout
-        android:layout_width="320sp"
+    <!-- Welcome Text -->
+
+    <!-- Organizer/User Switch -->
+
+    <TextView
+        android:id="@+id/createAccountTitle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginBottom="100sp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="4dp"
+        android:text="@string/create"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.4"
-        android:background="@drawable/rounded_rectangle_border"
-        >
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Organization Name Input -->
+    <Switch
+        android:id="@+id/OrganizerVSUserSwitch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/organizer"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/createAccountTitle"
+        app:layout_constraintWidth_percent="0.8" />
 
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+    <EditText
+        android:id="@+id/editTextTextOrganisation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rectangular_input_with_border"
+        android:hint="@string/organisation"
+        android:padding="16dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/material_dynamic_neutral30"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/OrganizerVSUserSwitch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintWidth_percent="0.8" />
 
+    <!-- Email Address -->
+    <EditText
+        android:id="@+id/editTextTextEmailAddressUserCreate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rectangular_input_with_border"
+        android:hint="@string/email"
+        android:padding="16dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/material_dynamic_neutral30"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/editTextTextOrganisation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintWidth_percent="0.8" />
 
-        <LinearLayout
+    <!-- Phone Number -->
+    <EditText
+        android:id="@+id/editTextPhoneUserCreate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rectangular_input_with_border"
+        android:hint="@string/phone"
+        android:padding="16dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/material_dynamic_neutral30"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/editTextTextEmailAddressUserCreate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintWidth_percent="0.8" />
 
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="vertical">
+    <!-- Address -->
+    <EditText
+        android:id="@+id/editTextTextPostalAddressUserCreate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rectangular_input_with_border"
+        android:hint="@string/address"
+        android:padding="16dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/material_dynamic_neutral30"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/editTextPhoneUserCreate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintWidth_percent="0.8" />
 
+    <!-- Password -->
+    <EditText
+        android:id="@+id/editTextTextPasswordUserCreate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rectangular_input_with_border"
+        android:hint="@string/password"
+        android:padding="16dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/material_dynamic_neutral30"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/editTextTextPostalAddressUserCreate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintWidth_percent="0.8" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_marginBottom="5sp"
-                android:orientation="horizontal">
+    <!-- Confirm Password -->
+    <EditText
+        android:id="@+id/editTextTextConfirmPasswordUserCreate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rectangular_input_with_border"
+        android:hint="@string/confirm_password"
+        android:padding="16dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/material_dynamic_neutral30"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/editTextTextPasswordUserCreate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintWidth_percent="0.8" />
 
+    <!-- First Name -->
+    <EditText
+        android:id="@+id/editTextTextUserCreate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rectangular_input_with_border"
+        android:hint="@string/first_name"
+        android:padding="16dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/material_dynamic_neutral30"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/editTextTextConfirmPasswordUserCreate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintWidth_percent="0.8" />
 
-                <Switch
-                    android:id="@+id/OrganizerVSUserSwitch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="48sp"
-                    android:gravity="center"
-                    android:textColor="@color/black"
-                    android:text="@string/organizer"
-                    android:textSize="@dimen/form_text_size"
-                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+    <!-- Last Name -->
+    <EditText
+        android:id="@+id/editTextText2UserCreate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rectangular_input_with_border"
+        android:hint="@string/last_name"
+        android:padding="16dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/material_dynamic_neutral30"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/editTextTextUserCreate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintWidth_percent="0.8" />
 
-            </LinearLayout>
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/editTextText2UserCreate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp">
 
-            <EditText
-                android:id="@+id/editTextTextOrganisation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5sp"
-                android:layout_marginBottom="5sp"
-                android:autofillHints="organization"
-                android:background="@drawable/rectangular_input"
-                android:ems="10"
-                android:gravity="center"
-                android:hint="@string/organisation"
-                android:inputType="text"
-                android:minHeight="48dp"
-                android:textSize="@dimen/form_text_size"
-                android:textColorHint="@color/material_dynamic_neutral30"
-                android:textColor="@color/black"
-                android:visibility="gone" />
+        <!-- Cancel Button -->
+        <Button
+            android:id="@+id/cancelButtonCreate"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/rounded_button_with_shadow"
+            android:text="@string/cancel"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
 
-            <EditText
-                android:id="@+id/editTextTextEmailAddressUserCreate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5sp"
-                android:autofillHints="emailAddress"
-                android:background="@drawable/rectangular_input"
-                android:ems="10"
-                android:gravity="center"
-                android:hint="@string/email"
-                android:inputType="textWebEmailAddress"
-                android:minHeight="48dp"
-                android:textColorHint="@color/material_dynamic_neutral30"
-                android:textColor="@color/black"
-                android:textSize="@dimen/form_text_size" />
-
-            <EditText
-                android:id="@+id/editTextPhoneUserCreate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5sp"
-                android:autofillHints="phoneNumber"
-                android:background="@drawable/rectangular_input"
-                android:ems="10"
-                android:gravity="center"
-                android:maxLength="10"
-                android:hint="@string/phone"
-                android:inputType="phone"
-                android:minHeight="48dp"
-                android:textColorHint="@color/material_dynamic_neutral30"
-                android:textColor="@color/black"
-                android:textSize="@dimen/form_text_size" />
-
-            <EditText
-                android:ems="10"
-                android:id="@+id/editTextTextPostalAddressUserCreate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5sp"
-                android:autofillHints="postalAddress"
-                android:background="@drawable/rectangular_input"
-                android:focusable="false"
-                android:gravity="center"
-                android:hint="@string/address"
-                android:inputType="textPostalAddress"
-                android:minHeight="48dp"
-                android:textColor="@color/black"
-                android:textColorHint="@color/material_dynamic_neutral30"
-                android:textSize="@dimen/form_text_size" />
-
-            <EditText
-                android:id="@+id/editTextTextPasswordUserCreate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5sp"
-                android:autofillHints="newPassword"
-                android:background="@drawable/rectangular_input"
-                android:ems="10"
-                android:gravity="center"
-                android:hint="@string/password"
-                android:inputType="textPassword"
-                android:minHeight="48dp"
-                android:textColorHint="@color/material_dynamic_neutral30"
-                android:textColor="@color/black"
-                android:textSize="@dimen/form_text_size" />
-          
-          <EditText
-            android:id="@+id/editTextTextConfirmPasswordUserCreate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5sp"
-            android:autofillHints="confirmPassword"
-            android:background="@drawable/rectangular_input"
-            android:ems="10"
-            android:gravity="center"
-            android:hint="@string/confirm_password"
-            android:inputType="textPassword"
-            android:minHeight="48dp"
-              android:textColorHint="@color/material_dynamic_neutral30"
-              android:textColor="@color/black"
-            android:textSize="@dimen/form_text_size" />
-
-            <EditText
-                android:id="@+id/editTextTextUserCreate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5sp"
-                android:autofillHints="personGivenName"
-                android:background="@drawable/rectangular_input"
-                android:ems="10"
-                android:gravity="center"
-                android:hint="@string/first_name"
-                android:inputType="text"
-                android:minHeight="48dp"
-                android:textColorHint="@color/material_dynamic_neutral30"
-                android:textColor="@color/black"
-                android:textSize="@dimen/form_text_size" />
-
-            <EditText
-                android:id="@+id/editTextText2UserCreate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5sp"
-                android:autofillHints="personFamilyName"
-                android:background="@drawable/rectangular_input"
-                android:ems="10"
-                android:gravity="center"
-                android:hint="@string/last_name"
-                android:inputType="text"
-                android:minHeight="48dp"
-                android:textColorHint="@color/material_dynamic_neutral30"
-                android:textColor="@color/black"
-                android:textSize="@dimen/form_text_size" />
-
-            <LinearLayout
-                style="?android:attr/buttonBarStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5sp"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal"
-                tools:ignore="ExtraText">
-
-                <Button
-                    android:id="@+id/cancelButtonCreate"
-                    style="?android:attr/borderlessButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="1sp"
-                    android:background="@drawable/rounded_button"
-                    android:shadowColor="@color/text_shadow_button_form"
-                    android:shadowDx="-2"
-                    android:shadowDy="5"
-                    android:shadowRadius="2"
-                    android:text="@string/cancel"
-                    android:textColor="@color/white"
-                    android:textSize="19sp" />
-
-                <Button
-                    android:id="@+id/confirmCredentialAndCreateButton"
-                    style="?android:attr/borderlessButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="1sp"
-                    android:background="@drawable/rounded_button"
-                    android:shadowColor="@color/text_shadow_button_form"
-                    android:shadowDx="-2"
-                    android:shadowDy="5"
-                    android:shadowRadius="2"
-                    android:text="@string/create"
-                    android:textColor="@color/white"
-                    android:textSize="19sp" /><![CDATA[
-
-                />
-            ]]>
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
+        <!-- Create Account Button -->
+        <Button
+            android:id="@+id/confirmCredentialAndCreateButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/rounded_button_with_shadow"
+            android:text="@string/create"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
