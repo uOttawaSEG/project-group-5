@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:id="@+id/acceptedListLayout"
         android:layout_marginBottom="70sp"
+        android:paddingHorizontal="10dp"
         android:layout_height="match_parent">
     </ListView>
 </androidx.constraintlayout.widget.ConstraintLayout>
