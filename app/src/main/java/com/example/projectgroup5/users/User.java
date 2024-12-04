@@ -4,20 +4,13 @@ import static com.example.projectgroup5.database.DatabaseManager.USER_ORGANIZATI
 import static com.example.projectgroup5.database.DatabaseManager.USER_REGISTRATION_STATE;
 
 import android.util.Log;
-import android.view.View;
-import android.widget.LinearLayout;
 
-import com.example.projectgroup5.MainActivity;
-import com.example.projectgroup5.database.DatabaseListener;
 import com.example.projectgroup5.database.DatabaseManager;
-import com.example.projectgroup5.events.Event;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public abstract class User {
@@ -49,8 +42,7 @@ public abstract class User {
      * Creates a new User instance based on the specified user type.
      * <p>
      * This static method generates a user of a specific type (Organizer, Attendee, or Administrator)
-     * based on the provided user ID and user type. If the user type does not match any known types,
-     * it returns null.
+     * based on the provided user ID and user type.
      *
      * @param userId The unique identifier for the user.
      *               one of the predefined user types:
@@ -59,7 +51,6 @@ public abstract class User {
      *                 <li><code>USER_TYPE_USER</code></li>
      *                 <li><code>USER_TYPE_ADMIN</code></li>
      *               </ul>
-     * @return A new User instance of the specified type, or null if the user type is invalid.
      */
     public static void newUserFromDatabase(String userId, OnCompleteListener<User> listener) {
         DatabaseManager.getDatabaseManager().getUserDataFromFirestore(userId, DatabaseManager.USER_TYPE, userType -> {
@@ -90,7 +81,7 @@ public abstract class User {
                         user.setUserEmail(value.get(DatabaseManager.USER_EMAIL).toString());
                     }
                     if (value.containsKey(DatabaseManager.USER_PHONE)) {
-                        user.setUserPhoneNumber(Long.valueOf(value.get(DatabaseManager.USER_PHONE).toString().replace("\"", "")));
+                        user.setUserPhoneNumber(Long.parseLong(value.get(DatabaseManager.USER_PHONE).toString().replace("\"", "")));
                     }
                     if (value.containsKey(DatabaseManager.USER_ADDRESS)) {
                         user.setUserAddress(value.get(DatabaseManager.USER_ADDRESS).toString());
@@ -103,7 +94,7 @@ public abstract class User {
                         if (user instanceof Organizer organizer) {
                             // try the cast to list of document references
                             Log.d("User", "User organizer events at database fetch: " + value.get(DatabaseManager.USER_ORGANIZER_EVENTS).toString());
-                            ArrayList<DocumentReference>  events =  (ArrayList<DocumentReference>) value.get(DatabaseManager.USER_ORGANIZER_EVENTS);
+                            ArrayList<DocumentReference> events = (ArrayList<DocumentReference>) value.get(DatabaseManager.USER_ORGANIZER_EVENTS);
                             Log.d("User", "After organizer events cast: " + events.toString());
                             organizer.setOrganizerEvents(events);
                             Log.d("User", "After organizer events set: " + organizer.getOrganizerEvents().toString());
@@ -119,7 +110,7 @@ public abstract class User {
                             // try the cast to list of document references
                             List<DocumentReference> registrations = (List<DocumentReference>) value.get(DatabaseManager.USER_ATTENDEE_REGISTRATIONS);
 
-                                attendee.setAttendeeRegistrations(registrations);
+                            attendee.setAttendeeRegistrations(registrations);
                         }
                     }
                     user.setUserType(userType.toString());
@@ -130,7 +121,26 @@ public abstract class User {
         });
     }
 
-    //TODO: add documentation
+    /**
+     * Creates a new user of the specified type with the provided details.
+     * This method instantiates a user object based on the specified user type and sets
+     * the user's details including name, email, phone number, address, and organization
+     * (if applicable). The user type determines which subclass of the `User` class is
+     * instantiated.
+     *
+     * @param userType The type of the user. This can be one of the following:
+     *                 - `USER_TYPE_ORGANIZER`
+     *                 - `USER_TYPE_ATTENDEE`
+     *                 - `USER_TYPE_ADMIN`
+     * @param firstName The first name of the user.
+     * @param lastName The last name of the user.
+     * @param email The email address of the user.
+     * @param phoneNumber The phone number of the user.
+     * @param address The address of the user.
+     * @param organisation The organization name for organizers. Can be null for non-organizer users.
+     *
+     * @return A new `User` object corresponding to the specified user type, or `null` if the user type is invalid.
+     */
     public static User newUser(String userType, String firstName, String lastName, String email, long phoneNumber, String address, String organisation) {
         final User user;
         switch (userType) {
@@ -152,12 +162,25 @@ public abstract class User {
         return user;
     }
 
-    public void setUserRegistrationState(String userRegistrationState) {
-        this.userRegistrationState = userRegistrationState;
-    }
 
+    /**
+     * Returns the current registration state of the user.
+     *
+     * @return The registration state of the user (e.g., "accepted", "pending", "rejected").
+     */
     public String getUserRegistrationState() {
         return userRegistrationState;
+    }
+
+    /**
+     * Sets the registration state of the user.
+     * <p>
+     * This method updates the user's registration state, such as "accepted", "pending", or "rejected".
+     *
+     * @param userRegistrationState The registration state to be set for the user.
+     */
+    public void setUserRegistrationState(String userRegistrationState) {
+        this.userRegistrationState = userRegistrationState;
     }
 
     /**
@@ -194,6 +217,15 @@ public abstract class User {
     }
 
     /**
+     * Retrieves the type of the user.
+     *
+     * @return The current user type, represented as an integer.
+     */
+    public String getUserType() {
+        return userType;
+    }
+
+    /**
      * Sets the type of the user.
      * <p>
      * This method updates the user's type, which may represent different roles or permissions.
@@ -205,12 +237,41 @@ public abstract class User {
     }
 
     /**
-     * Retrieves the type of the user.
+     * Retrieves the email address of the user.
      *
-     * @return The current user type, represented as an integer.
+     * @return The email address of the user, represented as a String.
      */
-    public String getUserType() {
-        return userType;
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    /**
+     * Sets the email address of the user.
+     * <p>
+     * This method updates the user's email address in the current user representation.
+     *
+     * @param email The email address to be set for the user.
+     */
+    public void setUserEmail(String email) {
+        this.userEmail = email;
+    }
+
+    /**
+     * Returns the unique identifier for the user.
+     *
+     * @return The user ID.
+     */
+    public String getUserId() {
+        return userId;
+    }
+
+    /**
+     * Returns the address of the user.
+     *
+     * @return The user's address.
+     */
+    public String getUserAddress() {
+        return userAddress;
     }
 
     /**
@@ -225,52 +286,28 @@ public abstract class User {
     }
 
     /**
-     * Sets the email address of the user.
-     * <p>
-     * This method updates the user's email address in the current user representation.
+     * Returns the first name of the user.
      *
-     * @param email The email address to be set for the user.
+     * @return The user's first name.
      */
-    public void setUserEmail(String email) {
-        this.userEmail = email;
-    }
-
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    /**
-     * Removes a user entry view from the specified layout.
-     * <p>
-     * This method searches for the user entry view associated with the user's ID (hashed)
-     * and removes it from the given LinearLayout if it exists.
-     *
-     * @param layout The LinearLayout from which the user entry will be removed.
-     */
-    private void removeUserFromLayout(LinearLayout layout) {
-        int viewId = userId.hashCode();
-        View viewToRemove = layout.findViewById(viewId);
-        if (viewToRemove != null) {
-            layout.removeView(viewToRemove);
-        }
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getUserAddress() {
-        return userAddress;
-    }
-
     public String getFirstName() {
         return userFirstName;
     }
 
+    /**
+     * Returns the last name of the user.
+     *
+     * @return The user's last name.
+     */
     public String getLastName() {
         return userLastName;
     }
 
+    /**
+     * Returns the phone number of the user.
+     *
+     * @return The user's phone number.
+     */
     public long getPhoneNumber() {
         return userPhoneNumber;
     }

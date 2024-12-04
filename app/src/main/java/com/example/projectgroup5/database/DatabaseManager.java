@@ -11,7 +11,6 @@ import com.example.projectgroup5.users.Organizer;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
@@ -38,6 +37,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DatabaseManager {
+    //---------------------------------------------Constants-------------------------------------------------------------------
     public static final String USER_TYPE = "UserType";
     public static final String USER_EMAIL = "UserEmail";
     public static final String USER_PHONE = "UserPhone";
@@ -48,9 +48,6 @@ public class DatabaseManager {
     public static final String USER_ORGANIZATION_NAME = "UserOrganizationName";
     public static final String USER_ATTENDEE_REGISTRATIONS = "UserAttendeeRegistrations";
     public static final String USER_ORGANIZER_EVENTS = "UserOrganizerEvents";
-    private static final DatabaseManager databaseManager = new DatabaseManager();
-    private final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-    private final FirebaseFirestore firestoreDatabase = FirebaseFirestore.getInstance();
     public static final String EVENT_TITLE = "EventTitle";
     public static final String EVENT_DESCRIPTION = "EventDescription";
     public static final String EVENT_ADDRESS = "EventAddress";
@@ -63,9 +60,12 @@ public class DatabaseManager {
     public static final String EVENT_REGISTRATION_STATUS = "eventRegistrationStatus";
     public static final String REGISTRATION_EVENT = "event";
 
-    //---------------------------------------------USER-------------------------------------------------------------------
+    //-------------------------------------------DB related instances-------------------------------------------------------
+    private static final DatabaseManager databaseManager = new DatabaseManager();
+    private final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private final FirebaseFirestore firestoreDatabase = FirebaseFirestore.getInstance();
 
-
+    //---------------------------------------------USER RELATED DB METHODS-------------------------------------------------------------------
     /**
      * Retrieves the singleton instance of the DatabaseManager.
      * <p>
@@ -111,6 +111,13 @@ public class DatabaseManager {
         firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(listener);
     }
 
+    /**
+     * Retrieves the unique authentication ID (UID) of the currently authenticated user.
+     * This method fetches the current user's UID from Firebase Authentication. It is used
+     * to identify the user within the system for operations that require user-specific data.
+     *
+     * @return The UID of the currently authenticated user as a {@link String}.
+     */
     public String getAuthID() {
         return firebaseAuth.getCurrentUser().getUid();
     }
@@ -169,24 +176,14 @@ public class DatabaseManager {
     }
 
     /**
-     * Deletes the currently authenticated user account from the {@link #firestoreDatabase}.
-     * <p>
-     * This method first retrieves the currently signed-in user. If a user is logged in, it removes
-     * their data from the database and deletes the user from Firebase Authentication. After the
-     * deletion, it logs out the user. If no user is logged in, it calls the provided listener
-     * with an exception indicating that no user is logged in.
+     * Fetches user data from Firestore for a specific user and key.
+     * This method retrieves data from the "users" collection in Firestore based on the provided user ID and key.
+     * If the user document exists and the key is found, the associated value is returned via the callback.
+     * If the document does not exist or an error occurs, the callback is invoked with a `null` value.
      *
-     * @param listener A listener that will be notified when the user deletion operation is complete.
-     */
-    public void deleteUserFromFirestore(OnCompleteListener<Void> listener) {
-        FirebaseUser user = firebaseAuth.getCurrentUser();
-        if (user != null) {
-            deleteFromFirestore(getCurrentUserReference(), listener);
-        }
-    }
-
-    /**
-     * TODO definitions
+     * @param userId The unique identifier for the user whose data is being retrieved.
+     * @param key The key representing the specific data field to retrieve from the user's document.
+     * @param callback The callback to handle the retrieved data or handle errors. It accepts an {@link Object} containing the data or `null` if retrieval fails.
      */
     public void getUserDataFromFirestore(String userId, String key, final UserSession.FirebaseCallback<Object> callback) {
         if (userId == null) {
@@ -194,12 +191,9 @@ public class DatabaseManager {
             callback.onCallback(null);
             return;
         }
-
         // Reference to Firestore
         DocumentReference docRef = firestoreDatabase.collection("users").document(userId);
-
         Log.d("DatabaseManager", "Fetching user data for key: " + key); // Debug log
-
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
@@ -224,7 +218,6 @@ public class DatabaseManager {
      * Retrieves user data from {@link #firestoreDatabase} for the currently authenticated user using the specified key.
      * <p>
      * It is a convenience method for accessing user data without requiring the caller to provide the user ID.
-     * TODO: add documentation
      */
     public void getUserDataFromFirestore(String key, final UserSession.FirebaseCallback<Object> callback) {
         getUserDataFromFirestore(UserSession.getInstance().getUserId(), key, callback);
@@ -324,6 +317,15 @@ public class DatabaseManager {
         });
     }
 
+    /**
+     * Adds a value event listener to Firestore user data for the currently authenticated user.
+     * This method calls the overloaded version of the function, passing the current user's ID
+     * along with the provided event listener and key to monitor changes to a specific field of the user's data.
+     *
+     * @param eventListener The {@link EventListener} to handle changes to the user's data document.
+     * @param key The key in the user's document whose changes will be listened to.
+     * @return A {@link ListenerRegistration} object used to manage and remove the event listener.
+     */
     public ListenerRegistration addValueEventListenerToFirestoreUserData(EventListener<DocumentSnapshot> eventListener, String key) {
         return addValueEventListenerToFirestoreUserData(UserSession.getInstance().getUserId(), eventListener, key);
     }
@@ -348,7 +350,6 @@ public class DatabaseManager {
             Log.e("DatabaseManager", "No listener to remove from Firestore");
         }
     }
-
 
     /**
      * Callback interface for receiving a list of user IDs.
@@ -461,15 +462,41 @@ public class DatabaseManager {
         storeUserValueToFirestore(UserSession.getInstance().getUserId(), type, value, listener);
     }
 
+    /**
+     * Retrieves a Firestore {@link DocumentReference} for the currently authenticated user.
+     * This method calls another overloaded version of the function, passing the current user's ID
+     * to obtain the reference to the user's document in Firestore.
+     *
+     * @return A {@link DocumentReference} pointing to the current user's document in Firestore.
+     */
     public DocumentReference getCurrentUserReference() {
         return getUserReference(UserSession.getInstance().getUserId());
     }
 
+    /**
+     * Retrieves a Firestore {@link DocumentReference} for a specific user based on their user ID.
+     * This method returns a reference to the user's document in the "users" collection in Firestore
+     * using the provided user ID.
+     *
+     * @param userId The unique identifier of the user whose document reference is to be retrieved.
+     * @return A {@link DocumentReference} pointing to the specified user's document in Firestore.
+     */
     public DocumentReference getUserReference(String userId) {
         return firestoreDatabase.collection("users").document(userId);
     }
 
-    //TODO documentation, this method should only be called to create a brand new user or to update an existing user from the ground up
+    /**
+     * Creates a new user or updates an existing user from the ground up in Firestore.
+     * This method first attempts to create a new user using email and password, and then stores the user's data in Firestore.
+     * It handles the user creation and stores user information like type, address, email, phone number, name, and registration state.
+     * Depending on the type of user (Organizer or Attendee), additional data may also be stored, such as organization name and event registrations.
+     * This method is intended to be called when creating a completely new user or when updating an existing user's data entirely.
+     *
+     * @param user The {@link User} object containing the user details to be saved.
+     * @param password The password to be associated with the new user account.
+     * @param listener The {@link OnCompleteListener} to be notified upon completion of the user creation and data storage process.
+     *                 If the process fails, an exception is passed to the listener; otherwise, the task is marked as successful.
+     */
     public void createNewUser(User user, String password, OnCompleteListener<DocumentReference> listener) {
         databaseManager.createUserWithEmailAndPassword(user.getUserEmail(), password, task -> {
             // now we have tried to create the user, lets check if it was successful
@@ -555,10 +582,19 @@ public class DatabaseManager {
         });
     }
 
-    public void addEventToOrganizer(DocumentReference eventRef, OnCompleteListener<Void> listener) {
-        addEventToOrganizer(getCurrentUserReference().getId(), eventRef, listener);
-    }
 
+
+    /**
+     * Adds an event to the specified organizer's event list in Firestore.
+     * This method retrieves the user data for the specified organizer, checks if the user is an
+     * instance of {@link Organizer}, and then adds the event reference to the organizer's list of events in Firestore.
+     * Additionally, the event reference is added to the {@link Organizer} object locally.
+     *
+     * @param organizerId The unique identifier of the organizer to whom the event will be added.
+     * @param eventRef The {@link DocumentReference} of the event to be added to the organizer's event list.
+     * @param listener The {@link OnCompleteListener} to handle the result of the operation.
+     *                 It will be triggered once the event is successfully added or if the operation fails.
+     */
     public void addEventToOrganizer(String organizerId, DocumentReference eventRef, OnCompleteListener<Void> listener) {
         User.newUserFromDatabase(organizerId, userTask -> {
             if (userTask.isSuccessful()) {
@@ -574,6 +610,31 @@ public class DatabaseManager {
         });
     }
 
+    /**
+     * Adds an event to the current user's organizer collection in Firestore.
+     * This method calls the overloaded version of the function, passing the current user's ID
+     * along with the event reference to add the event to the user's organizer data.
+     *
+     * @param eventRef The {@link DocumentReference} of the event to be added to the organizer's collection.
+     * @param listener The {@link OnCompleteListener} to handle the result of the operation.
+     *                 It will be triggered once the event is successfully added or if the operation fails.
+     */
+    public void addEventToOrganizer(DocumentReference eventRef, OnCompleteListener<Void> listener) {
+        addEventToOrganizer(getCurrentUserReference().getId(), eventRef, listener);
+    }
+
+    /**
+     * Adds a registration to the specified attendee's registration list in Firestore.
+     * This method retrieves the user data for the specified attendee, checks if the user is an
+     * instance of {@link Attendee}, and then adds the registration reference to the attendee's list
+     * of registrations in Firestore. Additionally, the registration reference is added to the
+     * {@link Attendee} object locally.
+     *
+     * @param attendeeId The unique identifier of the attendee to whom the registration will be added.
+     * @param registrationId The {@link DocumentReference} of the registration to be added to the attendee's list.
+     * @param listener The {@link OnCompleteListener} to handle the result of the operation.
+     *                 It will be triggered once the registration is successfully added or if the operation fails.
+     */
     public void addRegistrationToAttendee(String attendeeId, DocumentReference registrationId, OnCompleteListener<Void> listener) {
         User.newUserFromDatabase(attendeeId, userTask -> {
             if (userTask.isSuccessful()) {
@@ -585,6 +646,16 @@ public class DatabaseManager {
         });
     }
 
+    /**
+     * Removes an event from the current organizer's event list in Firestore.
+     * This method checks if the current user is an {@link Organizer}, and if so, it removes the event
+     * reference from the organizer's event list in Firestore. Additionally, the event reference is removed
+     * from the {@link Organizer} object locally.
+     *
+     * @param eventRef The {@link DocumentReference} of the event to be removed from the organizer's event list.
+     * @param listener The {@link OnCompleteListener} to handle the result of the operation.
+     *                 It will be triggered once the event is successfully removed or if the operation fails.
+     */
     public void removeEventFromOrganizer(DocumentReference eventRef, OnCompleteListener<Void> listener) {
         if (UserSession.getInstance().getUserRepresentation() instanceof Organizer organizer) {
             // now we have an organizer we have to add the event to him in the database
@@ -593,6 +664,17 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Retrieves the list of registrations for the specified attendee.
+     * This method retrieves the user data for the specified user ID, checks if the user is an
+     * instance of {@link Attendee}, and if so, it returns the list of event registrations associated
+     * with the attendee.
+     *
+     * @param userId The unique identifier of the attendee whose registrations will be retrieved.
+     * @param listener The {@link OnCompleteListener} to handle the result of the operation.
+     *                 It will be triggered once the attendee's registrations are successfully fetched
+     *                 or if the operation fails.
+     */
     public void getAttendeeRegistrations(String userId, OnCompleteListener<List<DocumentReference>> listener) {
         // get the user data from the database
         User.newUserFromDatabase(userId, userTask -> {
@@ -605,6 +687,17 @@ public class DatabaseManager {
         });
     }
 
+    /**
+     * Retrieves the list of events associated with the specified organizer.
+     * This method fetches the list of event references for the specified organizer user ID, retrieves
+     * the event details for each reference, and compiles a list of {@link Event} objects. Once all the
+     * events are retrieved, the result is passed to the provided listener.
+     *
+     * @param userId The unique identifier of the organizer whose events will be retrieved.
+     * @param listener The {@link OnCompleteListener} to handle the result of the operation.
+     *                 It will be triggered once the list of events has been successfully retrieved
+     *                 or if the operation fails.
+     */
     public void getOrganizerEvents(String userId, OnCompleteListener<List<Event>> listener) {
         getOrganizerEventsReference(userId, task -> {
             if (task.isSuccessful() && task.getResult() != null) {
@@ -624,6 +717,17 @@ public class DatabaseManager {
         });
     }
 
+    /**
+     * Retrieves the list of events references associated with the specified organizer.
+     * This method fetches the list of event references for the specified organizer user ID, retrieves
+     * the event details for each reference, and compiles a list of {@link Event} objects. Once all the
+     * events are retrieved, the result is passed to the provided listener.
+     *
+     * @param userId The unique identifier of the organizer whose events will be retrieved.
+     * @param listener The {@link OnCompleteListener} to handle the result of the operation.
+     *                 It will be triggered once the list of events has been successfully retrieved
+     *                 or if the operation fails.
+     */
     public void getOrganizerEventsReference(String userId, OnCompleteListener<List<DocumentReference>> listener) {
         // get the user data from the database
         User.newUserFromDatabase(userId, userTask -> {
@@ -641,10 +745,31 @@ public class DatabaseManager {
 
 //---------------------------------------EVENT------------------------------------------------
 
+    /**
+     * Retrieves a reference to a specific event document in Firestore.
+     * This method returns a {@link DocumentReference} to the Firestore document associated
+     * with the specified event ID, allowing further interactions (e.g., reading or updating the event data).
+     *
+     * @param eventId The unique identifier of the event whose document reference is to be retrieved.
+     * @return A {@link DocumentReference} pointing to the event document in Firestore.
+     */
     public DocumentReference getEventReference(String eventId) {
         return firestoreDatabase.collection("events").document(eventId);
     }
 
+    /**
+     * Stores a specified value in the Firestore document for the given event.
+     * This method stores a value for a specific field (type) in the event document, identified by
+     * the provided event ID. It uses {@link SetOptions#merge()} to ensure that only the specified field
+     * is updated without overwriting other existing fields in the document. The provided listener will
+     * be notified once the operation completes.
+     *
+     * @param eventID The unique identifier of the event whose document will be updated.
+     * @param type The field name in the event document where the value will be stored.
+     * @param value The value to store in the specified field. Can be {@code null}.
+     * @param listener An optional listener that will be triggered upon completion of the operation.
+     *                 It can be {@code null} if no callback is needed.
+     */
     public void storeEventValueToFirestore(String eventID, String type, @Nullable Object value, @Nullable OnCompleteListener<Void> listener) {
         // Create a reference to the document
         DocumentReference docRef = firestoreDatabase.collection("events").document(eventID);
@@ -672,6 +797,19 @@ public class DatabaseManager {
         Log.d("DatabaseManager", "Done storing data"); // Log completion
     }
 
+    /**
+     * Stores a specified value in the Firestore document for the given registration.
+     * This method stores a value for a specific field (type) in the registration document, identified by
+     * the provided registration ID. It uses {@link SetOptions#merge()} to ensure that only the specified field
+     * is updated without overwriting other existing fields in the document. The provided listener will
+     * be notified once the operation completes.
+     *
+     * @param registrationID The unique identifier of the registration whose document will be updated.
+     * @param type The field name in the registration document where the value will be stored.
+     * @param value The value to store in the specified field. Can be {@code null}.
+     * @param listener An optional listener that will be triggered upon completion of the operation.
+     *                 It can be {@code null} if no callback is needed.
+     */
     public void storeRegistrationValueToFirestore(String registrationID, String type, @Nullable Object value, @Nullable OnCompleteListener<Void> listener) {
         // Create a reference to the document
         DocumentReference docRef = firestoreDatabase.collection("registrations").document(registrationID);
@@ -699,10 +837,18 @@ public class DatabaseManager {
         Log.d("DatabaseManager", "Done storing data"); // Log completion
     }
 
+    /**
+     * Creates a new event in the Firestore database by storing the event details in a document.
+     * This method stores various details of the event (such as title, description, address, start time,
+     * end time, auto-accept status, registrations, and organizer) into the Firestore document identified
+     * by the event's ID. The method uses multiple Firestore tasks to store each piece of information
+     * and ensures all tasks complete successfully before invoking the provided listener.
+     *
+     * @param event The {@link Event} object containing the details of the event to be stored.
+     * @param listener The listener to be called when all tasks have completed. If any task fails, the listener will be
+     *                 notified of the failure.
+     */
     public void createNewEvent(Event event, OnCompleteListener<DocumentReference> listener) {
-        // now we have tried to create the user, lets check if it was successful
-        // now we have created the user, lets store the user data
-        // we must first make sure that the UserSession userid is set
         // Initialize a counter for the number of tasks
         int totalTasks = 9; // Number of Firestore tasks
         AtomicInteger tasksCompleted = new AtomicInteger(0); // Use AtomicInteger for thread safety
@@ -771,10 +917,33 @@ public class DatabaseManager {
         );
     }
 
+    /**
+     * Deletes an event from Firestore using the provided event reference.
+     * This method deletes an event document from the Firestore database using the provided
+     * {@link DocumentReference} that identifies the event to be removed. It then invokes the provided
+     * listener when the deletion operation is complete.
+     *
+     * @param eventReference The {@link DocumentReference} pointing to the event document in Firestore.
+     * @param listener The listener to be notified when the deletion operation has completed. If the operation
+     *                 is successful, the listener will be notified with a success status; otherwise, an error
+     *                 status will be passed.
+     */
     public void deleteEventFromFirestore(DocumentReference eventReference, OnCompleteListener<Void> listener) {
         deleteFromFirestore(eventReference, listener);
     }
 
+    /**
+     * Retrieves an event from Firestore by its event ID.
+     * This method fetches the event document from the Firestore database using the provided event ID.
+     * It extracts various fields such as the event title, description, address, start and end times,
+     * auto-accept flag, registrations, and organizer. The retrieved event data is encapsulated in an
+     * {@link EventOptional} object, which is passed to the provided listener upon successful retrieval.
+     *
+     * @param eventId The ID of the event to be retrieved from Firestore.
+     * @param listener The listener to be notified once the event retrieval operation completes.
+     *                 The listener will receive an {@link EventOptional} object with the event details
+     *                 if the retrieval is successful, or an exception if the operation fails.
+     */
     public void getEvent(String eventId, OnCompleteListener<EventOptional> listener) {
         // we want a datasnapshot of the event
         Log.d("DatabaseManager", "Getting event with ID: " + eventId);
@@ -787,10 +956,7 @@ public class DatabaseManager {
                         String address = snapshot.getString(EVENT_ADDRESS);
                         Timestamp startTime = snapshot.getTimestamp(EVENT_START_TIME);
                         Timestamp endTime = snapshot.getTimestamp(EVENT_END_TIME);
-                        Log.e("DatabaseManager", "Event start time: " + startTime);
                         Boolean autoAccept = snapshot.getBoolean(EVENT_AUTO_ACCEPT);
-                        Log.e("DatabaseManager", "Event auto accept: " + autoAccept);
-                        Log.e("DatabaseManager", "Event id: " + eventId);
                         List<DocumentReference> registrations = (List<DocumentReference>) snapshot.get(EVENT_REGISTRATIONS);
                         DocumentReference organizer = snapshot.getDocumentReference(EVENT_ORGANIZER);
                         EventOptional eventOptional = EventOptional.oldEvent(eventId, title, description, address, startTime, endTime, autoAccept, registrations, organizer);
@@ -802,6 +968,19 @@ public class DatabaseManager {
         );
     }
 
+    /**
+     * Retrieves an event from Firestore based on a registration reference.
+     * This method fetches the event associated with a given registration reference. It first retrieves
+     * the registration document from Firestore, extracts the reference to the event document, and then
+     * calls the {@link #getEvent(String, OnCompleteListener)} method to retrieve the event's details
+     * using the event's ID. The event data is passed to the provided listener once it is successfully
+     * retrieved.
+     *
+     * @param registrationReference The Firestore document reference of the registration.
+     * @param listener The listener to be notified once the event retrieval operation completes.
+     *                 The listener will receive an {@link EventOptional} object containing the event
+     *                 details if the retrieval is successful, or an exception if the operation fails.
+     */
     public void getEventFromRegistration(DocumentReference registrationReference, OnCompleteListener<EventOptional> listener) {
         // we want a datasnapshot of the event
         registrationReference.get().addOnCompleteListener(
@@ -817,8 +996,20 @@ public class DatabaseManager {
         );
     }
 
+    /**
+     * Adds an attendee to an event and updates their registration status based on the event's auto-accept setting.
+     * This method checks if the event is set to auto-accept attendees. If the event has the auto-accept
+     * feature enabled, it automatically accepts the attendee by changing their registration status. After
+     * verifying the auto-accept status, the method either accepts the attendee or performs no further action.
+     * The completion listener is notified once the operation is finished.
+     *
+     * @param eventReference The Firestore document reference of the event to which the attendee is being added.
+     * @param registrationReference The Firestore document reference of the attendee's registration.
+     * @param listener The listener to be notified once the operation is complete. If the operation is successful,
+     *                 the listener will be notified with a `null` result, indicating that the operation completed.
+     *                 If an error occurs, the listener will be notified with an exception.
+     */
     public void addEventAttendee(DocumentReference eventReference, DocumentReference registrationReference, OnCompleteListener<Void> listener) {
-//        eventReference.update("registrations", FieldValue.arrayUnion(registrationReference)).addOnCompleteListener(listener);
         // check if the event is auto accept
         // if so, add the attendee to the event. get the event and check if the event is auto accept
         firestoreDatabase.collection("events").document(eventReference.getId()).get().addOnCompleteListener(
@@ -837,29 +1028,72 @@ public class DatabaseManager {
         );
     }
 
+    /**
+     * Updates the registration status of an attendee for a specific event.
+     * This method allows you to change the status of an attendee's registration in Firestore. The status
+     * is updated in the registration document corresponding to the provided `registrationReference`.
+     * Typically, this can be used to mark an attendee as accepted, rejected, or waitlisted.
+     *
+     * @param registrationReference The Firestore document reference pointing to the attendee's registration.
+     *                              This reference is used to locate the registration document that will be updated.
+     * @param status The new status to assign to the attendee's registration.
+     *               This can be a value such as "ACCEPTED", "REJECTED", or any other status defined in the system.
+     */
     public void changeAttendeeStatus(DocumentReference registrationReference, String status) {
         registrationReference.update(DatabaseManager.EVENT_REGISTRATION_STATUS, status);
     }
 
+    /**
+     * Retrieves the registration status of the current user for a specific event.
+     * This method retrieves the registration document that links a user to an event and then fetches
+     * the registration status for that specific user-event relationship. The status is returned via the
+     * provided listener once the data is retrieved.
+     *
+     * @param eventReference A `DocumentReference` to the Firestore document representing the event.
+     *                       This reference is used to locate the event's registration information.
+     * @param listener The `OnCompleteListener<String>` listener that will be called with the registration status
+     *                 once the operation completes. The status is returned as a `String`, typically values like
+     *                 "ACCEPTED", "WAITLISTED", or "REJECTED".
+     */
     public void getAttendanceToEvent(DocumentReference eventReference, OnCompleteListener<String> listener) {
         // take the registration that intersects both the event and the user, and return the registration status
-        getRegistrationReferenceToEvent(eventReference, task -> {
-            task.getResult().get().addOnCompleteListener(task2 -> {
-                if (task2.isSuccessful()) {
-                    DocumentSnapshot snapshot2 = task2.getResult();
-                    String status = snapshot2.getString(EVENT_REGISTRATION_STATUS);
-                    listener.onComplete(Tasks.forResult(status));
-                } else {
-                    listener.onComplete(Tasks.forException(task2.getException()));
-                }
-            });
-        });
+        getRegistrationReferenceToEvent(eventReference, task -> task.getResult().get().addOnCompleteListener(task2 -> {
+            if (task2.isSuccessful()) {
+                DocumentSnapshot snapshot2 = task2.getResult();
+                String status = snapshot2.getString(EVENT_REGISTRATION_STATUS);
+                listener.onComplete(Tasks.forResult(status));
+            } else {
+                listener.onComplete(Tasks.forException(task2.getException()));
+            }
+        }));
     }
 
+    /**
+     * Updates the auto-accept status for an event.
+     * This method allows you to change the auto-accept behavior of an event. When auto-accept is enabled,
+     * attendees are automatically accepted into the event without needing manual approval. The method
+     * updates the `EVENT_AUTO_ACCEPT` field in the event document in Firestore.
+     *
+     * @param eventReference A `DocumentReference` to the Firestore document representing the event whose
+     *                       auto-accept status needs to be updated.
+     * @param autoAccept A boolean indicating whether auto-accept should be enabled (`true`) or disabled (`false`).
+     *                   If `true`, attendees will be automatically accepted into the event. If `false`,
+     *                   attendees will require manual approval to be accepted.
+     */
     public void changeEventAutoAccept(DocumentReference eventReference, boolean autoAccept) {
         eventReference.update(EVENT_AUTO_ACCEPT, autoAccept);
     }
 
+    /**
+     * Retrieves all events from the Firestore database.
+     * This method fetches all the events stored in the "events" collection of Firestore. It processes each event
+     * and filters the events based on the current user's registration status if the user is an attendee. If the
+     * user is an attendee and the event contains registrations, it will only include events that have no matching
+     * registration in common with the user's attendee registrations.
+     *
+     * @param listener A callback listener that receives the result of the operation, which will be a list of events
+     *                 if the operation is successful. If the operation fails, the listener will receive an exception.
+     */
     public void getEvents(OnCompleteListener<List<Event>> listener) {
         // get all the events
         firestoreDatabase.collection("events").get().addOnCompleteListener(task -> {
@@ -875,17 +1109,17 @@ public class DatabaseManager {
                         List<DocumentReference> newRegistrations = new ArrayList<>(registrations);
                         newRegistrations.retainAll(attendee.getAttendeeRegistrations());
                         if (newRegistrations.size() == 1) {
-                            Log.d("DatabaseManager", "Event has one registration");
+//                            Log.d("DatabaseManager", "Event has one registration");
                             continue;
                         } else if (newRegistrations.size() > 1) {
                             Log.e("DatabaseManager", "Event has multiple registrations");
                             continue;
-                        } else {
-                            Log.d("DatabaseManager", "Event has no registrations in common");
-                            // print the user registrations and the event registrations
-                            Log.d("DatabaseManager", "User event has registrations:  " + attendee.getAttendeeRegistrations());
-                            Log.d("DatabaseManager", "Event has registrations:       " + registrations);
-                        }
+                        }// else {
+//                            Log.d("DatabaseManager", "Event has no registrations in common");
+//                            // print the user registrations and the event registrations
+//                            Log.d("DatabaseManager", "User event has registrations:  " + attendee.getAttendeeRegistrations());
+//                            Log.d("DatabaseManager", "Event has registrations:       " + registrations);
+//                        }
                     }
 
                     String title = document.getString(EVENT_TITLE);
@@ -902,6 +1136,16 @@ public class DatabaseManager {
             }        });
     }
 
+    /**
+     * Retrieves all events from the database and filters them based on the provided query.
+     * This method fetches all events from the Firestore database and filters them based on a search query.
+     * If the query is not null or empty, it checks if the event's title or description contains the query string
+     * (case-insensitive). If the query is null or empty, all events will be returned without filtering.
+     *
+     * @param query The search query string used to filter events. If null or empty, no filtering is applied.
+     * @param callback A callback interface to receive the list of events that match the query.
+     *                 If no events match, an empty list will be passed to the callback.
+     */
     public void getEventsThatMatchQuery(String query, EventOption.EventsCallback callback) {
         List<Event> events = new ArrayList<>();
         boolean check = query == null || query.isEmpty();
@@ -932,10 +1176,28 @@ public class DatabaseManager {
 
 //---------------------------------------Registration------------------------------------------------
 
+    /**
+     * Retrieves a reference to a specific registration document in Firestore.
+     * This method generates a reference to a registration document in the "registrations" collection
+     * using the provided registration ID. This reference can then be used to perform further operations
+     * such as fetching or updating the registration data in Firestore.
+     *
+     * @param registrationId The unique ID of the registration document in Firestore.
+     * @return A `DocumentReference` pointing to the registration document with the specified ID.
+     */
     public DocumentReference getRegistrationReference(String registrationId) {
         return firestoreDatabase.collection("registrations").document(registrationId);
     }
 
+    /**
+     * Retrieves all the registrations for a specific event.
+     * This method queries the Firestore document for the specified event and retrieves the list of
+     * registration document references associated with that event. The results are passed to the provided
+     * listener once the operation is complete.
+     *
+     * @param eventReference A reference to the Firestore document of the event whose registrations are being retrieved.
+     * @param listener The listener that will be notified once the registration data has been retrieved or if there is an error.
+     */
     public void getAllRegistrationToEvent(DocumentReference eventReference, OnCompleteListener<List<DocumentReference>> listener) {
         // get all the registration to a specific event
         eventReference.get().addOnCompleteListener(
@@ -953,10 +1215,35 @@ public class DatabaseManager {
 
     }
 
+    /**
+     * Adds a registration document reference to the list of registrations for a specific event.
+     * This method updates the event document in Firestore by adding the provided registration reference
+     * to the event's list of registrations. The operation is asynchronous, and the provided listener will
+     * be notified once the update is complete.
+     *
+     * @param eventReference A reference to the Firestore document of the event where the registration is being added.
+     * @param registrationReference A reference to the Firestore document of the registration that is being added to the event.
+     * @param listener The listener that will be notified when the update operation completes or if there is an error.
+     */
     public void addRegistrationToEvent(DocumentReference eventReference, DocumentReference registrationReference, OnCompleteListener<Void> listener) {
         eventReference.update(EVENT_REGISTRATIONS, FieldValue.arrayUnion(registrationReference)).addOnCompleteListener(listener);
     }
 
+    /**
+     * Deletes a registration document from the Firestore database and removes its references
+     * from both the associated event and attendee documents.
+     * This method performs the following steps:
+     * <ul>
+     *     <li>Retrieves the registration document from the database using the provided registration reference.</li>
+     *     <li>Gets the associated event and attendee references from the registration.</li>
+     *     <li>Removes the registration reference from the list of registrations in both the event and attendee documents.</li>
+     *     <li>If the current user is an attendee, removes the registration reference from the attendee's local list of registrations.</li>
+     *     <li>Deletes the registration document from the Firestore database.</li>
+     * </ul>
+     *
+     * @param registrationReference A reference to the Firestore document representing the registration to be deleted.
+     * @param listener The listener that will be notified once the deletion operation completes or if there is an error.
+     */
     public void deleteRegistration(DocumentReference registrationReference, OnCompleteListener<Void> listener) {
         // must first get the registrations object
         getRegistration(registrationReference.getId(), task -> {
@@ -976,6 +1263,24 @@ public class DatabaseManager {
         });
     }
 
+    /**
+     * Retrieves the registration reference for the current attendee for a specific event.
+     * This method checks if the current user is an attendee and attempts to find the registration
+     * that intersects both the given event and the attendee's current registrations.
+     * If the attendee has exactly one registration for the event, the method returns the corresponding
+     * registration reference. Otherwise, an exception is thrown.
+     * The method performs the following steps:
+     * <ul>
+     *     <li>Checks if the current user is an attendee.</li>
+     *     <li>Retrieves the list of registrations for the provided event from Firestore.</li>
+     *     <li>Filters the registrations to only include those that intersect with the attendee's list of registrations.</li>
+     *     <li>If exactly one matching registration is found, returns the registration reference to the caller.</li>
+     *     <li>If no registration or more than one registration is found, returns an error.</li>
+     * </ul>
+     *
+     * @param eventReference A reference to the Firestore document representing the event.
+     * @param listener The listener that will be notified once the operation completes, with either the registration reference or an error.
+     */
     public void getRegistrationReferenceToEvent(DocumentReference eventReference, OnCompleteListener<DocumentReference> listener) {
         // take the registration that intersects both the event and the user, and return the registration status
         if (UserSession.getInstance().getUserRepresentation() instanceof Attendee attendee) {
@@ -1000,6 +1305,19 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Creates a new registration in the Firestore database.
+     * This method stores the details of a new registration, which includes the registration status,
+     * attendee reference, and event reference. The method performs multiple Firestore operations to
+     * store each of these values and ensures that all tasks are completed before notifying the listener.
+     * Once all Firestore tasks are completed, the method calls the provided listener, passing the result
+     * of the Firestore operations.
+     *
+     * @param registration The registration object that contains the details of the registration, including the status,
+     *                     attendee, and event.
+     * @param listener     The listener to be notified once all Firestore operations are completed, providing the document reference
+     *                     of the newly created registration document.
+     */
     public void createNewRegistration(Registration registration, OnCompleteListener<DocumentReference> listener) {
         int totalTasks = 3; // Number of Firestore tasks
         AtomicInteger tasksCompleted = new AtomicInteger(0); // Use AtomicInteger for thread safety
@@ -1029,6 +1347,16 @@ public class DatabaseManager {
 
     }
 
+    /**
+     * Retrieves a registration from the Firestore database based on the provided registration ID.
+     * This method fetches a registration document from the "registrations" collection in Firestore.
+     * It retrieves the registration status, attendee reference, and event reference from the document,
+     * and then creates a `Registration` object with these values. Once the registration is successfully
+     * retrieved, the listener is notified with the resulting `Registration` object.
+     *
+     * @param registrationId The unique ID of the registration document to retrieve.
+     * @param listener       The listener to be notified with the retrieved registration object or any error encountered.
+     */
     public void getRegistration(String registrationId, OnCompleteListener<Registration> listener) {
         // we want a datasnapshot of the registration
         firestoreDatabase.collection("registrations").document(registrationId).get().addOnCompleteListener(
@@ -1047,6 +1375,18 @@ public class DatabaseManager {
         );
     }
 
+    /**
+     * Adds a listener to a Firestore document to listen for changes to a specific field.
+     * This method adds a snapshot listener to the "registrations" collection in Firestore, specifically
+     * for the document identified by the provided registration ID. The listener listens for changes to the
+     * document, and when the document is updated, it checks if the specified field (key) exists. If it does,
+     * the provided `EventListener` is triggered with the updated document snapshot.
+     *
+     * @param registrationId The unique ID of the registration document to listen for changes.
+     * @param eventListener  The event listener that will be called when the specified field is updated.
+     * @param key            The field (key) in the document to listen for changes.
+     * @return A `ListenerRegistration` object which can be used to remove the listener when no longer needed.
+     */
     public ListenerRegistration addValueEventListenerToFirestoreRegistration(String registrationId, EventListener<DocumentSnapshot> eventListener, String key) {
 
         if (registrationId == null) {
@@ -1081,6 +1421,19 @@ public class DatabaseManager {
     }
 
     //---------------------------------------MultiTaskHandler------------------------------------------------
+
+    /**
+     * Handles the completion of a Firestore task and manages task completion tracking.
+     * This method is called whenever a Firestore task completes (successfully or with an error). It checks the
+     * result of the task, logs any errors, and updates the count of completed tasks. Once all tasks are successfully
+     * completed, it notifies the listener with the reference to the Firestore document.
+     *
+     * @param task                The Firestore task that has been completed.
+     * @param tasksCompleted      An AtomicInteger used to safely track the number of completed tasks in a multithreaded context.
+     * @param totalTasks          The total number of tasks that need to be completed. When all tasks are done, the listener is called.
+     * @param referenceToItem     A reference to the Firestore document to be returned after all tasks are completed successfully.
+     * @param listener            The listener that will be notified when all tasks are completed or if an error occurs.
+     */
     synchronized private void handleTaskCompletion(Task<Void> task, AtomicInteger tasksCompleted, int totalTasks, DocumentReference referenceToItem, OnCompleteListener<DocumentReference> listener) {
         if (task.isSuccessful()) {
             Log.d("DatabaseManager", "Success: " + task.getResult());  // Logging success, if needed
@@ -1102,7 +1455,16 @@ public class DatabaseManager {
         }
     }
 
-    // Delete stuff from db
+    /**
+     * Deletes a document from Firestore based on the provided document reference.
+     * This method attempts to delete the document specified by the provided reference. If the reference is null,
+     * it will immediately return with an exception. Upon successful deletion, it logs the success. If an error occurs
+     * during the deletion process, it logs the error and notifies the listener with the exception.
+     *
+     * @param itemRef  A reference to the Firestore document to be deleted.
+     * @param listener The listener that will be notified when the deletion task is completed.
+     *                 If the deletion is successful, the listener will receive a result, otherwise, an exception.
+     */
     private void deleteFromFirestore(DocumentReference itemRef, OnCompleteListener<Void> listener) {
         if (itemRef == null) {
             Log.e("DatabaseManager", "Reference is null");

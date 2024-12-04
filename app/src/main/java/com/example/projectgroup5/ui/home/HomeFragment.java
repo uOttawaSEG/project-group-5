@@ -14,8 +14,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
-import com.example.projectgroup5.databinding.FragmentHomeBinding;
 import com.example.projectgroup5.database.DatabaseManager;
+import com.example.projectgroup5.databinding.FragmentHomeBinding;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
 
@@ -48,6 +48,7 @@ public class HomeFragment extends Fragment {
 
         return root;
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -57,6 +58,7 @@ public class HomeFragment extends Fragment {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();

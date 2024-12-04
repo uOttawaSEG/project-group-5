@@ -11,9 +11,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import com.example.projectgroup5.MainActivity;
 import com.example.projectgroup5.R;
-import com.example.projectgroup5.events.Event;
 
 public class Notification {
     public static final String CHANNEL_ID = "account_creation_channel";
@@ -28,8 +26,6 @@ public class Notification {
      * @param title   The title of the notification.
      * @param message The content of the notification.
      */
-
-
     public static void sendMessageNotification(Context context, String title, String message) {
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,

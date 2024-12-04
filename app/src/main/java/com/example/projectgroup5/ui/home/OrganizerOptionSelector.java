@@ -33,10 +33,12 @@ public class OrganizerOptionSelector extends Fragment {
 //        // and finally the pending list button
         binding.getRoot().findViewById(R.id.organizer_event_requests).setOnClickListener(v -> {
             OrganizerRegistrationList.setGlobal();
-            navController.navigate(R.id.action_organizer_option_selector_to_organizer_registration_list);});
+            navController.navigate(R.id.action_organizer_option_selector_to_organizer_registration_list);
+        });
 
         return binding.getRoot();
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -46,6 +48,7 @@ public class OrganizerOptionSelector extends Fragment {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();

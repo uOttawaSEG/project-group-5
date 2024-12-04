@@ -1,6 +1,5 @@
 package com.example.projectgroup5.users;
 
-import static com.example.projectgroup5.database.DatabaseManager.USER_ORGANIZATION_NAME;
 import static com.example.projectgroup5.users.User.ACCEPTED;
 import static com.example.projectgroup5.users.User.REJECTED;
 import static com.example.projectgroup5.users.User.WAITLISTED;
@@ -26,13 +25,11 @@ import java.util.List;
 public class RegistrationAdapterForOrganizerView extends ArrayAdapter<Registration> {
 
     private final Context context;
-    private final List<Registration> registrations;
 
     // Constructor for the adapter
     public RegistrationAdapterForOrganizerView(@NonNull Context context, List<Registration> registrations) {
         super(context, 0, registrations);
         this.context = context;
-        this.registrations = registrations;
     }
 
     @NonNull
@@ -118,7 +115,7 @@ public class RegistrationAdapterForOrganizerView extends ArrayAdapter<Registrati
                         userEmailTextView.setText(user.getUserEmail());
                     }
                     if (value.containsKey(DatabaseManager.USER_PHONE)) {
-                        user.setUserPhoneNumber(Long.valueOf(value.get(DatabaseManager.USER_PHONE).toString().replace("\"", "")));
+                        user.setUserPhoneNumber(Long.parseLong(value.get(DatabaseManager.USER_PHONE).toString().replace("\"", "")));
                         TextView userPhoneNumberTextView = finalCustomView.findViewById(R.id.phoneNumberEntry);
                         userPhoneNumberTextView.setText(user.getPhoneNumber() + "");
                     }

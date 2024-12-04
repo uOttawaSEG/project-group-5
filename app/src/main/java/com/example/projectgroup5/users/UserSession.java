@@ -20,8 +20,8 @@ import java.util.List;
 
 public class UserSession {
     private static UserSession instance;
-    private String userId;
     private static User userRepresentation;
+    private String userId;
 
     /**
      * Constructs a new instance of the UserSession class and initializes it with a navigation controller.
@@ -35,8 +35,32 @@ public class UserSession {
         instantiateUserRepresentation(context, listener);
     }
 
-    public interface FirebaseCallback<T> {
-        void onCallback(T value);
+    /**
+     * Initializes the {@link UserSession} instance with the provided activity and navigation controller.
+     * This method sets up the Firebase application and ensures that the user session is instantiated only once.
+     *
+     * @param activity The main activity context used to initialize Firebase.
+     */
+    public static void initialize(MainActivity activity, OnCompleteListener<AuthResult> listener) {
+        if (instance == null) {
+            instance = new UserSession(activity, listener);
+            Log.d("UserSession", "initialize: " + instance);
+            FirebaseApp.initializeApp(activity);
+        }
+    }
+
+    /**
+     * Retrieves the singleton instance of the {@link UserSession}.
+     * If the instance is not already created, it initializes a new instance using the provided navigation controller.
+     *
+     * @return The current instance of {@link UserSession}.
+     */
+    public static UserSession getInstance() {
+        if (instance == null) {
+            System.err.println("UserSession is null");
+//            instance = new UserSession();
+        }
+        return instance;
     }
 
     /**
@@ -155,33 +179,13 @@ public class UserSession {
         return userRepresentation;
     }
 
-
     /**
-     * Initializes the {@link UserSession} instance with the provided activity and navigation controller.
-     * This method sets up the Firebase application and ensures that the user session is instantiated only once.
+     * Retrieves the user ID of the current user session.
      *
-     * @param activity      The main activity context used to initialize Firebase.
+     * @return The unique identifier of the user, or {@code null} if not set.
      */
-    public static void initialize(MainActivity activity, OnCompleteListener<AuthResult> listener) {
-        if (instance == null) {
-            instance = new UserSession(activity, listener);
-            Log.d("UserSession", "initialize: " + instance);
-            FirebaseApp.initializeApp(activity);
-        }
-    }
-
-    /**
-     * Retrieves the singleton instance of the {@link UserSession}.
-     * If the instance is not already created, it initializes a new instance using the provided navigation controller.
-     *
-     * @return The current instance of {@link UserSession}.
-     */
-    public static UserSession getInstance() {
-        if (instance == null) {
-            System.err.println("UserSession is null");
-//            instance = new UserSession();
-        }
-        return instance;
+    public String getUserId() {
+        return userId;
     }
 
     /**
@@ -192,57 +196,6 @@ public class UserSession {
     public void setUserId(String userId) {
         this.userId = userId;
     }
-
-    /**
-     * Retrieves the user ID of the current user session.
-     *
-     * @return The unique identifier of the user, or {@code null} if not set.
-     */
-    public String getUserId() {
-        return userId;
-    }
-
-
-    /*
-     * Creates a new user with the specified email and password.
-     * <p>
-     * This method uses Firebase Authentication to create the user account and
-     * retrieves the user type from the database to instantiate the user representation.
-     *
-     * @param email    The email address for the new user.
-     * @param password The password for the new user.
-     */
-//    public void createUser(String email, String password, MainActivity context, OnCompleteListener<AuthResult> listener) {
-        // TODO check this out
-//        Log.d("UserSession", "createUser: " + email + " " + password);
-//        DatabaseManager.getDatabaseManager().createUserWithEmailAndPassword(email, password, context, task -> DatabaseManager.getDatabaseManager().getUserDataFromFirestore(DatabaseManager.USER_TYPE, userType -> {
-//            if (userType != null) {
-//                Log.d("UserSession", "User type: " + userType);
-//                // Create a User representation based on the user type
-//                userRepresentation = User.newUserFromDatabase(userId, (int) (long) ((Long) userType));
-//                if (userRepresentation == null) {
-//                    Log.e("UserSession", "User representation is null 1");
-////                            return;
-//                }
-//                Log.d("UserSession", "The user representation is: " + userRepresentation.toString() + " with user type: " + userType);
-//                instantiateEmailForUser(DatabaseManager.getDatabaseManager().getCurrentUser());
-////                navController.navigate(R.id.account);
-//                Log.d("UserSession", "User type: " + userType);
-//            } else {
-//                Log.e("UserSession", "User type not found");
-//            }
-//            Log.d("UserSession", "aaaaaaaaa: " + userType);
-//            if (task.isSuccessful()) {
-//                Log.d("UserSession", "createUserWithEmail:success");
-//                listener.onComplete(task);
-//            }
-//            else {
-//                Log.w("UserSession", "createUserWithEmail:failure", task.getException());
-//                listener.onComplete(task);
-//            }
-//        }));
-//        Log.d("UserSession", "created User: " + email + " " + password);
-//    }
 
     /**
      * Logs out the current user from the application.
@@ -258,6 +211,10 @@ public class UserSession {
         // clear all the event listeners
         DatabaseListener.clearListeners();
         userId = null;
+    }
+
+    public interface FirebaseCallback<T> {
+        void onCallback(T value);
     }
 
 }

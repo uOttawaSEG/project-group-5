@@ -26,13 +26,20 @@ public class LoginOrCreate extends Fragment {
         NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
 
         // set the buttons on click listeners for the login button and the create account button
-        binding.getRoot().findViewById(R.id.loginButton).setOnClickListener(v -> {this.getView().performHapticFeedback(HapticFeedbackConstants.CONFIRM); navController.navigate(R.id.action_login_or_create_account_to_login);});
+        binding.getRoot().findViewById(R.id.loginButton).setOnClickListener(v -> {
+            this.getView().performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+            navController.navigate(R.id.action_login_or_create_account_to_login);
+        });
 
         // same for the create account button
-        binding.getRoot().findViewById(R.id.createAccountButton).setOnClickListener(v -> {this.getView().performHapticFeedback(HapticFeedbackConstants.CONFIRM);navController.navigate(R.id.action_login_or_create_account_to_create_account);});
+        binding.getRoot().findViewById(R.id.createAccountButton).setOnClickListener(v -> {
+            this.getView().performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+            navController.navigate(R.id.action_login_or_create_account_to_create_account);
+        });
 
         return binding.getRoot();
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

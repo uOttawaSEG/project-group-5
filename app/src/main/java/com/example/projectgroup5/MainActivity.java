@@ -6,33 +6,33 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.projectgroup5.database.Notification;
-import com.example.projectgroup5.users.UserSession;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Tasks;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.projectgroup5.database.Notification;
 import com.example.projectgroup5.databinding.ActivityMainBinding;
+import com.example.projectgroup5.users.UserSession;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Tasks;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private NavController navController;
-    private static OnCompleteListener<Boolean> onCompleteListener;
     public static boolean complete = false;
+    private static OnCompleteListener<Boolean> onCompleteListener;
+    private static MainActivity instance;
+    private NavController navController;
+
     public static void setOnCompleteListener(OnCompleteListener<Boolean> onCompleteListener) {
         MainActivity.onCompleteListener = onCompleteListener;
     }
-    private static MainActivity instance;
+
     public static MainActivity getInstance() {
         return instance;
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,10 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 complete = true;
             }
         });
-//        DatabaseManager.getDatabaseManager().test();
-
     }
-
 
 
     /**

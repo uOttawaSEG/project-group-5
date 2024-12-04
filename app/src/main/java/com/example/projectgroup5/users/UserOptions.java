@@ -84,10 +84,34 @@ public class UserOptions {
         });
     }
 
+    /**
+     * Retrieves the registrations with a specified status for a single event.
+     * This method acts as a wrapper around the `getRegistrationWithStatusToEvent` method
+     * to simplify the process of getting registrations for one event.
+     *
+     * @param callback The callback to receive the result once the data has been retrieved.
+     *                 This callback will be triggered with a list of `Registration` objects
+     *                 that match the specified registration status.
+     * @param userRegistrationState The registration status to filter the users by.
+     *                              It can be one of the predefined states like "accepted", "waitlisted", etc.
+     * @param event The event for which the registrations should be retrieved.
+     */
     public static void getRegistrationsWithStatusToEvent(RegistrationsCallback callback, String userRegistrationState, Event event) {
         getRegistrationWithStatusToEvent(callback, userRegistrationState, List.of(event));
     }
 
+    /**
+     * Retrieves the registrations with a specified status for a list of events.
+     * This method fetches all registrations with the specified status for the provided list
+     * of events. The results are passed back to the given callback once all data is retrieved.
+     *
+     * @param callback The callback to receive the result once the data has been retrieved.
+     *                 This callback will be triggered with a list of `Registration` objects
+     *                 that match the specified registration status.
+     * @param userRegistrationState The registration status to filter the users by.
+     *                              It can be one of the predefined states like "accepted", "waitlisted", etc.
+     * @param events The list of events for which the registrations should be retrieved.
+     */
     public static void getRegistrationWithStatusToEvent(RegistrationsCallback callback, String userRegistrationState, List<Event> events) {
         List<Registration> registrations = new ArrayList<>();
 
@@ -118,82 +142,10 @@ public class UserOptions {
                     // Call the callback with the retrieved pending users
                     callback.onDataReceived(registrations);
                 }
-                // Decrement the counter and check if all callbacks are complete
-//                    Registration registration = task.getResult();
-//                    Log.e("UserOptions", "Failed to create registration from database, registration ID: " + registrationReference.getId());
-//                    if (registration.getRegistrationStatus().equals(userRegistrationState)) {
-//                        DatabaseManager.getDatabaseManager().getRegistration(registrationReference.getId(), task2 -> {
-//                            if (!task2.isSuccessful() || task2.getResult() == null) {
-//                                Log.e("UserOptions", "Failed to create registration from database, registration ID: " + registrationReference.getId());
-//                                if (remainingCalls.decrementAndGet() == 0) {
-//                                    // Call the callback with the retrieved pending users
-//                                    Log.d("UserOptions", "Registration added OrganizerEvent0: " + registration);
-//                                    callback.onDataReceived(registrations);
-//                                }
-//                                return;
-//                            }
-//                            registrations.add(task2.getResult());
-//                            // Decrement the counter and check if all callbacks are complete
-//                            if (remainingCalls.decrementAndGet() == 0) {
-//                                // Call the callback with the retrieved pending users
-//                                Log.d("UserOptions", "Registration added OrganizerEvent1: " + registration);
-//                                callback.onDataReceived(registrations);
-//                            }
-//                        });
-//                    } else if (remainingCalls.decrementAndGet() == 0) {
-//                        // Call the callback with the retrieved pending users
-//                        Log.d("UserOptions", "Registration added OrganizerEvent3: " + registration);
-//                        callback.onDataReceived(registrations);
-//                    }
                 });
         }
     }
 
-
-    /*
-    List<Event> events = new ArrayList<>();
-        DatabaseManager databaseManager = DatabaseManager.getDatabaseManager();
-        databaseManager.getOrganizerEvents(UserSession.getInstance().getUserId(), task -> {
-            if (task == null || !task.isSuccessful()) {
-                Log.e("EventOptions", "Failed to get organizer events");
-                callback.onDataReceived(events);
-                return;
-            } else {
-                List<DocumentReference> eventIds = task.getResult();
-                // Create a counter to track completed event data retrieval
-                AtomicInteger remainingCalls = new AtomicInteger(eventIds.size());
-                Log.d("EventOptions", "Got " + eventIds.size() + " events");
-                for (DocumentReference eventId : eventIds) {
-                    DatabaseManager.getDatabaseManager().getEvent(eventId.getId(), task2 -> {
-                        if (task2.getResult() == null || !task2.isSuccessful()) {
-                            Log.e("EventOptions", "Failed to create event from database, event ID: " + eventId);
-                            if (remainingCalls.decrementAndGet() == 0) {
-                                // Call the callback with the retrieved pending events
-                                callback.onDataReceived(events);
-                            }
-                            return;
-                        }
-                        if (task2.getResult().holdsAnEvent()) {
-                            Event event = task2.getResult().getEvent();
-                            // check if the event is in the correct time status
-                            if (event.getTimeStatus().equals(eventTimeStatus)) {
-                                events.add(event);
-                            }
-                        }
-                        // Decrement the counter and check if all callbacks are complete
-                        if (remainingCalls.decrementAndGet() == 0) {
-                            // Call the callback with the retrieved pending events
-                            callback.onDataReceived(events);
-                        }
-                    });
-                }
-                // If there are no events, callback immediately
-                if (eventIds.isEmpty()) {
-                    callback.onDataReceived(events);
-                }
-            }
-        });
-    * */
 
 
     /**

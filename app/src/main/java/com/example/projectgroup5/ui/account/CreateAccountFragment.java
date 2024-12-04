@@ -238,9 +238,17 @@ public class CreateAccountFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Launches an autocomplete activity to allow the user to search for and select a place.
+     * <p>
+     * This method utilizes the Google Places API to show a overlay autocomplete screen, allowing the user
+     * to search for places. The autocomplete results will include the place's ID, display name, and formatted address.
+     * The results can then be processed based on the user's selection.
+     * </p>
+     */
     private void openAutocompleteActivity() {
         // Use the Places API to show autocomplete suggestions
-        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN,
+        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY,
                 Arrays.asList(Place.Field.ID, Place.Field.DISPLAY_NAME, Place.Field.FORMATTED_ADDRESS))
                 .build(getContext());
         // Launch the autocomplete activity using the launcher initialized in OnCreate

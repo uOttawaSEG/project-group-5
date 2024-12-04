@@ -6,6 +6,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.icu.util.Calendar;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -40,19 +42,20 @@ import java.util.Arrays;
 
 public class CreateEventFragment extends Fragment {
 
+    //---------------------------------Constants------------------------------------------------------
+    private final Calendar startCalendar = Calendar.getInstance();
+    private final Calendar stopCalendar = Calendar.getInstance();
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
 
+    //---------------------------------Variables-----------------------------------------------------
     private FragmentCreateEventBinding binding;
-
-    // Define a variable to hold the Places API key.
     private EditText editTextLocation;
     private ActivityResultLauncher<Intent> autocompleteLauncher;
     private String placeAddress = null;
-    private final Calendar startCalendar = Calendar.getInstance();
-    private final Calendar stopCalendar = Calendar.getInstance();
     private Timestamp startTime = new Timestamp(startCalendar.getTime());
     private Timestamp endTime = new Timestamp(stopCalendar.getTime());
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentCreateEventBinding.inflate(inflater, container, false);
@@ -224,6 +227,19 @@ public class CreateEventFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Opens a TimePickerDialog to allow the user to select a time, and updates the provided button
+     * with the selected time. The time is rounded to the nearest 30 minutes, and adjustments are made
+     * to ensure the end time is after the start time, and the selected time is not earlier than the current time.
+     * This method also handles the following:
+     * - Rounds the selected minute to the nearest 30-minute increment.
+     * - If the selected time is too close to the start time, it increments the day by 1.
+     * - If the selected start time is later than or equal to the current end time, it clears the end time.
+     *
+     * @param timeChosen The timestamp representing the time being set (either start or end time).
+     * @param button The button to update with the selected time.
+     * @param calendarToSet The calendar object that holds the time to be set, which will be updated with the selected time.
+     */
     private void timePicker(Timestamp timeChosen, Button button, Calendar calendarToSet) {
         Calendar calendar1 = Calendar.getInstance();
         int hour = calendar1.get(Calendar.HOUR_OF_DAY);
@@ -266,9 +282,17 @@ public class CreateEventFragment extends Fragment {
         binding = null;
     }
 
+    /**
+     * Launches the Places Autocomplete activity to allow the user to select a place.
+     * The autocomplete activity shows suggestions as the user types, and the user can choose
+     * a place which will be returned to the application.
+     * This method utilizes the Places API to request place suggestions in a overlay view.
+     * It retrieves information such as the place ID, name, and formatted address.
+     * Once the user selects a place, the result is handled in the registered activity result launcher.
+     */
     private void openAutocompleteActivity() {
         // Use the Places API to show autocomplete suggestions
-        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN,
+        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY,
                 Arrays.asList(Place.Field.ID, Place.Field.DISPLAY_NAME, Place.Field.FORMATTED_ADDRESS))
                 .build(getContext());
         // Launch the autocomplete activity using the launcher initialized in OnCreate

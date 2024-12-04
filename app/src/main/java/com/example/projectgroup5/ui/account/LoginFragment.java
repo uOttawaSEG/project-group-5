@@ -33,18 +33,20 @@ public class LoginFragment extends Fragment {
         root.findViewById(R.id.confirmCredentialAndLoginButton).setOnClickListener(v -> {
             this.getView().performHapticFeedback(HapticFeedbackConstants.CONFIRM);
             UserSession.getInstance().login(binding.emailInput.getText().toString(), binding.passwordInput.getText().toString(), (MainActivity) getContext(), (task) -> {
-            if (task.isSuccessful()) {
-                Log.e("LoginFragment", "login was successful");
-                this.getView().performHapticFeedback(HapticFeedbackConstants.CONFIRM);
-                navController.navigate(R.id.action_login_to_account_management);
-            } else {
-                // show an error message
-                Log.e("LoginFragment", "login was not successful");
-                this.getView().performHapticFeedback(HapticFeedbackConstants.REJECT);
-                binding.emailInput.setError("Invalid email or password");
-            }
-        });});
-        root.findViewById(R.id.cancelButton).setOnClickListener(v -> {navController.popBackStack();
+                if (task.isSuccessful()) {
+                    Log.e("LoginFragment", "login was successful");
+                    this.getView().performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+                    navController.navigate(R.id.action_login_to_account_management);
+                } else {
+                    // show an error message
+                    Log.e("LoginFragment", "login was not successful");
+                    this.getView().performHapticFeedback(HapticFeedbackConstants.REJECT);
+                    binding.emailInput.setError("Invalid email or password");
+                }
+            });
+        });
+        root.findViewById(R.id.cancelButton).setOnClickListener(v -> {
+            navController.popBackStack();
             this.getView().performHapticFeedback(HapticFeedbackConstants.CONFIRM);
         });
         return root;

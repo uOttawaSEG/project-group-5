@@ -14,20 +14,6 @@ public class EventOptional {
     EventError error;
     boolean holdsAnEvent;
 
-    public Event getEvent() {
-        return holdsAnEvent ? event : null;
-    }
-
-    private void setEvent(Event event) {
-        this.event = event;
-        this.holdsAnEvent = true;
-    }
-
-    private void setError(EventError error) {
-        this.error = error;
-        this.holdsAnEvent = false;
-    }
-
     /**
      * This constructor is used to create a new event option. For an event that has already occurred.
      * Returns one of the following:
@@ -71,11 +57,10 @@ public class EventOptional {
      *  <li><code>END_TIME_EMPTY_ERROR</code></li>
      * </ul>
      */
-    // TODO auto accept and address
     public static EventOptional newEvent(String title, String description, String address, Timestamp startTime, Timestamp endTime, boolean autoAccept, DocumentReference organizer) {
         EventOptional option = new EventOptional();
 
-        if (checkFields(option, title,description, address, startTime, endTime, organizer)) {
+        if (checkFields(option, title, description, address, startTime, endTime, organizer)) {
             return option;
         }
 
@@ -83,22 +68,30 @@ public class EventOptional {
             return option;
         }
 
-        Event event = new Event(title, description, address, startTime, endTime, autoAccept, new ArrayList<DocumentReference>(), organizer);
+        Event event = new Event(title, description, address, startTime, endTime, autoAccept, new ArrayList<>(), organizer);
         option.setEvent(event);
         return option;
     }
 
-    public boolean holdsAnEvent() {
-        return holdsAnEvent;
-    }
-
-    public EventError getError() {
-        if (!holdsAnEvent) {
-            return error;
-        }
-        return null;
-    }
-    private static boolean checkFields(EventOptional option, String title, String description, String address, Timestamp startTime, Timestamp endTime, DocumentReference organizer, String eventID){
+    /**
+     * Validates the fields of an event, checking basic properties like title, description, address, start time,
+     * end time, organizer, and event ID. If any field is invalid, an error is set on the provided {@link EventOptional} object.
+     * <p>
+     * This method first calls the overloaded {@link #checkFields(EventOptional, String, String, String, Timestamp, Timestamp, DocumentReference)}
+     * to check basic fields. Then it checks if the event ID is null or empty and sets an appropriate error if it is.
+     * </p>
+     *
+     * @param option The {@link EventOptional} object to set the error on if any field is invalid.
+     * @param title The title of the event.
+     * @param description The description of the event.
+     * @param address The address where the event will take place.
+     * @param startTime The start time of the event.
+     * @param endTime The end time of the event.
+     * @param organizer The {@link DocumentReference} representing the organizer of the event.
+     * @param eventID The unique ID of the event.
+     * @return {@code true} if any field is invalid, {@code false} if all fields are valid.
+     */
+    private static boolean checkFields(EventOptional option, String title, String description, String address, Timestamp startTime, Timestamp endTime, DocumentReference organizer, String eventID) {
         if (checkFields(option, title, description, address, startTime, endTime, organizer)) {
             return true;
         }
@@ -110,6 +103,24 @@ public class EventOptional {
 
         return false;
     }
+
+    /**
+     * Validates the basic fields of an event, including title, description, address, start time, end time, and organizer.
+     * Sets appropriate error on the {@link EventOptional} object if any of the fields are invalid.
+     * <p>
+     * This method checks that all required fields are provided and formatted correctly. If any field is invalid,
+     * an error is set on the {@link EventOptional} object and {@code true} is returned.
+     * </p>
+     *
+     * @param option The {@link EventOptional} object to set the error on if any field is invalid.
+     * @param title The title of the event.
+     * @param description The description of the event.
+     * @param address The address where the event will take place.
+     * @param startTime The start time of the event.
+     * @param endTime The end time of the event.
+     * @param organizer The {@link DocumentReference} representing the organizer of the event.
+     * @return {@code true} if any field is invalid, {@code false} if all fields are valid.
+     */
     private static boolean checkFields(EventOptional option, String title, String description, String address, Timestamp startTime, Timestamp endTime, DocumentReference organizer) {
         if (title == null || title.isEmpty()) {
             option.setError(EventError.TITLE_EMPTY);
@@ -142,6 +153,16 @@ public class EventOptional {
         return false; // No errors found
     }
 
+    /**
+     * Validates the start and end times of an event.
+     * Checks if the start time or end time is in the past and if the end time is before the start time.
+     * Sets appropriate error on the {@link EventOptional} object if any of the conditions are violated.
+     *
+     * @param option The {@link EventOptional} object to set the error on if any of the times are invalid.
+     * @param startTime The start time of the event.
+     * @param endTime The end time of the event.
+     * @return {@code true} if any time-related validation fails, {@code false} if the times are valid.
+     */
     private static boolean checkTimes(EventOptional option, Timestamp startTime, Timestamp endTime) {
         if (startTime.compareTo(Timestamp.now()) < 0) {
             option.setError(EventError.START_TIME_PAST);
@@ -156,5 +177,57 @@ public class EventOptional {
             return true;
         }
         return false; // No errors found
+    }
+
+    /**
+     * Retrieves the event associated with this {@link EventOptional} object.
+     * If the object does not hold a valid event, {@code null} is returned.
+     *
+     * @return The event if present, otherwise {@code null}.
+     */
+    public Event getEvent() {
+        return holdsAnEvent ? event : null;
+    }
+
+    /**
+     * Sets the event for this {@link EventOptional} object. Marks the object as holding a valid event.
+     *
+     * @param event The event to set for this object.
+     */
+    private void setEvent(Event event) {
+        this.event = event;
+        this.holdsAnEvent = true;
+    }
+
+    /**
+     * Checks whether this {@link EventOptional} object holds a valid event.
+     *
+     * @return {@code true} if the object holds a valid event, otherwise {@code false}.
+     */
+    public boolean holdsAnEvent() {
+        return holdsAnEvent;
+    }
+
+    /**
+     * Retrieves the error associated with this {@link EventOptional} object.
+     * If the object does not hold a valid event, the error is returned. Otherwise, {@code null} is returned.
+     *
+     * @return The error if present, otherwise {@code null}.
+     */
+    public EventError getError() {
+        if (!holdsAnEvent) {
+            return error;
+        }
+        return null;
+    }
+
+    /**
+     * Sets an error on this {@link EventOptional} object and marks it as not holding a valid event.
+     *
+     * @param error The error to set for this object.
+     */
+    private void setError(EventError error) {
+        this.error = error;
+        this.holdsAnEvent = false;
     }
 }

@@ -16,8 +16,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.projectgroup5.R;
-import com.example.projectgroup5.databinding.FragmentAccountManagementBinding;
 import com.example.projectgroup5.database.DatabaseManager;
+import com.example.projectgroup5.databinding.FragmentAccountManagementBinding;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
 
@@ -39,14 +39,14 @@ public class AccountManagementFragment extends Fragment {
             return root;
         }
 
-            // get the user type
-            displayUserType();
+        // get the user type
+        displayUserType();
 
-            // get the user email
-            displayUserEmail();
+        // get the user email
+        displayUserEmail();
 
-            // get the user registration status
-            displayUserRegistrationStatus();
+        // get the user registration status
+        displayUserRegistrationStatus();
 
         root.findViewById(R.id.logoutButton).setOnClickListener(v -> {
             UserSession.getInstance().logout();
@@ -99,17 +99,26 @@ public class AccountManagementFragment extends Fragment {
                 }
                 // Append the userCurrentState to the current text
                 Log.d("AccountManagementFragment", "userState: " + userState);
-                    binding.userCurrentState.setText(newText);
+                binding.userCurrentState.setText(newText);
             } else {
                 Log.e("AccountManagementFragment", "User registration state not found");
             }
         });
     }
 
+    /**
+     * Displays the current registration status of the user based on their registration state.
+     * The method checks the user's registration status (e.g., "Waitlisted", "Accepted", or "Rejected")
+     * and updates the UI accordingly, including showing a message with the appropriate status and logging the result.
+     * <p>
+     * If the user's registration state is unknown, the status message is hidden.
+     * </p>
+     */
     private void cachedDisplayRegistrationStatus() {
         if (UserSession.getInstance().getUserRepresentation() != null) {
             String newText;
-            if (UserSession.getInstance().getUserRepresentation().getUserRegistrationState() == null) return;
+            if (UserSession.getInstance().getUserRepresentation().getUserRegistrationState() == null)
+                return;
             switch (UserSession.getInstance().getUserRepresentation().getUserRegistrationState()) {
                 case User.WAITLISTED:
                     binding.userCurrentState.setVisibility(View.VISIBLE);
@@ -163,6 +172,13 @@ public class AccountManagementFragment extends Fragment {
         });
     }
 
+    /**
+     * Displays the user's email if available in the user session.
+     * <p>
+     * The method checks if the user is logged in and if the user's email is not null or empty. If both conditions
+     * are met, it displays the email in a TextView. Otherwise, it hides the email TextView.
+     * </p>
+     */
     private void cachedDisplayUserEmail() {
         User userRepresentation = UserSession.getInstance().getUserRepresentation();
         if (userRepresentation != null && userRepresentation.getUserEmail() != null && !userRepresentation.getUserEmail().isEmpty()) {
@@ -217,7 +233,7 @@ public class AccountManagementFragment extends Fragment {
                         break;
                 }
                 Log.d("AccountManagementFragment", "newText for userType: " + newText);
-                    binding.userAccountType.setText(newText);
+                binding.userAccountType.setText(newText);
 
             } else {
                 Log.e("AccountManagementFragment", "User type not found");
@@ -225,6 +241,14 @@ public class AccountManagementFragment extends Fragment {
         });
     }
 
+    /**
+     * Displays the user's account type (organizer, attendee, admin) based on the current user session.
+     * <p>
+     * This method checks the user type from the user session and updates the UI accordingly. If the user is an
+     * organizer, attendee, or admin, it shows a welcome message with the respective user type. If the user type
+     * is unknown or not set, it hides the account type UI component.
+     * </p>
+     */
     private void cachedDisplayUserType() {
         if (UserSession.getInstance().getUserRepresentation() == null) return;
         String newText;

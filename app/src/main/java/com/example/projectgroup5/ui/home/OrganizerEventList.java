@@ -27,7 +27,6 @@ import com.example.projectgroup5.databinding.FragmentOrganizerEventListBinding;
 import com.example.projectgroup5.events.Event;
 import com.example.projectgroup5.events.EventAdapterForDisplay;
 import com.example.projectgroup5.events.EventOption;
-import com.example.projectgroup5.events.Registration;
 import com.example.projectgroup5.users.Organizer;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserOptions;
@@ -95,19 +94,16 @@ public class OrganizerEventList extends Fragment {
                 }
                 // Set the Long Click Listener for the ListView items
 
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parentView, View view, int position, long id) {
-                        // go to the list of registrations if it is not empty
-                        Event selectedEvent = (Event) parentView.getItemAtPosition(position);
-                        if (selectedEvent.getRegistrations() != null && !selectedEvent.getRegistrations().isEmpty()) {
-                            OrganizerRegistrationList.setSelectedEvent(selectedEvent);
-                            navController.navigate(R.id.action_organizer_event_list_to_organizer_registration_list);
-                        } else {
-                            Toast.makeText(getContext(), "No registrations", Toast.LENGTH_SHORT).show();
-                        }
-
+                listView.setOnItemClickListener((parentView1, view, position1, id1) -> {
+                    // go to the list of registrations if it is not empty
+                    Event selectedEvent = (Event) parentView1.getItemAtPosition(position1);
+                    if (selectedEvent.getRegistrations() != null && !selectedEvent.getRegistrations().isEmpty()) {
+                        OrganizerRegistrationList.setSelectedEvent(selectedEvent);
+                        navController.navigate(R.id.action_organizer_event_list_to_organizer_registration_list);
+                    } else {
+                        Toast.makeText(getContext(), "No registrations", Toast.LENGTH_SHORT).show();
                     }
+
                 });
 
                 listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -135,38 +131,34 @@ public class OrganizerEventList extends Fragment {
                                 getView().performHapticFeedback(HapticFeedbackConstants.GESTURE_START);
                                 // we display the option to delete the event and delete it
                                 // Set up prolonged press detection
-                                prolongedPressRunnable = new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        // delete the event from the list and from the database and from the user
-                                        DocumentReference eventRef = DatabaseManager.getDatabaseManager().getEventReference(selectedEvent.getEventID());
-                                        Log.d("OrganizerEventList", "Event ref ID: " + selectedEvent);
-                                        Log.d("OrganizerEventList", "Event deleted from firestore " + eventRef.getId());
-                                        // get a list of all the registrations for the event and delete them
-                                        List<User> attendees = new ArrayList<>();
-                                        DatabaseManager.getDatabaseManager().getAllRegistrationToEvent(eventRef, task -> {
-                                            if (task.isSuccessful()) {
-                                                for (DocumentReference registrationRef : task.getResult()) {
-                                                    // delete all these registrations
-                                                    DatabaseManager.getDatabaseManager().deleteRegistration(registrationRef, task1 -> {
-                                                        Log.d("OrganizerEventList", "Registration deleted from firestore " + registrationRef.getId());
-                                                    });
-                                                }
-                                                // delete the event from the organizer on firestore
-                                                ((Organizer) UserSession.getInstance().getUserRepresentation()).removeEvent(eventRef);
-                                                DatabaseManager.getDatabaseManager().removeEventFromOrganizer(eventRef, task2 -> {
-                                                    // delete the event from the listview
-                                                    DatabaseManager.getDatabaseManager().deleteEventFromFirestore(eventRef, task1 -> {
-                                                        events.remove(selectedEvent);
-                                                        EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
-                                                        listView.setAdapter(eventOrganizerAdapter);
-                                                        getView().performHapticFeedback(HapticFeedbackConstants.GESTURE_END);
-                                                    });
+                                prolongedPressRunnable = () -> {
+                                    // delete the event from the list and from the database and from the user
+                                    DocumentReference eventRef = DatabaseManager.getDatabaseManager().getEventReference(selectedEvent.getEventID());
+                                    Log.d("OrganizerEventList", "Event ref ID: " + selectedEvent);
+                                    Log.d("OrganizerEventList", "Event deleted from firestore " + eventRef.getId());
+                                    // get a list of all the registrations for the event and delete them
+                                    DatabaseManager.getDatabaseManager().getAllRegistrationToEvent(eventRef, task -> {
+                                        if (task.isSuccessful()) {
+                                            for (DocumentReference registrationRef : task.getResult()) {
+                                                // delete all these registrations
+                                                DatabaseManager.getDatabaseManager().deleteRegistration(registrationRef, task1 -> {
+                                                    Log.d("OrganizerEventList", "Registration deleted from firestore " + registrationRef.getId());
                                                 });
                                             }
-                                        });
+                                            // delete the event from the organizer on firestore
+                                            ((Organizer) UserSession.getInstance().getUserRepresentation()).removeEvent(eventRef);
+                                            DatabaseManager.getDatabaseManager().removeEventFromOrganizer(eventRef, task2 -> {
+                                                // delete the event from the listview
+                                                DatabaseManager.getDatabaseManager().deleteEventFromFirestore(eventRef, task1 -> {
+                                                    events.remove(selectedEvent);
+                                                    EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
+                                                    listView.setAdapter(eventOrganizerAdapter);
+                                                    getView().performHapticFeedback(HapticFeedbackConstants.GESTURE_END);
+                                                });
+                                            });
+                                        }
+                                    });
 
-                                    }
                                 };
 
                                 // Start the delayed action

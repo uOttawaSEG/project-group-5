@@ -3,27 +3,20 @@ package com.example.projectgroup5.ui.search;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcel;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.SearchEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.projectgroup5.MainActivity;
@@ -33,13 +26,9 @@ import com.example.projectgroup5.database.DatabaseManager;
 import com.example.projectgroup5.databinding.FragmentDashboardEventListBinding;
 import com.example.projectgroup5.events.Event;
 import com.example.projectgroup5.events.EventAdapterForDisplay;
-import com.example.projectgroup5.events.EventOption;
 import com.example.projectgroup5.events.Registration;
-import com.example.projectgroup5.ui.home.OrganizerRegistrationList;
 import com.example.projectgroup5.users.Attendee;
-import com.example.projectgroup5.users.Organizer;
 import com.example.projectgroup5.users.User;
-import com.example.projectgroup5.users.UserOptions;
 import com.example.projectgroup5.users.UserSession;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -66,34 +55,27 @@ public class DashboardEventList extends Fragment {
         List<Event> events = new ArrayList<>();
         DatabaseManager.getDatabaseManager().getEvents(eventIds -> {
             Log.d("DashboardEventList", "Event before ids: " + eventIds.getResult());
-            if (eventIds == null) {
-            } else {
-                Log.d("DashboardEventList", "Event ids: " + eventIds.getResult());
-                events.addAll(eventIds.getResult());
-                // remove the past events
-                events.removeIf(event -> event.getStartTime().toDate().before(new java.util.Date()));
-                // now we must sort the events by starting date
-                events.sort(Comparator.comparing(Event::getStartTime));
-                EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
-                listView.setAdapter(eventOrganizerAdapter);
-            }
+            Log.d("DashboardEventList", "Event ids: " + eventIds.getResult());
+            events.addAll(eventIds.getResult());
+            // remove the past events
+            events.removeIf(event -> event.getStartTime().toDate().before(new java.util.Date()));
+            // now we must sort the events by starting date
+            events.sort(Comparator.comparing(Event::getStartTime));
+            EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
+            listView.setAdapter(eventOrganizerAdapter);
         });
-        // ---------------------------
         // Disable swipe refresh initially
         swipeRefreshLayout.setEnabled(false);
 
-// Add an onScrollListener to check if the ListView is at the top
+        // Add an onScrollListener to check if the ListView is at the top
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 // Only enable swipe refresh when the list is fully at the top
                 if (scrollState == SCROLL_STATE_IDLE) {
                     // Ensure the first visible position is 0 and the top of the first child is 0
-                    if (listView.getFirstVisiblePosition() == 0 && listView.getChildAt(0).getTop() == 0) {
-                        swipeRefreshLayout.setEnabled(true); // Enable swipe to refresh
-                    } else {
-                        swipeRefreshLayout.setEnabled(false); // Disable swipe to refresh
-                    }
+                    // Disable swipe to refresh
+                    swipeRefreshLayout.setEnabled(listView.getFirstVisiblePosition() == 0 && listView.getChildAt(0).getTop() == 0); // Enable swipe to refresh
                 }
             }
 
@@ -103,20 +85,18 @@ public class DashboardEventList extends Fragment {
             }
         });
 
-// Set up the swipe-to-refresh listener
+        // Set up the swipe-to-refresh listener
         swipeRefreshLayout.setOnRefreshListener(() -> {
             // Simulate refreshing events (you can add actual logic to refresh data from the database)
             DatabaseManager.getDatabaseManager().getEvents(eventIds -> {
-                if (eventIds != null) {
-                    events.clear();
-                    events.addAll(eventIds.getResult());
-                    events.removeIf(event -> event.getStartTime().toDate().before(new java.util.Date()));
-                    events.sort(Comparator.comparing(Event::getStartTime));
+                events.clear();
+                events.addAll(eventIds.getResult());
+                events.removeIf(event -> event.getStartTime().toDate().before(new java.util.Date()));
+                events.sort(Comparator.comparing(Event::getStartTime));
 
-                    EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
-                    listView.setAdapter(eventOrganizerAdapter);
-                    Toast.makeText(getContext(), "Refreshed", Toast.LENGTH_SHORT).show();
-                }
+                EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
+                listView.setAdapter(eventOrganizerAdapter);
+                Toast.makeText(getContext(), "Refreshed", Toast.LENGTH_SHORT).show();
                 // Stop the refresh animation once the data is loaded
                 swipeRefreshLayout.setRefreshing(false);
             });
@@ -155,18 +135,6 @@ public class DashboardEventList extends Fragment {
             @Override
             public boolean onQueryTextChange(String query) {
                 if (query == null || query.isEmpty()) {
-//                    List<Event> events = new ArrayList<>();
-//                    DatabaseManager.getDatabaseManager().getEvents(eventIds -> {
-//                        Log.d("DashboardEventList", "Event before ids: " + eventIds.getResult());
-//                        if (eventIds == null) {
-//                        } else {
-//                            Log.d("DashboardEventList", "Event ids: " + eventIds.getResult());
-//                            events.clear();
-//                            events.addAll(eventIds.getResult());
-//                            EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
-//                            listView.setAdapter(eventOrganizerAdapter);
-//                        }
-//                    });
                     if (UserSession.getInstance().getUserRepresentation() instanceof Attendee) {
                         DatabaseManager.getDatabaseManager().getEventsThatMatchQuery(query, eventIds -> {
                             if (eventIds == null) {
@@ -337,12 +305,6 @@ public class DashboardEventList extends Fragment {
 
         });
 
-
-//
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parentView) {
-//                // Handle the case where nothing is select
         return binding.getRoot();
     }
 

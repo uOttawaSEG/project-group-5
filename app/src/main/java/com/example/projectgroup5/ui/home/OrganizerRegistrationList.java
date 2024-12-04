@@ -69,7 +69,7 @@ public class OrganizerRegistrationList extends Fragment {
                     acceptCorresponding(spinner, navController, events);
                 } else {
                     DatabaseManager.getDatabaseManager().getOrganizerEvents(UserSession.getInstance().getUserId(), task -> {
-                        if (task == null || !task.isSuccessful()) {
+                        if (!task.isSuccessful()) {
                             Log.e("EventOptions", "Failed to get organizer events");
                         } else {
                             Log.w("OrganizerRegistrationList", "Organizer Events: " + task.getResult());
@@ -143,7 +143,7 @@ public class OrganizerRegistrationList extends Fragment {
                     // get all the events of the organizer from the database
                     DatabaseManager.getDatabaseManager().getOrganizerEvents(UserSession.getInstance().getUserId(), task -> {
                         List<Event> events;
-                        if (task == null || !task.isSuccessful()) {
+                        if (!task.isSuccessful()) {
                             Log.e("EventOptions", "Failed to get organizer events");
                             return;
                         } else {
@@ -202,6 +202,18 @@ public class OrganizerRegistrationList extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Accepts or updates the registration status of attendees based on the selected value from the spinner.
+     * This method checks the selected status from the spinner (ACCEPTED, WAITLISTED, or REJECTED) and
+     * updates the registration status for corresponding attendees of the event.
+     * The method calls `UserOptions.getRegistrationWithStatusToEvent()` to fetch registrations
+     * with a particular status and updates each registration status accordingly.
+     * After updating the registration statuses, it navigates back to the organizer registration list view.
+     *
+     * @param spinner The spinner that contains the selected status option for the attendees.
+     * @param navController The NavController to manage navigation between fragments.
+     * @param events The list of events that are currently active, referenced by an AtomicReference.
+     */
     private static void acceptCorresponding(Spinner spinner, NavController navController, AtomicReference<List<Event>> events) {
         String status = spinner.getSelectedItemPosition() == 0 ? User.ACCEPTED : spinner.getSelectedItemPosition() == 1 ? User.WAITLISTED : User.REJECTED;
         if (status.equals(User.ACCEPTED) || status.equals(User.WAITLISTED)) {
@@ -235,19 +247,34 @@ public class OrganizerRegistrationList extends Fragment {
         }
     }
 
-    public static Event getSelectedEvent() {
-        return selectedEvent;
-    }
-
+    /**
+     * Sets the selected event globally.
+     * This method marks an event as the selected event for further processing or display.
+     * It updates the `onlyEvent` flag to `true` and stores the given event as the selected event.
+     *
+     * @param event The event to set as the selected event.
+     */
     public static void setSelectedEvent(Event event) {
         setOnlyEvent(true);
         selectedEvent = event;
     }
 
+    /**
+     * Resets the global event selection, allowing for all events to be considered.
+     * This method updates the `onlyEvent` flag to `false`, indicating that no specific
+     * event is selected and all events should be taken into account.
+     */
     public static void setGlobal() {
         setOnlyEvent(false);
     }
 
+    /**
+     * Sets the flag indicating whether only one event is of interest.
+     * This method directly sets the `onlyEvent` flag, which determines whether only the selected
+     * event is considered in various operations or whether multiple events are relevant.
+     *
+     * @param onlyEvent A boolean value to set the `onlyEvent` flag.
+     */
     private static void setOnlyEvent(boolean onlyEvent) {
         OrganizerRegistrationList.onlyEvent = onlyEvent;
     }

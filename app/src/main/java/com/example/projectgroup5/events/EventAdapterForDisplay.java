@@ -5,7 +5,6 @@ import android.graphics.PorterDuff;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -13,18 +12,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.ViewCompat;
 
 import com.example.projectgroup5.R;
 import com.example.projectgroup5.database.DatabaseManager;
 import com.example.projectgroup5.users.Attendee;
 import com.example.projectgroup5.users.User;
 import com.example.projectgroup5.users.UserSession;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.DocumentReference;
 
 import java.text.SimpleDateFormat;
@@ -36,14 +32,34 @@ public class EventAdapterForDisplay extends ArrayAdapter<Event> {
 
     Context context;
 
+    /**
+     * Date format used to display event time.
+     */
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
 
+    /**
+     * Constructs a new {@link EventAdapterForDisplay} instance.
+     *
+     * @param context The context in which the adapter is being used.
+     * @param objects The list of {@link Event} objects to be displayed.
+     */
     public EventAdapterForDisplay(@NonNull Context context, @NonNull List<Event> objects) {
         super(context, 0, objects);
         this.context = context;
     }
 
-
+    /**
+     * Returns a view for the event item at the specified position in the list.
+     * This method is responsible for populating the event data in the list item view,
+     * including the event title, description, address, start time, and end time.
+     * It also checks if the user is an attendee and displays the registration status
+     * or any potential time conflicts for the event.
+     *
+     * @param position The position of the event in the list.
+     * @param convertView The recycled view to populate (if available).
+     * @param parent The parent view that the returned view will be attached to.
+     * @return The view populated with event data at the given position.
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Event event = getItem(position);
@@ -90,7 +106,7 @@ public class EventAdapterForDisplay extends ArrayAdapter<Event> {
                 if (!myRegistrations.isEmpty()) {
                     // we set the status icon to the registration status of the event
                     convertView.findViewById(R.id.statusIcon).setVisibility(View.VISIBLE);
-                        convertView.findViewById(R.id.spaceWithinTheEventEntry).setVisibility(View.VISIBLE);
+                    convertView.findViewById(R.id.spaceWithinTheEventEntry).setVisibility(View.VISIBLE);
                     // we set the color to match the registration status
                     View finalConvertView1 = convertView;
                     // load the event registration id from cache
@@ -105,16 +121,16 @@ public class EventAdapterForDisplay extends ArrayAdapter<Event> {
                                 statusIcon.setColorFilter(color, PorterDuff.Mode.SRC_IN);
                                 // set the on long click listener
                                 statusIcon.setOnLongClickListener(v -> {
-                                        showCustomTooltip(finalConvertView1.findViewById(R.id.statusIcon), "Accepted");
+                                    showCustomTooltip(finalConvertView1.findViewById(R.id.statusIcon), "Accepted");
                                     return true;
-                                    });
+                                });
                             } else if (attendance.getResult().equals(User.WAITLISTED)) {
                                 ImageView statusIcon = finalConvertView1.findViewById(R.id.statusIcon);
                                 int color = ContextCompat.getColor(finalConvertView1.getContext(), android.R.color.holo_blue_light);
                                 statusIcon.setColorFilter(color, PorterDuff.Mode.SRC_IN);
                                 // set the on long click listener
                                 statusIcon.setOnLongClickListener(v -> {
-                                        showCustomTooltip(finalConvertView1.findViewById(R.id.statusIcon), "Waitlisted");
+                                    showCustomTooltip(finalConvertView1.findViewById(R.id.statusIcon), "Waitlisted");
                                     return true;
                                 });
                             } else if (attendance.getResult().equals(User.REJECTED)) {
@@ -123,8 +139,8 @@ public class EventAdapterForDisplay extends ArrayAdapter<Event> {
                                 statusIcon.setColorFilter(color, PorterDuff.Mode.SRC_IN);
                                 // set the on long click listener
                                 statusIcon.setOnLongClickListener(v -> {
-                                        showCustomTooltip(finalConvertView1.findViewById(R.id.statusIcon), "Rejected");
-                                        return true;
+                                    showCustomTooltip(finalConvertView1.findViewById(R.id.statusIcon), "Rejected");
+                                    return true;
                                 });
                             }
 
@@ -161,19 +177,27 @@ public class EventAdapterForDisplay extends ArrayAdapter<Event> {
         return convertView;
     }
 
+    /**
+     * Checks if the specified event has a time conflict with any event in the attendee's event cache.
+     * If a conflict is found, it updates the UI to indicate the conflict by showing an icon and
+     * enabling a long click listener to display a tooltip with details about the conflict.
+     *
+     * @param convertView The view representing the event entry in the list. Used to update the UI elements.
+     * @param attendee The {@link Attendee} object whose events are checked for conflicts.
+     * @param event The {@link Event} object to check for conflicts.
+     */
     private void checkConflict(View convertView, Attendee attendee, Event event) {
         for (Event otherEvent : attendee.getEventCache()) {
             if (event.timeConflict(otherEvent)) {
                 convertView.findViewById(R.id.statusIcon).setVisibility(View.VISIBLE);
                 convertView.findViewById(R.id.spaceWithinTheEventEntry).setVisibility(View.VISIBLE);
                 // we add the hover effect to the icon
-                View finalConvertView = convertView;
-                ImageView statusIcon = finalConvertView.findViewById(R.id.statusIcon);
-                int color = ContextCompat.getColor(finalConvertView.getContext(), android.R.color.holo_orange_light);
+                ImageView statusIcon = convertView.findViewById(R.id.statusIcon);
+                int color = ContextCompat.getColor(convertView.getContext(), android.R.color.holo_orange_light);
                 statusIcon.setColorFilter(color, PorterDuff.Mode.SRC_IN);
                 // set the on long click listener
                 statusIcon.setOnLongClickListener(v -> {
-                    showCustomTooltip(finalConvertView.findViewById(R.id.statusIcon), "Time conflict with " + otherEvent.getTitle());
+                    showCustomTooltip(convertView.findViewById(R.id.statusIcon), "Time conflict with " + otherEvent.getTitle());
                     Log.e("EventAdapterForDisplay", "Time conflict between " + event.getTitle() + " with " + otherEvent.getTitle());
                     Log.e("EventAdapterForDisplay", "attendee event cache: " + attendee.getEventCache());
                     return true;
@@ -183,6 +207,14 @@ public class EventAdapterForDisplay extends ArrayAdapter<Event> {
         }
     }
 
+    /**
+     * Displays a custom tooltip near the specified anchor view with the provided tooltip message.
+     * The tooltip is displayed as a popup window at a position relative to the anchor view (usually an icon).
+     * The tooltip will automatically dismiss after a brief delay.
+     *
+     * @param anchorView The view that serves as the anchor for the tooltip (usually the icon that triggers the tooltip).
+     * @param tooltipTextMessage The message to be displayed in the tooltip.
+     */
     private void showCustomTooltip(View anchorView, String tooltipTextMessage) {
         // Get the position of the statusIcon on screen
         int[] location = new int[2];
@@ -205,7 +237,7 @@ public class EventAdapterForDisplay extends ArrayAdapter<Event> {
         int yPos = location[1];  // Position it at the same vertical level as the icon
 
         // Show PopupWindow near the statusIcon
-        popupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, xPos-700, yPos-30);
+        popupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, xPos - 700, yPos - 30);
 
         // Optionally, dismiss the popup after some time
         popupView.postDelayed(popupWindow::dismiss, 1500);

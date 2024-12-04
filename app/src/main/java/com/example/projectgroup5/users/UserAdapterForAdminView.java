@@ -25,7 +25,7 @@ import java.util.List;
 
 public class UserAdapterForAdminView extends ArrayAdapter<User> {
 
-    private Context context;
+    private final Context context;
 
     // Constructor for the adapter
     public UserAdapterForAdminView(@NonNull Context context, List<User> users) {
@@ -47,7 +47,7 @@ public class UserAdapterForAdminView extends ArrayAdapter<User> {
         User user = getItem(position);
 //        if (position <= 0 && position < getCount())
         if (user == null) {
-            Log.e("UserAdapterForAdminView", "User is null at position : " + position + " for item : " + getItem(position) );
+            Log.e("UserAdapterForAdminView", "User is null at position : " + position + " for item : " + getItem(position));
             return customView;
         }
 
@@ -91,7 +91,7 @@ public class UserAdapterForAdminView extends ArrayAdapter<User> {
                     userEmailTextView.setText(user.getUserEmail());
                 }
                 if (value.containsKey(DatabaseManager.USER_PHONE)) {
-                    user.setUserPhoneNumber(Long.valueOf(value.get(DatabaseManager.USER_PHONE).toString().replace("\"", "")));
+                    user.setUserPhoneNumber(Long.parseLong(value.get(DatabaseManager.USER_PHONE).toString().replace("\"", "")));
                     TextView userPhoneNumberTextView = finalCustomView.findViewById(R.id.phoneNumberEntry);
                     userPhoneNumberTextView.setText(user.getPhoneNumber() + "");
                 }

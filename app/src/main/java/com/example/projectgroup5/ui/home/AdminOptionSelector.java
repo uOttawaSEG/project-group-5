@@ -35,6 +35,7 @@ public class AdminOptionSelector extends Fragment {
 
         return binding.getRoot();
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -44,6 +45,7 @@ public class AdminOptionSelector extends Fragment {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
