@@ -11,9 +11,9 @@ username: organizer@gmail.com
 password: organizer
 
 ## User info:
-username: MainUser@gmail.com
+username: mainuser@gmail.com
 
-password: MainUser
+password: mainuser
 
 
 ## Device:
