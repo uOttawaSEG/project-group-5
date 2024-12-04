@@ -299,6 +299,7 @@ public class DashboardEventList extends Fragment {
                                                         }
                                                     });
                                                 }
+                                                ((Attendee) UserSession.getInstance().getUserRepresentation()).clearEventCache();
 //                                    events.remove(selectedEvent);
                                                 EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
                                                 listView.setAdapter(eventOrganizerAdapter);

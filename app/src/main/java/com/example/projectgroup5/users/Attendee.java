@@ -44,6 +44,14 @@ public class Attendee extends User {
         this.eventCache.add(event);
     }
 
+    public void removeEventFromCache(Event event) {
+        this.eventCache.remove(event);
+    }
+
+    public void clearEventCache() {
+        this.eventCache.clear();
+    }
+
     //TODO if this is called, event cache should also be updated
     public void addRegistration(DocumentReference attendeeRegistration) {
         this.attendeeRegistrations.add(attendeeRegistration);

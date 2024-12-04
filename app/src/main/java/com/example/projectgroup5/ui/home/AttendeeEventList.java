@@ -59,6 +59,7 @@ public class AttendeeEventList extends Fragment {
 
         // get the events from the database
         List<Event> events = new ArrayList<>();
+        change_status_bar_message(events, binding);
         DatabaseManager.getDatabaseManager().getAttendeeRegistrations(UserSession.getInstance().getUserRepresentation().getUserId(), registrations -> {
             AtomicInteger count = new AtomicInteger(registrations.getResult().size());
             events.clear();
@@ -140,6 +141,7 @@ public class AttendeeEventList extends Fragment {
                                         // remove the listener
                                         DatabaseListener.deleteEventStartListener(selectedEvent.getEventID());
                                         EventAdapterForDisplay eventOrganizerAdapter = new EventAdapterForDisplay(getContext(), events);
+                                        ((Attendee) UserSession.getInstance().getUserRepresentation()).clearEventCache();
                                         change_status_bar_message(events, binding);
                                         listView.setAdapter(eventOrganizerAdapter);
                                     });
